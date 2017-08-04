@@ -1,0 +1,8 @@
+以下代码依赖项需要手动复制到项目的生成目标文件夹中，否则在使用某些相关功能，可能将会导致一些未知的异常：
+
+SQLite.Interop.dll
+Microsoft.WindowsAPICodePack.DirectX.dll
+
+举例说明，如果您的项目的生成目标文件夹是
+C:\CodeSolution\CSharpProjects\StudentManagementPlatform\StudentManagementPlatform\bin\Release
+那么你则需要将上面所提到的文件手动复制到这个目录中去，否则可能会出现一些异常，比如说SQL语法错误等异常。

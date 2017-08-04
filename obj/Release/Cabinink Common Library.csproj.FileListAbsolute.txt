@@ -1,0 +1,11 @@
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\Cabinink Common Library.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\Cabinink Common Library.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\Microsoft.WindowsAPICodePack.DirectX.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\System.Data.SQLite.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\Microsoft.WindowsAPICodePack.DirectX.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\System.Data.SQLite.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Release\Cabinink Common Library.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Release\Cabinink Common Library.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\System.ValueTuple.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\System.Data.SQLite.dll.config
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Release\Cabinink Common Library.csproj.ResolveComReference.cache

@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7728B57B-1988-4E1E-9DD5-A230AAB14AA2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cabinink</RootNamespace>
+    <AssemblyName>Cabinink Common Library</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.WindowsAPICodePack.DirectX">
+      <HintPath>D:\Installer\Windows API Code Pack 1.1\binaries\DirectX\x86\Microsoft.WindowsAPICodePack.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\ciw\ciw\bin\Debug\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Algorithm\MathConstant.cs" />
+    <Compile Include="Algorithm\NumericalStatistics.cs" />
+    <Compile Include="AssemblyInformation.cs" />
+    <Compile Include="DataTreatment\Database\MSAccessDBOIEncapsulation.cs" />
+    <Compile Include="DataTreatment\Database\SQLiteDBOIEncapsulation.cs" />
+    <Compile Include="DataTreatment\Database\SQLServerDBOIEncapsulation.cs" />
+    <Compile Include="DataTreatment\DocumentData\SpreadsheetDataOperator.cs" />
+    <Compile Include="DataTreatment\IDatabasesOperationBase.cs" />
+    <Compile Include="DataTreatment\ORMapping\ObjectMemberGetter.cs" />
+    <Compile Include="DataTreatment\ORMapping\SQLGenerator.cs" />
+    <Compile Include="DataTreatment\ORMapping\TypeMapping.cs" />
+    <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
+    <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
+    <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
+    <Compile Include="IOSystem\FileOperator.cs" />
+    <Compile Include="IOSystem\FileSecurity\FileSignature.cs" />
+    <Compile Include="IOSystem\FileSecurity\IOSecurityFile.cs" />
+    <Compile Include="IOSystem\IExampledObjectFileBaseIO.cs" />
+    <Compile Include="IOSystem\FileSecurity\IFileOperatingSecurity.cs" />
+    <Compile Include="IOSystem\UnmanagedKernelObjectBase.cs" />
+    <Compile Include="Network\InternetDiagnosticsTool.cs" />
+    <Compile Include="Network\MailSender.cs" />
+    <Compile Include="Peripheral\Keyboard.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="TypeExtend\BigDate.cs" />
+    <Compile Include="TypeExtend\ExString.cs" />
+    <Compile Include="TypeExtend\Geometry2D\Angle.cs" />
+    <Compile Include="TypeExtend\Geometry2D\Circular.cs" />
+    <Compile Include="TypeExtend\Geometry2D\ExPoint2D.cs" />
+    <Compile Include="TypeExtend\Geometry2D\ExRectangle.cs" />
+    <Compile Include="TypeExtend\Geometry2D\IMeasureOfArea.cs" />
+    <Compile Include="TypeExtend\Geometry2D\IPerimeter.cs" />
+    <Compile Include="TypeExtend\Geometry2D\ISize.cs" />
+    <Compile Include="TypeExtend\Geometry2D\ITranslation2D.cs" />
+    <Compile Include="TypeExtend\Geometry2D\Quadrilateral.cs" />
+    <Compile Include="TypeExtend\Geometry2D\StraightLine2D.cs" />
+    <Compile Include="Win32ApiHelper.cs" />
+    <Compile Include="Windows\Energy\BatteryUsageInformation .cs" />
+    <Compile Include="Windows\EnvironmentInformation.cs" />
+    <Compile Include="Windows\Energy\PowerOperator.cs" />
+    <Compile Include="Windows\MemoryOperator.cs" />
+    <Compile Include="Windows\ProcessManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Peripheral\QRCode\" />
+    <Folder Include="Peripheral\SerialPort\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

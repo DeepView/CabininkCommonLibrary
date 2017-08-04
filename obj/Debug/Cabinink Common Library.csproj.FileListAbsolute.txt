@@ -1,0 +1,12 @@
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Cabinink Common Library.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.WindowsAPICodePack.DirectX.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.Data.SQLite.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.WindowsAPICodePack.DirectX.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.Data.SQLite.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.pdb
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Newtonsoft.Json.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.ValueTuple.dll
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.Data.SQLite.dll.config
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csproj.ResolveComReference.cache
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Cabinink Common Library.pdb
