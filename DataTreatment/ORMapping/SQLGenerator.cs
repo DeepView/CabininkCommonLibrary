@@ -133,5 +133,6 @@ namespace Cabinink.DataTreatment.ORMapping
          }
          SqlSentence = baseSql.SubString(0, baseSql.Length - 1) + ");";
       }
+      public void GenerateSqlForDeleteTable(string tableName) => SqlSentence = @"drop table " + tableName;
    }
 }

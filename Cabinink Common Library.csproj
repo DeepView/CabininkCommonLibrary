@@ -72,6 +72,7 @@
     <Compile Include="DataTreatment\Database\SQLServerDBOIEncapsulation.cs" />
     <Compile Include="DataTreatment\DocumentData\SpreadsheetDataOperator.cs" />
     <Compile Include="DataTreatment\IDatabasesOperationBase.cs" />
+    <Compile Include="DataTreatment\ORMapping\ConditionMapping.cs" />
     <Compile Include="DataTreatment\ORMapping\ObjectMemberGetter.cs" />
     <Compile Include="DataTreatment\ORMapping\SQLGenerator.cs" />
     <Compile Include="DataTreatment\ORMapping\TypeMapping.cs" />
