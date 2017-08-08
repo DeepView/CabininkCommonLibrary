@@ -8,7 +8,7 @@ namespace Cabinink.TypeExtend.Geometry2D
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class StraightLine2D : IEquatable<StraightLine2D>
+   public class StraightLine2D : UnregoinallyShape, IRotate, ITranslation2D, IEquatable<StraightLine2D>
    {
       [CLSCompliant(false)]
       protected ExPoint2D _anyPoint01;//直线上任意的一个二维点。
@@ -95,6 +95,10 @@ namespace Cabinink.TypeExtend.Geometry2D
             else return FirstPoint.YPosition - Slope * FirstPoint.XPosition;
          }
       }
+      /// <summary>
+      /// 获取当前图形是否被允许在Graphics对象中绘制，不过在不存在数学区域的图形中，这个属性的值都为false。
+      /// </summary>
+      public override bool IsAllowDrawing => !base.IsAllowDrawing;
       /// <summary>
       /// 计算当前的二维直线穿越的象限集合。
       /// </summary>
@@ -193,7 +197,37 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <param name="axisPoint">旋转直线的轴心点。</param>
       /// <param name="angle">旋转的角度大小。</param>
       /// <returns>该操作会返回一条围绕指定点旋转后的二维直线实例。</returns>
-      public StraightLine2D Rotate(ExPoint2D axisPoint, Angle angle) => (FirstPoint.Rotate(axisPoint, angle), LastPoint.Rotate(axisPoint, angle));
+      public Shape2D Rotate(ExPoint2D axisPoint, Angle angle) => new StraightLine2D(
+         (ExPoint2D)FirstPoint.Rotate(axisPoint, angle),
+         (ExPoint2D)LastPoint.Rotate(axisPoint, angle)
+      );
+      /// <summary>
+      /// 横坐标平移。
+      /// </summary>
+      /// <param name="offset">横坐标X的偏移量。</param>
+      public void AbscissaTranslation(double offset)
+      {
+         ((ITranslation2D)FirstPoint).AbscissaTranslation(offset);
+         ((ITranslation2D)LastPoint).AbscissaTranslation(offset);
+      }
+      /// <summary>
+      /// 纵坐标平移。
+      /// </summary>
+      /// <param name="offset">纵坐标Y的偏移量。</param>
+      public void OrdinateTranslation(double offset)
+      {
+         ((ITranslation2D)FirstPoint).OrdinateTranslation(offset);
+         ((ITranslation2D)LastPoint).OrdinateTranslation(offset);
+      }
+      /// <summary>
+      /// 坐标平移，也可以叫做坐标相加。
+      /// </summary>
+      /// <param name="offsetPoint">一个偏移点，这个点包含了横坐标X和纵坐标Y的偏移量。</param>
+      public void Translation(ExPoint2D offsetPoint)
+      {
+         ((ITranslation2D)FirstPoint).Translation(offsetPoint);
+         ((ITranslation2D)LastPoint).Translation(offsetPoint);
+      }
       /// <summary>
       /// 确定此实例是否与另一个指定的StraightLine2D对象具有相同的值。
       /// </summary>

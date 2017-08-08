@@ -7,7 +7,7 @@ namespace Cabinink.TypeExtend.Geometry2D
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public abstract class Quadrilateral : IMeasureOfArea, IPerimeter, IEquatable<Quadrilateral>
+   public abstract class Quadrilateral : RegionallyShape, IEquatable<Quadrilateral>
    {
       private ExPoint2D _leftTopVertex;//左上角的（或者第一个）顶点。
       private ExPoint2D _leftBottomVertex;//左下角的（或者第二个）顶点。
@@ -32,11 +32,58 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <summary>
       /// 获取当前四边形的面积。
       /// </summary>
-      public abstract double MeasureOfArea { get; }
+      public override double MeasureOfArea { get; }
       /// <summary>
       /// 获取当前四边形的周长。
       /// </summary>
-      public abstract double Perimeter { get; }
+      public override double Perimeter { get; }
+      /// <summary>
+      /// 横坐标平移。
+      /// </summary>
+      /// <param name="offset">横坐标X的偏移量。</param>
+      public override void AbscissaTranslation(double offset)
+      {
+         ((ITranslation2D)LeftTopVertex).AbscissaTranslation(offset);
+         ((ITranslation2D)LeftBottomVertex).AbscissaTranslation(offset);
+         ((ITranslation2D)RightTopVertex).AbscissaTranslation(offset);
+         ((ITranslation2D)RightBottomVertex).AbscissaTranslation(offset);
+      }
+      /// <summary>
+      /// 纵坐标平移。
+      /// </summary>
+      /// <param name="offset">纵坐标Y的偏移量。</param>
+      public override void OrdinateTranslation(double offset)
+      {
+         ((ITranslation2D)LeftTopVertex).OrdinateTranslation(offset);
+         ((ITranslation2D)LeftBottomVertex).OrdinateTranslation(offset);
+         ((ITranslation2D)RightTopVertex).OrdinateTranslation(offset);
+         ((ITranslation2D)RightBottomVertex).OrdinateTranslation(offset);
+      }
+      /// <summary>
+      /// 坐标平移，也可以叫做坐标相加。
+      /// </summary>
+      /// <param name="offsetPoint">一个偏移点，这个点包含了横坐标X和纵坐标Y的偏移量。</param>
+      public override void Translation(ExPoint2D offsetPoint)
+      {
+         ((ITranslation2D)LeftTopVertex).Translation(offsetPoint);
+         ((ITranslation2D)LeftBottomVertex).Translation(offsetPoint);
+         ((ITranslation2D)RightTopVertex).Translation(offsetPoint);
+         ((ITranslation2D)RightBottomVertex).Translation(offsetPoint);
+      }
+      /// <summary>
+      /// 将当前的四边形围绕指定的点旋转指定的角度。
+      /// </summary>
+      /// <param name="axisPoint">围绕旋转的中心点。</param>
+      /// <param name="angle"></param>
+      /// <returns></returns>
+      public override Shape2D Rotate(ExPoint2D axisPoint, Angle angle)
+      {
+         ExPoint2D r_ltp = (ExPoint2D)LeftTopVertex.Rotate(axisPoint, angle);
+         ExPoint2D r_lbp = (ExPoint2D)LeftBottomVertex.Rotate(axisPoint, angle);
+         ExPoint2D r_rtp = (ExPoint2D)RightTopVertex.Rotate(axisPoint, angle);
+         ExPoint2D r_rbp = (ExPoint2D)RightBottomVertex.Rotate(axisPoint, angle);
+         return new ExRectangle(r_ltp, r_lbp, r_rtp, r_rbp);
+      }
       /// <summary>
       /// 判断当前四边形是否与另一个四边形相同。
       /// </summary>

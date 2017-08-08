@@ -8,7 +8,7 @@ namespace Cabinink.TypeExtend.Geometry2D
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class Angle : IEquatable<Angle>
+   public class Angle : UnregoinallyShape, IEquatable<Angle>
    {
       private double _angleSize;//角度大小。
       private EAngleMeteringMode _meteringMode;//计量单位（弧度制或者角度制）。
@@ -25,6 +25,10 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// 获取或设置当前实例的角度大小。
       /// </summary>
       public double Size { get => _angleSize; set => _angleSize = value; }
+      /// <summary>
+      /// 获取当前图形是否被允许在Graphics对象中绘制。
+      /// </summary>
+      public override bool IsAllowDrawing => !base.IsAllowDrawing;
       /// <summary>
       /// 获取或设置当前实例的角度计量单位。
       /// </summary>
@@ -52,6 +56,13 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <param name="rotateLimit">旋转的倍数，这个值可以为负数，如果为负数则表示这个操作会返回一个反向旋转360度整数倍的角度实例。</param>
       /// <returns>该操作会返回一个旋转整数倍360度的角度实例。</returns>
       public Angle GetCycleRotateAngle(int rotateLimit) => this + GetPerigon() * rotateLimit;
+      /// <summary>
+      /// 将当前的角度围绕指定点旋转指定角度，不过这个操作在当前类无意义，因此始终都会返回当前实例。
+      /// </summary>
+      /// <param name="axisPoint"></param>
+      /// <param name="angle"></param>
+      /// <returns></returns>
+      public Shape2D Rotate(ExPoint2D axisPoint, Angle angle) => this;
       /// <summary>
       /// 获取当前Angle实例所表示的角度的正弦值。
       /// </summary>

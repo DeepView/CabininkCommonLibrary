@@ -15,7 +15,7 @@ namespace Cabinink.Windows
    /// 用来存放快照进程信息的一个结构体，存放进程信息和调用成员输出进程信息。
    /// </summary>
    [StructLayout(LayoutKind.Sequential)]
-   public struct ProcessEntry32
+   public struct SProcessEntry32
    {
       /// <summary>
       /// 这个结构的长度，以字节为单位，初始化一个实例以后调用Process32First函数，设置成员的大小。
@@ -102,7 +102,8 @@ namespace Cabinink.Windows
       /// <param name="handle">需要被关闭的对象。</param>
       /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
       /// <remarks>关闭一个内核对象。其中包括文件、文件映射、进程、线程、安全和同步对象等。在CreateThread成功之后会返回一个hThread的handle，且内核对象的计数加1，CloseHandle之后，引用计数减1，当变为0时，系统删除内核对象。若在线程执行完之后，没有调用CloseHandle，在进程执行期间，将会造成内核对象的泄露，相当于句柄泄露，但不同于内存泄露，这势必会对系统的效率带来一定程度上的负面影响。但当进程结束退出后，系统会自动清理这些资源。</remarks>
-      [DllImport("kernel.dll", CharSet = CharSet.Auto), ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+      [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+      [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
       private static extern bool CloseHandle(IntPtr handle);
       /// <summary>
       /// 查看系统权限的特权值。
@@ -162,7 +163,7 @@ namespace Cabinink.Windows
       /// <param name="pe">一个指向ProcessEntry32结构。它包含进程信息，例如可执行文件的名称、进程标识符和父进程的进程标识符。</param>
       /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
       [DllImport("kernel32.dll")]
-      private static extern int Process32First(IntPtr handle, ref ProcessEntry32 pe);
+      private static extern int Process32First(IntPtr handle, ref SProcessEntry32 pe);
       /// <summary>
       /// 一个进程获取函数，当我们利用函数CreateToolhelp32Snapshot()获得当前运行进程的快照后,我们可以利用Process32Next函数来获得下一个进程的句柄。
       /// </summary>
@@ -170,7 +171,7 @@ namespace Cabinink.Windows
       /// <param name="pe">一个指向ProcessEntry32结构。它包含进程信息，例如可执行文件的名称、进程标识符和父进程的进程标识符。</param>
       /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
       [DllImport("kernel32.dll")]
-      private static extern int Process32Next(IntPtr handle, ref ProcessEntry32 pe);
+      private static extern int Process32Next(IntPtr handle, ref SProcessEntry32 pe);
       /// <summary>
       /// 找出某个窗口的创建者（线程或进程），返回创建者的标志符。
       /// </summary>
@@ -459,19 +460,19 @@ namespace Cabinink.Windows
       /// <returns>该操作会返回一个进程句柄，如果操作出现异常，则可能会返回一个Zero句柄。</returns>
       public static IntPtr GetHandleByImageName(string processName)
       {
-         List<ProcessEntry32> list = new List<ProcessEntry32>();
+         List<SProcessEntry32> list = new List<SProcessEntry32>();
          IntPtr handle = CreateToolhelp32Snapshot(0x2, 0);
          IntPtr processHandle = IntPtr.Zero;
          if ((int)handle > 0)
          {
-            ProcessEntry32 pe32 = new ProcessEntry32();
+            SProcessEntry32 pe32 = new SProcessEntry32();
             pe32.Size = (uint)Marshal.SizeOf(pe32);
             int bMore = Process32First(handle, ref pe32);
             while (bMore == 1)
             {
                IntPtr temp = Marshal.AllocHGlobal((int)pe32.Size);
                Marshal.StructureToPtr(pe32, temp, true);
-               ProcessEntry32 pe32_s = (ProcessEntry32)Marshal.PtrToStructure(temp, typeof(ProcessEntry32));
+               SProcessEntry32 pe32_s = (SProcessEntry32)Marshal.PtrToStructure(temp, typeof(SProcessEntry32));
                Marshal.FreeHGlobal(temp);
                list.Add(pe32_s);
                if (pe32_s.ExecuteFileName == processName)

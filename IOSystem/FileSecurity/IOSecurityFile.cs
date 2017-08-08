@@ -13,7 +13,7 @@ namespace Cabinink.IOSystem.FileSecurity
    [Serializable]
    [ComVisible(true)]
    [DebuggerDisplay("IOSecurityFile = FileUrl:{FileUrl};SecurityFlag:{SecurityFlag.ToString()}")]
-   public class IOSecurityFile : IFileOperatingSecurity, IExampledObjectFileBaseIO, IEquatable<IOSecurityFile>
+   public class IOSecurityFile : IFileOperatingSecurity, IExampledObjectFileBaseIO, ISaveAsUnencryptedCopy, IEquatable<IOSecurityFile>
    {
       private string _securityFileUrl;//IO操作安全文件的文件路径。
       private ExString _fileContext;//IO操作安全文件的文件内容。
@@ -22,6 +22,7 @@ namespace Cabinink.IOSystem.FileSecurity
       private int _codeSecurityFlag;//代码安全标识符。
       private const int CODE_SECURITY_FLAG_STOP = 0x0000;//代码安全标识符，操作非法。
       private const int CODE_SECURITY_FLAG_NORMAL = 0xffff;//代码安全标识符，操作合法。
+      private const string FILE_SECURITY_KEY = @"cabinink";//文件加密和解密用的安全密钥。
       /// <summary>
       /// 构造函数，创建一个指定文件路径的IO操作安全文件操作实例。
       /// </summary>
@@ -131,7 +132,22 @@ namespace Cabinink.IOSystem.FileSecurity
       public void Read(Encoding encoding)
       {
          if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
-         FileContext = FileOperator.ReadFileContext(FileUrl, true, encoding);
+         FileContext = ExString.Decrypt(FileOperator.ReadFileContext(FileUrl, true, encoding), FILE_SECURITY_KEY);
+      }
+      /// <summary>
+      /// 创建并保存一个当前文件的内容未加密的文件副本。
+      /// </summary>
+      /// <param name="fileUrl">文件副本的地址。</param>
+      /// <param name="encoding">文件内容需要采用的编码格式。</param>
+      /// <exception cref="FileIsExistedException">如果参数fileUrl指定的文件地址存在时，则会抛出这个异常。</exception>
+      public void WriteUnencryptedCopy(string fileUrl, Encoding encoding)
+      {
+         if (FileOperator.FileExists(fileUrl)) throw new FileIsExistedException();
+         else
+         {
+            FileOperator.CreateFile(fileUrl, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
+            FileOperator.WriteFile(fileUrl, FileContext, false, encoding);
+         }
       }
       /// <summary>
       /// 撤销当前实例的IO操作权限。
@@ -206,7 +222,8 @@ namespace Cabinink.IOSystem.FileSecurity
       public void Write(bool isAppend, Encoding encoding)
       {
          if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
-         FileOperator.WriteFile(FileUrl, FileContext, isAppend, encoding);
+         string ciphertext = ExString.Encrypt(FileContext, FILE_SECURITY_KEY);
+         FileOperator.WriteFile(FileUrl, ciphertext, isAppend, encoding);
       }
       /// <summary>
       /// 变更代码安全标识符。

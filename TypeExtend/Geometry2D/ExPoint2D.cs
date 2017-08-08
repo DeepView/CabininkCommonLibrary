@@ -8,7 +8,7 @@ namespace Cabinink.TypeExtend.Geometry2D
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class ExPoint2D : IEquatable<ExPoint2D>, ITranslation2D
+   public class ExPoint2D : UnregoinallyShape, IRotate, ITranslation2D, IEquatable<ExPoint2D>
    {
       private double _x;//二维点的横坐标。
       private double _y;//二维点的纵坐标。
@@ -51,6 +51,10 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// 获取当前实例所表示的二维点是否为笛卡尔平面直角坐标系的原点。
       /// </summary>
       public bool IsOrigin => GetQuadrantInCoordinateSystem2D() == 0 ? true : false;
+      /// <summary>
+      /// 获取当前图形是否被允许在Graphics对象中绘制，不过在不存在数学区域的图形中，这个属性的值都为false。
+      /// </summary>
+      public override bool IsAllowDrawing => !base.IsAllowDrawing;
       /// <summary>
       /// 横坐标平移。
       /// </summary>
@@ -105,7 +109,7 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <param name="axisPoint">二维点旋转的中心点。</param>
       /// <param name="angle">逆时针旋转的角度。</param>
       /// <returns>这个操作会返回一个通过逆时针旋转后获取到的新的二维点实例。</returns>
-      public ExPoint2D Rotate(ExPoint2D axisPoint, Angle angle)
+      public Shape2D Rotate(ExPoint2D axisPoint, Angle angle)
       {
          double xPos = 0;
          double yPos = 0;
@@ -113,7 +117,7 @@ namespace Cabinink.TypeExtend.Geometry2D
          double deltaY = YPosition - axisPoint.YPosition;
          xPos = deltaX * angle.GetCosinusoidal() + deltaY * angle.GetSinusoidal() + axisPoint.XPosition;
          yPos = deltaX * angle.GetSinusoidal() + deltaY * angle.GetCosinusoidal() + axisPoint.YPosition;
-         return (xPos, yPos);
+         return new ExPoint2D(xPos, yPos);
       }
       /// <summary>
       /// 获取两个点的中点坐标。

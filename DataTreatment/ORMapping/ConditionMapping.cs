@@ -13,6 +13,6 @@ namespace Cabinink.DataTreatment.ORMapping
    [ComVisible(true)]
    public class ConditionMapping
    {
-
+      //TODO: 这个类还需要构思...
    }
 }

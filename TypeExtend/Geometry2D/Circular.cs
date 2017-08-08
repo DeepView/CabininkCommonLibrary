@@ -9,7 +9,7 @@ namespace Cabinink.TypeExtend.Geometry2D
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class Circular : IPerimeter, IMeasureOfArea, ITranslation2D, IEquatable<Circular>
+   public class Circular : RegionallyShape, IEquatable<Circular>
    {
       private ExPoint2D _center;//圆心定义
       private double _radius;//圆的半径
@@ -62,11 +62,11 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <summary>
       /// 获取当前圆的周长。
       /// </summary>
-      public double Perimeter => MathConstant.CircumferenceRatio * Radius * 2;
+      public override double Perimeter => MathConstant.CircumferenceRatio * Radius * 2;
       /// <summary>
       /// 获取当前圆的面积。
       /// </summary>
-      public double MeasureOfArea => MathConstant.CircumferenceRatio * Math.Pow(Radius, 2);
+      public override double MeasureOfArea => MathConstant.CircumferenceRatio * Math.Pow(Radius, 2);
       /// <summary>
       /// 判断两个圆之间的距离关系。
       /// </summary>
@@ -96,17 +96,24 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// 将当前的圆在横轴上平移指定的长度。
       /// </summary>
       /// <param name="offset">偏移量，即平移的长度。</param>
-      public void AbscissaTranslation(double offset) => ((ITranslation2D)Center).AbscissaTranslation(offset);
+      public override void AbscissaTranslation(double offset) => ((ITranslation2D)Center).AbscissaTranslation(offset);
       /// <summary>
       /// 将当前的圆在纵轴上平移指定的长度。
       /// </summary>
       /// <param name="offset">偏移量，即平移的长度。</param>
-      public void OrdinateTranslation(double offset) => ((ITranslation2D)Center).OrdinateTranslation(offset);
+      public override void OrdinateTranslation(double offset) => ((ITranslation2D)Center).OrdinateTranslation(offset);
       /// <summary>
       /// 将整个圆进行坐标平移。
       /// </summary>
       /// <param name="offsetPoint">偏移量，即在横轴和纵轴上平移的长度。</param>
-      public void Translation(ExPoint2D offsetPoint) => ((ITranslation2D)Center).Translation(offsetPoint);
+      public override void Translation(ExPoint2D offsetPoint) => ((ITranslation2D)Center).Translation(offsetPoint);
+      /// <summary>
+      /// 将当前圆形围绕指定点旋转指定角度。
+      /// </summary>
+      /// <param name="axisPoint">二维点旋转的中心点。</param>
+      /// <param name="angle">逆时针旋转的角度。</param>
+      /// <returns>这个操作会返回一个通过逆时针旋转后获取到的新的圆形实例。</returns>
+      public override Shape2D Rotate(ExPoint2D axisPoint, Angle angle) => new Circular((ExPoint2D)Center.Rotate(axisPoint, angle), Radius);
       /// <summary>
       /// 判断两个圆是否相同，值得注意的是，这里是从数学的层面上进行判断，而非代码逻辑上去判断。
       /// </summary>
