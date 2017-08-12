@@ -140,7 +140,7 @@ namespace Cabinink.IOSystem.FileSecurity
       /// <param name="fileUrl">文件副本的地址。</param>
       /// <param name="encoding">文件内容需要采用的编码格式。</param>
       /// <exception cref="FileIsExistedException">如果参数fileUrl指定的文件地址存在时，则会抛出这个异常。</exception>
-      public void WriteUnencryptedCopy(string fileUrl, Encoding encoding)
+      public void SaveAsUnencryptedCopy(string fileUrl, Encoding encoding)
       {
          if (FileOperator.FileExists(fileUrl)) throw new FileIsExistedException();
          else

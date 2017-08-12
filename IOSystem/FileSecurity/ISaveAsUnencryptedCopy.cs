@@ -11,6 +11,6 @@ namespace Cabinink.IOSystem.FileSecurity
       /// </summary>
       /// <param name="fileUrl">文件副本的地址。</param>
       /// <param name="encoding">文件内容需要采用的编码格式。</param>
-      void WriteUnencryptedCopy(string fileUrl, Encoding encoding);
+      void SaveAsUnencryptedCopy(string fileUrl, Encoding encoding);
    }
 }
