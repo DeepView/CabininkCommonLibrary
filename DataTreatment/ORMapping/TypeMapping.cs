@@ -51,6 +51,9 @@ namespace Cabinink.DataTreatment.ORMapping
       /// 获取或设置当前实例受支持的数据库系统。
       /// </summary>
       public ESupportedDbSystem SupportedDbSystem { get => _supportedDbSystem; set => _supportedDbSystem = value; }
+      //public List<(string,string)> ReuniteMapping()
+      //{
+      //}
       /// <summary>
       /// 获取通用类型系统的数据类型实例映射到当前实例指定数据库系统所对应的数据类型名称字符串。
       /// </summary>
@@ -278,10 +281,6 @@ namespace Cabinink.DataTreatment.ORMapping
                      throw new NotSupportedTypeException();
                }
                break;
-            case @"System.IntPtr":
-               throw new NotSupportedTypeException();
-            case @"System.UIntPtr":
-               throw new NotSupportedTypeException();
             case @"System.Object":
                switch (SupportedDbSystem)
                {
@@ -310,6 +309,8 @@ namespace Cabinink.DataTreatment.ORMapping
                      throw new NotSupportedTypeException();
                }
                break;
+            case @"System.IntPtr":
+            case @"System.UIntPtr":
             default:
                throw new NotSupportedTypeException();
          }
@@ -453,16 +454,13 @@ namespace Cabinink.DataTreatment.ORMapping
          switch (SupportedDbSystem)
          {
             case ESupportedDbSystem.SQLServer:
-               if (isConvertToTicks) result = "bigint";
-               else result = "datetime2";
+               if (isConvertToTicks) result = "bigint"; else result = "datetime2";
                break;
             case ESupportedDbSystem.SQLite:
-               if (isConvertToTicks) result = "BIGINT";
-               else throw new NotSupportedTypeException();
+               if (isConvertToTicks) result = "BIGINT"; else throw new NotSupportedTypeException();
                break;
             case ESupportedDbSystem.MSAccess2003:
-               if (isConvertToTicks) result = "LONG";
-               else result = "DATETIME";
+               if (isConvertToTicks) result = "LONG"; else result = "DATETIME";
                break;
             default:
                throw new NotSupportedTypeException();

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using Cabinink.IOSystem;
+using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -15,7 +16,7 @@ namespace Cabinink.TypeExtend
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class ExString : IDisposable, IComparable<string>, IEquatable<ExString>, IConvertible, ICloneable
+   public class ExString : IDisposable, IComparable<string>, IComparable, IEquatable<ExString>, IEquatable<string>, IConvertible, ICloneable, IEnumerable
    {
       private string _clrString;//当前实例需要操作的核心字符串。
       private bool _disposedValue = false;//检测冗余调用。
@@ -213,6 +214,12 @@ namespace Cabinink.TypeExtend
          else return serial;
       }
       /// <summary>
+      /// 将当前字符串实例转换为字节码数组，并允许中文转换。
+      /// </summary>
+      /// <param name="encoding">指定的编码格式。</param>
+      /// <returns>执行这个操作之后会获取当前实例所表示字符串中每一个字符的字节码的有序集合，在这里值得一提的是，这个有序集合的顺序和当前字符串实例中字符排序是相吻合的。</returns>
+      public byte[] ToBytecodeArray(Encoding encoding) => encoding.GetBytes(StringContext);
+      /// <summary>
       /// 返回当前扩展字符串实例的十六进制ASCII序列。
       /// </summary>
       /// <returns>如果该操作没有产生任何异常，则会得到一个当前实例的十六进制ASCII序列字符串。</returns>
@@ -334,12 +341,44 @@ namespace Cabinink.TypeExtend
       /// <summary>
       /// 基于数组中的字符将字符串拆分为多个子字符串。
       /// </summary>
-      /// <param name="separator">分隔此字符串中子字符串的字符数组、不包含分隔符的空数组或null。</param>
+      /// <param name="separators">分隔此字符串中子字符串的字符数组、不包含分隔符的空数组或null。</param>
       /// <returns>一个数组，其元素包含此实例中的子字符串，这些子字符串由separator中的一个或多个字符分隔。</returns>
       /// <remarks>该方法等效于String.Split方法。</remarks>
-      public string[] SegmentationBy(char[] separator)
+      public string[] SegmentationBy(char[] separators)
       {
-         return StringContext.Split(separator);
+         return StringContext.Split(separators);
+      }
+      /// <summary>
+      /// 基于多个索引将字符串拆分为多个子字符串。
+      /// </summary>
+      /// <param name="indexes">用于分割字符串的索引集合。</param>
+      /// <returns>该方法用于分隔为多个子字符串由一组已知的字符分隔的字符串。</returns>
+      /// <exception cref="ArgumentOutOfRangeException">如果参数indexes包含的任意索引，或者包含索引数量过多时，则会抛出这个异常。</exception>
+      public string[] SegmentationBy(int[] indexes)
+      {
+         string[] result;
+         Parallel.For(0, Length, (index, interrupt) =>
+         {
+            if (indexes[index] > Length - 1)
+            {
+               int exLocation = index + 1;
+               throw new ArgumentOutOfRangeException("参数indexes中第" + exLocation + "个索引超出当前实例长度！");
+            }
+         });
+         if (indexes.Count() > Length) throw new ArgumentOutOfRangeException("参数indexes包含的索引数量过多！");
+         else
+         {
+            int loopLimit = 0;
+            ExString tempStr = this;
+            for (int i = 0; i < tempStr.Length; i++)
+            {
+               if (loopLimit > 0) tempStr = tempStr.InsertBy(indexes[i], "\x1");
+               else tempStr = tempStr.InsertBy(indexes[i + 1], "\x1");
+               loopLimit++;
+            }
+            result = SegmentationBy('\x1');
+         }
+         return result;
       }
       /// <summary>
       /// 将此实例中的字符复制到Unicode字符数组。
@@ -540,6 +579,12 @@ namespace Cabinink.TypeExtend
          return CompareTo(other.StringContext);
       }
       /// <summary>
+      /// 将此实例与指定的object进行比较，并指示此实例在排序顺序中是位于指定的字符串之前、之后还是与其出现在同一位置。
+      /// </summary>
+      /// <param name="obj">要与此实例进行比较的object实例。</param>
+      /// <returns>一个32位带符号整数，该整数指示此实例在排序顺序中是位于other参数之前、之后还是与其出现在同一位置。</returns>
+      public int CompareTo(object obj) => StringContext.CompareTo(obj);
+      /// <summary>
       /// 返回对此ExString实例的引用。
       /// </summary>
       /// <returns>作为此实例副本的新对象。</returns>
@@ -548,6 +593,11 @@ namespace Cabinink.TypeExtend
          return StringContext.Clone();
       }
       /// <summary>
+      /// 检索一个可以循环访问此ExString扩展字符串中的每一个字符的对象。
+      /// </summary>
+      /// <returns>该操作会返回一个枚举器对象。</returns>
+      public IEnumerator GetEnumerator() => StringContext.GetEnumerator();
+      /// <summary>
       /// 确定此实例是否与另一个指定的ExString对象具有相同的值。
       /// </summary>
       /// <param name="other">要与此实例进行比较的扩展字符串。</param>
@@ -555,6 +605,15 @@ namespace Cabinink.TypeExtend
       public bool Equals(ExString other)
       {
          return StringContext.Equals(other.StringContext);
+      }
+      /// <summary>
+      /// 确定此实例是否与指定的string对象具有相同的值。
+      /// </summary>
+      /// <param name="other">要与此实例进行比较的扩展字符串。</param>
+      /// <returns>如果true参数的值与此实例的值相同，则为value；否则为false。如果value为null，则此方法返回false。</returns>
+      public bool Equals(string other)
+      {
+         return StringContext.Equals(other);
       }
       /// <summary>
       /// 确定此实例是否与指定的对象（也必须是ExString对象）具有相同的值。
@@ -650,19 +709,22 @@ namespace Cabinink.TypeExtend
       /// <param name="disposing">用于指示是否释放托管资源。</param>
       protected virtual void Dispose(bool disposing)
       {
+         int clsStrMaxGene = GC.GetGeneration(_clrString);
          if (!_disposedValue)
          {
-            if (disposing) _clrString = null;
+            if (disposing)
+            {
+               _clrString = null;
+               bool condition = GC.CollectionCount(clsStrMaxGene) == 0;
+               if (condition) GC.Collect(clsStrMaxGene, GCCollectionMode.Forced, true);
+            }
             _disposedValue = true;
          }
       }
       /// <summary>
       /// 手动释放该对象引用的所有内存资源。
       /// </summary>
-      public void Dispose()
-      {
-         Dispose(true);
-      }
+      public void Dispose() => Dispose(true);
       #endregion
    }
    /// <summary>

@@ -234,7 +234,7 @@ namespace Cabinink.Windows.Energy
          SLocallyUniqueIdentifier luid = new SLocallyUniqueIdentifier();
          STokenPrivileges newPrivileges = new STokenPrivileges();
          STokenPrivileges tokenPrivileges;
-         if (OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, ref tokenHandle) == false)
+         if (!OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, ref tokenHandle))
          {
             throw new Win32ApiErrorInformationException();
          }

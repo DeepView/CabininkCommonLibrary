@@ -46,6 +46,7 @@
       <HintPath>bin\Release\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\ciw\ciw\bin\Debug\System.Data.SQLite.dll</HintPath>
@@ -57,6 +58,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -69,24 +71,42 @@
     <Compile Include="Algorithm\NumericalSorting.cs" />
     <Compile Include="Algorithm\NumericalStatistics.cs" />
     <Compile Include="AssemblyInformation.cs" />
+    <Compile Include="DataTreatment\Database\DBOIEncapsulation.cs" />
+    <Compile Include="DataTreatment\Database\Extend\AdvancedPlanningTask.cs" />
+    <Compile Include="DataTreatment\Database\Extend\IDbOperatorSwitch.cs" />
+    <Compile Include="DataTreatment\Database\Extend\PlanningTask.cs" />
     <Compile Include="DataTreatment\Database\MSAccessDBOIEncapsulation.cs" />
     <Compile Include="DataTreatment\Database\SQLiteDBOIEncapsulation.cs" />
+    <Compile Include="DataTreatment\Database\Extend\SQLiteTrigger.cs" />
     <Compile Include="DataTreatment\Database\SQLServerDBOIEncapsulation.cs" />
     <Compile Include="DataTreatment\DocumentData\SpreadsheetDataOperator.cs" />
     <Compile Include="DataTreatment\IDatabasesOperationBase.cs" />
-    <Compile Include="DataTreatment\ORMapping\ConditionMapping.cs" />
     <Compile Include="DataTreatment\ORMapping\ObjectMemberGetter.cs" />
     <Compile Include="DataTreatment\ORMapping\SQLGenerator.cs" />
     <Compile Include="DataTreatment\ORMapping\TypeMapping.cs" />
     <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
     <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
+    <Compile Include="EnumerationDescriptionAttribute.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IOSystem\FileOperator.cs" />
-    <Compile Include="IOSystem\FileSecurity\FileSignature.cs" />
-    <Compile Include="IOSystem\FileSecurity\IOSecurityFile.cs" />
-    <Compile Include="IOSystem\FileSecurity\ISaveAsUnencryptedCopy.cs" />
+    <Compile Include="IOSystem\IObjectAccessSwitch.cs" />
+    <Compile Include="IOSystem\RevisionControl\BranchFactory.cs" />
+    <Compile Include="IOSystem\RevisionControl\Committer.cs" />
+    <Compile Include="IOSystem\RevisionControl\FileStateMonitor.cs" />
+    <Compile Include="IOSystem\RevisionControl\IExecuter.cs" />
+    <Compile Include="IOSystem\RevisionControl\Puller.cs" />
+    <Compile Include="IOSystem\RevisionControl\Pusher.cs" />
+    <Compile Include="IOSystem\RevisionControl\ActivityRecorder.cs" />
+    <Compile Include="IOSystem\RevisionControl\RepositoryManager.cs" />
+    <Compile Include="IOSystem\RevisionControl\StagingArea.cs" />
+    <Compile Include="IOSystem\RevisionControl\VersionComparer.cs" />
+    <Compile Include="IOSystem\Security\FileSignature.cs" />
+    <Compile Include="IOSystem\Security\IOSecurityFile.cs" />
+    <Compile Include="IOSystem\Security\IOAccessRuleManagement.cs" />
+    <Compile Include="IOSystem\Security\ISaveAsUnencryptedCopy.cs" />
     <Compile Include="IOSystem\IExampledObjectFileBaseIO.cs" />
-    <Compile Include="IOSystem\FileSecurity\IFileOperatingSecurity.cs" />
+    <Compile Include="IOSystem\Security\IFileOperatingSecurity.cs" />
     <Compile Include="IOSystem\UnmanagedKernelObjectBase.cs" />
     <Compile Include="Network\InternetDiagnosticsTool.cs" />
     <Compile Include="Network\MailSender.cs" />
@@ -120,9 +140,10 @@
     <Compile Include="Windows\Energy\PowerOperator.cs" />
     <Compile Include="Windows\MemoryOperator.cs" />
     <Compile Include="Windows\ProcessManager.cs" />
-    <Compile Include="Windows\SystemUserManagement.cs" />
+    <Compile Include="Windows\OSAccountManagement.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

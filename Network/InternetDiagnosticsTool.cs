@@ -110,7 +110,7 @@ namespace Cabinink.Network
       /// <returns>该操作将会返回当前计算机所在网络的外部IP地址的字符串表达形式。</returns>
       public static string GetOutsideNetAddress() => GetOutsideNetAddress(@"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
       /// <summary>
-      /// 获取当前计算机的外部网络IP地址，但是这个仿佛需要指定一个有效的UA字符串。
+      /// 获取当前计算机的外部网络IP地址，但是这个方法需要指定一个有效的UA字符串。
       /// </summary>
       /// <param name="userAgent">指定该方法的用户代理（User Agent）字符串。</param>
       /// <returns>该操作将会返回当前计算机所在网络的外部IP地址的字符串表达形式。</returns>

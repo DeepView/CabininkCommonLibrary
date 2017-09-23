@@ -1,5 +1,5 @@
 ﻿using Cabinink.TypeExtend;
-namespace Cabinink.IOSystem.FileSecurity
+namespace Cabinink.IOSystem.Security
 {
    /// <summary>
    /// 文件操作安全接口。

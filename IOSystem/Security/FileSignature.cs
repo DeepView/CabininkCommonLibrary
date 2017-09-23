@@ -6,7 +6,7 @@ using Cabinink.TypeExtend;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
-namespace Cabinink.IOSystem.FileSecurity
+namespace Cabinink.IOSystem.Security
 {
    /// <summary>
    /// 文件指纹（或者是文件签名）校验类。

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Security;
+using System.Threading;
 using Cabinink.IOSystem;
 using System.Diagnostics;
 using System.Collections;
@@ -384,6 +385,27 @@ namespace Cabinink.Windows
       {
          return SetThreadPriority(threadHandle.ToInt64(), (long)priority) != 0 ? true : false;
       }
+      /// <summary>
+      /// 更改指定线程的优先级。
+      /// </summary>
+      /// <param name="thread">指定的线程实例。</param>
+      /// <param name="priority">需要设置的线程优先级。</param>
+      public static void ChangeThreadPriority(Thread thread, ThreadPriority priority) => thread.Priority = priority;
+      /// <summary>
+      /// 更改指定线程的优先级。
+      /// </summary>
+      /// <param name="encapsulatedMethod">指定的ThreadStart封装的线程实例。</param>
+      /// <param name="priority">需要设置的线程优先级。</param>
+      public static void ChangeThreadPriority(ThreadStart encapsulatedMethod, ThreadPriority priority)
+      {
+         Thread thread = new Thread(encapsulatedMethod) { Priority = priority };
+      }
+      /// <summary>
+      /// 获取指定线程的状态。
+      /// </summary>
+      /// <param name="thread">用户获取状态的线程。</param>
+      /// <returns>如果操作无异常，则将会返回指定线程在Windows中的线程状态。</returns>
+      public static System.Threading.ThreadState GetThreadState(Thread thread) => thread.ThreadState;
       /// <summary>
       /// 修改指定进程的权限。
       /// </summary>

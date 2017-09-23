@@ -47,6 +47,11 @@ namespace Cabinink.Windows
          return new Computer().Name;
       }
       /// <summary>
+      /// 获取当前用户的用户名称。
+      /// </summary>
+      /// <returns>该操作会返回当前用户的用户名称字符串。</returns>
+      public static string GetCurrentUserName() => Environment.UserName;
+      /// <summary>
       /// 获取当前计算机所安装CPU的序列号。
       /// </summary>
       public static string GetProcessorSerial()

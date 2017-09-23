@@ -9,4 +9,5 @@ C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Libr
 C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\System.ValueTuple.dll
 C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\System.Data.SQLite.dll.config
 C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Release\Cabinink Common Library.csproj.ResolveComReference.cache
+C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Release\Cabinink Common Library.dll.config
 C:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Release\Cabinink Common Library.csprojResolveAssemblyReference.cache

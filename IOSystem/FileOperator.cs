@@ -6,8 +6,9 @@ using Cabinink.TypeExtend;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Microsoft.VisualBasic.FileIO;
 using System.Runtime.InteropServices;
-using Cabinink.IOSystem.FileSecurity;
+using Cabinink.IOSystem.Security;
 namespace Cabinink.IOSystem
 {
    /// <summary>
@@ -135,6 +136,25 @@ namespace Cabinink.IOSystem
          File.Delete(fileUrl);
       }
       /// <summary>
+      /// 重命名指定的文件的文件名称。
+      /// </summary>
+      /// <param name="fileUrl">需要被重命名的文件。</param>
+      /// <param name="newFileName">新的文件名，这个文件名不包含文件的父目录和文件扩展名。</param>
+      public static void RenameFile(string fileUrl, string newFileName)
+      {
+         RenameFile(fileUrl, newFileName + GetFileExtension(fileUrl));
+      }
+      /// <summary>
+      /// 重命名指定的文件的文件名称，同时也包括文件扩展名。
+      /// </summary>
+      /// <param name="fileUrl">需要被重命名的文件。</param>
+      /// <param name="newFileName">新的文件名，这个文件名不包含文件的父目录和文件扩展名。</param>
+      /// <param name="extensionName">新的文件扩展名，但是要记得在扩展名前面加上分割点，比如说：“.exe”，“.docx”，“.document-ci”。</param>
+      public static void RenameFile(string fileUrl, string newFileName, string extensionName)
+      {
+         FileSystem.RenameFile(fileUrl, newFileName + extensionName);
+      }
+      /// <summary>
       /// 删除指定目录下的所有文件。
       /// </summary>
       /// <param name="directory">指定的目录。</param>
@@ -260,14 +280,43 @@ namespace Cabinink.IOSystem
          }
       }
       /// <summary>
+      /// 复制一个指定的目录（文件夹）到另一个目录下。
+      /// </summary>
+      /// <param name="sourceDirectory">需要被复制的目录，其中允许包含子目录和文件。</param>
+      /// <param name="targetDirectory">存储的目标区域。</param>
+      /// <param name="isOverwrite">如果目标目录已存在，是否覆盖。</param>
+      /// <exception cref="DirectoryNotFoundException">当需要被复制的源目录不存在时，则会抛出这个异常。</exception>
+      /// <exception cref="DirectoryIsExistedException">当参数isOverwrite为false并且目标目录已存在时，则将会抛出这个异常。</exception>
+      public static void CopyDirectory(string sourceDirectory, string targetDirectory, bool isOverwrite)
+      {
+         if (!DirectoryExists(sourceDirectory)) throw new DirectoryNotFoundException("找不到源目录！");
+         if (!isOverwrite && DirectoryExists(targetDirectory)) throw new DirectoryIsExistedException();
+         string[] sourceFilesPath = Directory.GetFileSystemEntries(sourceDirectory);
+         for (int i = 0; i < sourceFilesPath.Length; i++)
+         {
+            string sourceFilePath = sourceFilesPath[i];
+            string directoryName = Path.GetDirectoryName(sourceFilePath);
+            string[] forlders = directoryName.Split('\\');
+            string lastDirectory = forlders[forlders.Length - 1];
+            string dest = Path.Combine(targetDirectory, lastDirectory);
+            if (FileExists(sourceFilePath))
+            {
+               string sourceFileName = Path.GetFileName(sourceFilePath);
+               if (!DirectoryExists(dest)) CreateDirectory(dest);
+               File.Copy(sourceFilePath, Path.Combine(dest, sourceFileName), isOverwrite);
+            }
+            else CopyDirectory(sourceFilePath, dest, isOverwrite);
+         }
+      }
+      /// <summary>
       /// 返回不具有扩展名的指定路径字符串的文件名。
       /// </summary>
       /// <param name="fileUrll">需要被获取文件名的文件地址。</param>
       /// <returns>由System.IO.Path.GetFileName返回的字符串，但不包括最后的句点以及之后的所有字符。</returns>
       /// <remarks>注意，这个方法不会验证文件的存在性和其他相关有效性</remarks>
-      public static string GetFileNameWithoutExtension(string fileUrll)
+      public static string GetFileNameWithoutExtension(string fileUrl)
       {
-         return Path.GetFileNameWithoutExtension(fileUrll);
+         return Path.GetFileNameWithoutExtension(fileUrl);
       }
       /// <summary>
       /// 获取一个包含后缀名的文件名。
@@ -317,6 +366,40 @@ namespace Cabinink.IOSystem
             });
          });
          return fList;
+      }
+      /// <summary>
+      /// 遍历指定目录下的文件。
+      /// </summary>
+      /// <param name="directory">需要被遍历的目录。</param>
+      /// <param name="isTraverseDirectory">指示是否将遍历的文件夹路径也存储到返回值中。</param>
+      /// <returns>该操作会返回一个可能包含文件（或者也包含文件夹）路径集合的列表，这个列表保存了当前目录下的所有文件（和文件夹）路径。</returns>
+      public static List<string> TraverseWith(string directory, bool isTraverseDirectory)
+      {
+         List<string> result = new List<string>();
+         DirectoryInfo dir = new DirectoryInfo(directory);
+         DirectoryInfo[] dirSub = dir.GetDirectories();
+         if (dirSub.Length <= 0)
+         {
+            Parallel.ForEach(dir.GetFiles("*.*", System.IO.SearchOption.TopDirectoryOnly), (fInfo) =>
+            {
+               result.Add(dir + @"\" + fInfo.ToString());
+            });
+         }
+         int t = 1;
+         Parallel.ForEach(dirSub, (dInfo) =>
+         {
+            TraverseWith(dir + @"\" + dInfo.ToString(), isTraverseDirectory);
+            if (isTraverseDirectory) result.Add(dir + @"\" + dInfo.ToString());
+            if (t == 1)
+            {
+               Parallel.ForEach(dir.GetFiles("*.*", System.IO.SearchOption.TopDirectoryOnly), (fInfo) =>
+               {
+                  result.Add(dir + @"\" + fInfo.ToString());
+               });
+               t = t + 1;
+            }
+         });
+         return result;
       }
       /// <summary>
       /// 获取指定目录下的所有子目录的名称。

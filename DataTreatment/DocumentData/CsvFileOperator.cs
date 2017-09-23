@@ -4,10 +4,10 @@ using Cabinink.IOSystem;
 using System.Collections;
 using System.Diagnostics;
 using Cabinink.TypeExtend;
+using Cabinink.IOSystem.Security;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
-using Cabinink.IOSystem.FileSecurity;
 namespace Cabinink.DataTreatment.DocumentData
 {
    /// <summary>
@@ -24,7 +24,7 @@ namespace Cabinink.DataTreatment.DocumentData
       /// </summary>
       /// <param name="csvFileUrl">指定的CSV文件的文件地址。</param>
       /// <exception cref="FileTypeNotLegitimateException">如果文件类型不符合匹配条件，则将会抛出这个异常。</exception>
-      public CsvFileOperator(string csvFileUrl) : base(csvFileUrl)
+      public CsvFileOperator(string csvFileUrl) : base(csvFileUrl, true)
       {
          if (FileOperator.GetFileExtension(csvFileUrl) != ".csv") throw new FileTypeNotLegitimateException();
       }
@@ -100,6 +100,11 @@ namespace Cabinink.DataTreatment.DocumentData
       /// <returns>如果这个操作成功，则将会返回true，否则返回false。</returns>
       public bool Remove(string item) => Elements.Remove(item);
       /// <summary>
+      /// 从当前实例包含的CSV列表中移除参数index指定索引对应的元素。
+      /// </summary>
+      /// <param name="index">指定的索引。</param>
+      public void Remove(int index) => Elements.RemoveAt(index);
+      /// <summary>
       /// 返回循环访问集合的枚举数。
       /// </summary>
       /// <returns>一个可用于循环访问集合的System.Collections.IEnumerator对象。</returns>
@@ -118,6 +123,12 @@ namespace Cabinink.DataTreatment.DocumentData
             FileContext = tempCsvString.Substring(0, tempCsvString.Length - 1);
          }
       }
+      /// <summary>
+      /// 通过文件MD5和文件路径判断两个CSV文件是否相同。
+      /// </summary>
+      /// <param name="other">用于比较的另一个CSV文件。</param>
+      /// <returns>如果两个CSV文件的文件路径和MD5都相同，则操作的这两个CSV文件属于同一个文件，那么这个操作就会返回true，否则将会返回false。</returns>
+      public override bool Equals(IOSecurityFile other) => base.Equals((CsvFileOperator)other);
    }
    /// <summary>
    /// 当文件类型不符合匹配条件时需要抛出的异常。

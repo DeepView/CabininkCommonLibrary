@@ -1,5 +1,5 @@
 ﻿using System.Text;
-namespace Cabinink.IOSystem.FileSecurity
+namespace Cabinink.IOSystem.Security
 {
    /// <summary>
    /// 提供另存为未加密副本文件的接口。

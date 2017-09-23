@@ -15,16 +15,15 @@ namespace Cabinink.DataTreatment.Database
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class MSAccessDBOIEncapsulation : IDatabasesOperationBase
+   public class MSAccessDBOIEncapsulation : DBOIEncapsulation
    {
-      private string _dbConnectionString;//数据库连接字符串。
       private OleDbCommand _sqlCommand;//Micrsoft Access 97-2003数据库查询执行类。
       private OleDbConnection _sqlConnection;//Micrsoft Access 97-2003数据库连接类。
       /// <summary>
       /// 构造函数，通过一个指定的数据库连接字符串地址来初始化当前实例。
       /// </summary>
       /// <param name="dbConnectionString">指定的数据库连接字符串。</param>
-      public MSAccessDBOIEncapsulation(string dbConnectionString)
+      public MSAccessDBOIEncapsulation(string dbConnectionString) : base(dbConnectionString)
       {
          _dbConnectionString = dbConnectionString;
       }
@@ -34,7 +33,7 @@ namespace Cabinink.DataTreatment.Database
       /// <param name="dbFileUrl">指定的数据库文件地址，如果这个文件地址无效则会抛出FileNotFoundException异常。</param>
       /// <exception cref="FileNotFoundException">如果找不到dbFileUrl参数指定的数据库文件，则会抛出这个异常。</exception>
       /// <exception cref="FileTypeNotLegitimateException">如果文件类型不符合匹配条件，则将会抛出这个异常。</exception>
-      public MSAccessDBOIEncapsulation(Uri dbFileUrl)
+      public MSAccessDBOIEncapsulation(Uri dbFileUrl) : base()
       {
          if (FileOperator.FileExists(dbFileUrl.LocalPath) == false) throw new FileNotFoundException("找不到数据库文件！");
          if (FileOperator.GetFileExtension(dbFileUrl.LocalPath) != ".mdb") throw new FileTypeNotLegitimateException();
@@ -63,7 +62,7 @@ namespace Cabinink.DataTreatment.Database
       /// <summary>
       /// 获取当前数据库的连接状态。
       /// </summary>
-      public ConnectionState ConnectionStatus => DbConnector.State;
+      public override ConnectionState ConnectionStatus => DbConnector.State;
       /// <summary>
       /// 获取当前数据库的源文件地址。
       /// </summary>
@@ -79,18 +78,18 @@ namespace Cabinink.DataTreatment.Database
       /// <summary>
       /// 获取或设置当前数据库的连接字符串。
       /// </summary>
-      public string ConnectionString
+      public override string ConnectionString
       {
          get => _dbConnectionString; set => _dbConnectionString = value;
       }
       /// <summary>
       /// 连接当前实例指定的数据库。
       /// </summary>
-      public void Connect() => DbConnector.Open();
+      public override void Connect() => DbConnector.Open();
       /// <summary>
       /// 断开当前数据库的连接。
       /// </summary>
-      public void Disconnect() => DbConnector.Close();
+      public override void Disconnect() => DbConnector.Close();
       /// <summary>
       /// 执行指定的SQL语句。
       /// </summary>
@@ -99,7 +98,7 @@ namespace Cabinink.DataTreatment.Database
       /// <exception cref="EmptySqlCommandLineException">当出现空的SQL语句时，则会抛出这个异常。</exception>
       /// <exception cref="ConnectionNotExistsException">当数据库未连接或者连接已断开时，则会抛出这个异常。</exception>
       /// <exception cref="SqlGrammarErrorException">当SQL语法出现错误时，则会抛出这个异常。</exception>
-      public int ExecuteSql(string sqlSentence)
+      public override int ExecuteSql(string sqlSentence)
       {
          if (sqlSentence.Length == 0 || sqlSentence == null) throw new EmptySqlCommandLineException();
          if (ConnectionStatus == ConnectionState.Closed) throw new ConnectionNotExistsException();
@@ -249,7 +248,7 @@ namespace Cabinink.DataTreatment.Database
       /// 初始化当前的数据库连接。
       /// </summary>
       /// <returns>如果初始化成功则会返回true，若被该方法捕获了一些无法处理的异常则会视为初始化失败，并返回false。</returns>
-      public bool InitializeConnection()
+      public override bool InitializeConnection()
       {
          bool isconned = true;
          try

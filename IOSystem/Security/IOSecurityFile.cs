@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Cabinink.Windows;
 using System.Diagnostics;
 using Cabinink.TypeExtend;
 using System.Runtime.Serialization;
+using System.Security.AccessControl;
 using System.Runtime.InteropServices;
-namespace Cabinink.IOSystem.FileSecurity
+namespace Cabinink.IOSystem.Security
 {
    /// <summary>
    /// IO操作安全文件类。
@@ -20,6 +22,7 @@ namespace Cabinink.IOSystem.FileSecurity
       private ExString _jurisdictionPassword;//适用于操作安全的权限密码。
       private EFileSecurityFlag _securityFlag;//文件操作安全标识符。
       private int _codeSecurityFlag;//代码安全标识符。
+      private bool _isApplyAccessRule;//指示是否应用文件安全访问规则。
       private const int CODE_SECURITY_FLAG_STOP = 0x0000;//代码安全标识符，操作非法。
       private const int CODE_SECURITY_FLAG_NORMAL = 0xffff;//代码安全标识符，操作合法。
       private const string FILE_SECURITY_KEY = @"cabinink";//文件加密和解密用的安全密钥。
@@ -34,6 +37,33 @@ namespace Cabinink.IOSystem.FileSecurity
          ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
+         _isApplyAccessRule = true;
+      }
+      /// <summary>
+      /// 构造函数，创建一个指定文件路径的IO操作安全文件操作实例，并根据参数createdThenNotExists决定当文件不存在时是否创建新文件。
+      /// </summary>
+      /// <param name="fileUrl">用于被操作的IO操作安全文件的文件地址，如果这个文件不存在，会重新创建一个新的文件地址为当前参数的文件。</param>
+      /// <param name="createdThenNotExists">用于决定是否在检测到文件不存在时来创建新文件。</param>
+      /// <exception cref="FileNotFoundException">当参数fileUrl指定的文件找不到，并且不允许根据参数createdThenNotExists决定当文件不存在时是否创建新文件的情况下，则会抛出这个异常。</exception>
+      public IOSecurityFile(string fileUrl, bool createdThenNotExists)
+      {
+         if (createdThenNotExists)
+         {
+            if (!FileOperator.FileExists(fileUrl))
+            {
+               ExString ciphertext = ExString.Encrypt(string.Empty, FILE_SECURITY_KEY);
+               FileOperator.CreateFile(fileUrl);
+               FileOperator.WriteFile(fileUrl, ciphertext, false);
+            }
+         }
+         else
+         {
+            if (!FileOperator.FileExists(fileUrl)) throw new FileNotFoundException("指定的文件找不到！", fileUrl);
+         }
+         ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
+         _securityFileUrl = fileUrl;
+         _fileContext = string.Empty;
+         _isApplyAccessRule = true;
       }
       /// <summary>
       /// 获取或设置当前实例的IO操作安全文件地址。
@@ -78,6 +108,10 @@ namespace Cabinink.IOSystem.FileSecurity
       /// 获取当前实例的安全标识符。
       /// </summary>
       public EFileSecurityFlag SecurityFlag => _securityFlag;
+      /// <summary>
+      /// 获取或设置当前实例是否应用Windows文件安全访问规则。
+      /// </summary>
+      public bool IsApplyAccessRule { get => _isApplyAccessRule; set => _isApplyAccessRule = value; }
       /// <summary>
       /// 加载当前文件的IO操作安全文件密码，这个方法不指定具体实现，需要通过开发者完成，因为当前方法无法定义密码存储源是哪一种文件类型或者存储方式。
       /// </summary>
@@ -156,9 +190,18 @@ namespace Cabinink.IOSystem.FileSecurity
       public bool RevokeJurisdiction()
       {
          bool result = true;
+         string domain = EnvironmentInformation.GetComputerName();
+         string usrname = domain + @"\" + EnvironmentInformation.GetCurrentUserName();
          try
          {
-            ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
+            ResetCodeSecurityFlag();
+            if (IsApplyAccessRule)
+            {
+               ERuleUpdateMode append = ERuleUpdateMode.Append;
+               ERuleUpdateMode remove = ERuleUpdateMode.Remove;
+               IOAccessRuleManagement.UpdateFileAccessRule(FileUrl, usrname, remove, FileSystemRights.FullControl, AccessControlType.Allow);
+               IOAccessRuleManagement.UpdateFileAccessRule(FileUrl, usrname, append, FileSystemRights.FullControl, AccessControlType.Deny);
+            }
          }
          catch (Exception ex)
          {
@@ -174,9 +217,18 @@ namespace Cabinink.IOSystem.FileSecurity
       public bool RrecoveryJurisdiction(ExString password)
       {
          bool result = true;
+         string domain = EnvironmentInformation.GetComputerName();
+         string usrname = domain + @"\" + EnvironmentInformation.GetCurrentUserName();
          if (JurisdictionPassword.Equals(password))
          {
             ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
+            if (IsApplyAccessRule)
+            {
+               ERuleUpdateMode append = ERuleUpdateMode.Append;
+               ERuleUpdateMode remove = ERuleUpdateMode.Remove;
+               IOAccessRuleManagement.UpdateFileAccessRule(FileUrl, usrname, remove, FileSystemRights.FullControl, AccessControlType.Deny);
+               IOAccessRuleManagement.UpdateFileAccessRule(FileUrl, usrname, append, FileSystemRights.FullControl, AccessControlType.Allow);
+            }
          }
          else result = false;
          return result;
@@ -245,7 +297,7 @@ namespace Cabinink.IOSystem.FileSecurity
       /// </summary>
       /// <param name="other">用于比较的另一个文件。</param>
       /// <returns>如果两个文件的文件路径和MD5都相同，则操作的这两个文件属于同一个文件，那么这个操作就会返回true，否则将会返回false。</returns>
-      public bool Equals(IOSecurityFile other)
+      public virtual bool Equals(IOSecurityFile other)
       {
          bool isEqual = false;
          FileSignature fSignature = new FileSignature(FileUrl);

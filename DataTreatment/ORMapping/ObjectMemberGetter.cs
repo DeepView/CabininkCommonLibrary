@@ -114,6 +114,11 @@ namespace Cabinink.DataTreatment.ORMapping
          else for (int i = 0; i < fInfos.Count; i++) if (!fInfos[i].IsPublic) fTypes.Add(fInfos[i].FieldType.ToString());
          return fTypes;
       }
+      //public List<(string,string)> GetFieldInfoWithRecursive()
+      //{
+      //   (string, string) infos = ("","");
+      //   foreach((string,string) item in T)
+      //}
       /// <summary>
       /// 获取指定变量的名称。
       /// </summary>
