@@ -80,14 +80,17 @@ namespace Cabinink.IOSystem.Security
       /// <summary>
       /// 追加访问权限。
       /// </summary>
+      [EnumerationDescription("追加访问权限")]
       Append = 0x0000,
       /// <summary>
       /// 覆盖以前的访问权限（暂时作为保留性质的值）。
       /// </summary>
+      [EnumerationDescription("覆盖以前的访问权限")]
       Cover = 0x00ff,
       /// <summary>
       /// 移除访问权限。
       /// </summary>
+      [EnumerationDescription("移除访问权限")]
       Remove = 0xffff,
    }
 }

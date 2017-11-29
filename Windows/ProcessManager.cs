@@ -6,10 +6,9 @@ using Cabinink.IOSystem;
 using System.Diagnostics;
 using System.Collections;
 using System.Threading.Tasks;
-using Cabinink.Windows.Energy;
 using System.Collections.Generic;
+using Cabinink.Windows.Privileges;
 using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
 namespace Cabinink.Windows
 {
    /// <summary>
@@ -91,55 +90,6 @@ namespace Cabinink.Windows
       /// <remarks>该函数返回调用线程最近的错误代码值，错误代码以单线程为基础来维护的，多线程不重写各自的错误代码值。</remarks>
       [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
       private static extern Int32 GetLastError();
-      /// <summary>
-      /// 获取当前进程的一个伪句柄。
-      /// </summary>
-      /// <returns>获取当前进程的一个伪句柄，只要当前进程需要一个进程句柄，就可以使用这个伪句柄。该句柄可以复制，但不可继承。</returns>
-      [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-      private static extern IntPtr GetCurrentProcess();
-      /// <summary>
-      /// 关闭一个内核对象。
-      /// </summary>
-      /// <param name="handle">需要被关闭的对象。</param>
-      /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
-      /// <remarks>关闭一个内核对象。其中包括文件、文件映射、进程、线程、安全和同步对象等。在CreateThread成功之后会返回一个hThread的handle，且内核对象的计数加1，CloseHandle之后，引用计数减1，当变为0时，系统删除内核对象。若在线程执行完之后，没有调用CloseHandle，在进程执行期间，将会造成内核对象的泄露，相当于句柄泄露，但不同于内存泄露，这势必会对系统的效率带来一定程度上的负面影响。但当进程结束退出后，系统会自动清理这些资源。</remarks>
-      [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-      [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-      private static extern bool CloseHandle(IntPtr handle);
-      /// <summary>
-      /// 查看系统权限的特权值。
-      /// </summary>
-      /// <param name="systemName">需要查看的系统，本地系统直接用NULL（Nothing）。</param>
-      /// <param name="jurisdictionName">指向一个以零结尾的字符串，指定特权的名称。</param>
-      /// <param name="luidPointer">接收所返回的制定特权名称的信息。</param>
-      /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
-      /// <remarks>查看指定系统权限的特权值，如果操作成功则返回true，否则返回false，与此同时，还会将接收的信息反馈到LocallyUniqueIdentifier结构类里面。</remarks>
-      [DllImport("advapi32.dll", CharSet = CharSet.Auto)]
-      [return: MarshalAs(UnmanagedType.Bool)]
-      private static extern bool LookupPrivilegeValue(string systemName, string jurisdictionName, [Out()] SLocallyUniqueIdentifier luidPointer);
-      /// <summary>
-      /// 打开与进程相关联的访问令牌。
-      /// </summary>
-      /// <param name="handle">要修改访问权限的进程句柄。</param>
-      /// <param name="operationType">指定你要进行的操作类型。</param>
-      /// <param name="tokenPointer">返回的访问令牌指针。</param>
-      /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
-      /// <remarks>打开与进程相关联的访问令牌，当修改权限的时候需要用到这个句柄，操作成功返回true，否则返回false。</remarks>
-      [DllImport("advapi32.dll", CharSet = CharSet.Auto)]
-      private static extern bool OpenProcessToken([In()]IntPtr handle, [In()]Int32 operationType, [Out()] IntPtr tokenPointer);
-      /// <summary>
-      /// 启用或禁止指定访问令牌的特权。
-      /// </summary>
-      /// <param name="tokenPointer">包含特权的句柄。</param>
-      /// <param name="disable">禁用所有权限标志。</param>
-      /// <param name="newStateInfo">新特权信息。</param>
-      /// <param name="bufferSize">缓冲数据大小,以字节为单位的PreviousState的缓存区。</param>
-      /// <param name="privileges">接收被改变特权当前状态的Buffer。</param>
-      /// <param name="retunValueSize">接收PreviousState缓存区要求的大小。</param>
-      /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
-      /// <remarks>启用或禁用特权一个有TOKEN_ADJUST_PRIVILEGES访问的访问令牌，成功返回true，否则返回false。</remarks>
-      [DllImport("advapi32.dll", CharSet = CharSet.Auto)]
-      private static extern bool AdjustTokenPrivileges(IntPtr tokenPointer, bool disable, STokenPrivileges newStateInfo, Int32 bufferSize, STokenPrivileges privileges, Int32 retunValueSize);
       /// <summary>
       /// 设定线程的优先级。
       /// </summary>
@@ -419,11 +369,11 @@ namespace Cabinink.Windows
       {
          IntPtr hwnd_t = IntPtr.Zero;
          bool rv;
-         LookupPrivilegeValue(systemName, processName, privileges.Privileges.ParticularLuid);
-         OpenProcessToken(GetCurrentProcess(), operationType, hwnd_t);
-         AdjustTokenPrivileges(hwnd_t, false, privileges, 100000, new STokenPrivileges(), 0);
+         PrivilegeGetter.LookupPrivilegeValue(systemName, processName, ref privileges.Privileges.ParticularLuid);
+         PrivilegeGetter.OpenProcessToken(PrivilegeGetter.GetCurrentProcess(), operationType, hwnd_t);
+         PrivilegeGetter.AdjustTokenPrivileges(hwnd_t, false, ref privileges, 100000, new STokenPrivileges(), 0);
          rv = GetLastError() == ERROR_SUCCESS ? true : false;
-         CloseHandle(hwnd_t);
+         PrivilegeGetter.CloseHandle(hwnd_t);
          return rv;
       }
       /// <summary>
@@ -564,26 +514,32 @@ namespace Cabinink.Windows
       /// <summary>
       /// 指定进程的优先级在 Normal 之上，但在 High 之下。
       /// </summary>
+      [EnumerationDescription("次高优先级")]
       AboveNormal = 32768,
       /// <summary>
       /// 指定进程的优先级在 Idle 之上，但在 Normal 之下。
       /// </summary>
+      [EnumerationDescription("低优先级")]
       BelowNormal = 16384,
       /// <summary>
       /// 指定进程执行必须立即执行的时间关键任务。
       /// </summary>
+      [EnumerationDescription("高优先级")]
       High = 128,
       /// <summary>
       /// 指定此进程的线程只能在系统空闲时运行。
       /// </summary>
+      [EnumerationDescription("空闲时运行")]
       Idle = 64,
       /// <summary>
       /// 指定进程没有特殊的安排需求。
       /// </summary>
+      [EnumerationDescription("常规")]
       Normal = 32,
       /// <summary>
       /// 指定进程拥有可能的最高优先级。
       /// </summary>
+      [EnumerationDescription("实时")]
       RealTime = 256
    }
    /// <summary>
@@ -594,38 +550,47 @@ namespace Cabinink.Windows
       /// <summary>
       /// 开始后台处理模式。
       /// </summary>
+      [EnumerationDescription("开始后台处理模式")]
       BackgroundBegin = 65536,
       /// <summary>
       /// 终止后台处理模式。
       /// </summary>
+      [EnumerationDescription("终止后台处理模式")]
       BackgroundEnd = 131072,
       /// <summary>
       /// 略微高于正常。
       /// </summary>
+      [EnumerationDescription("高于正常")]
       AboveNormal = 1,
       /// <summary>
       /// 略微低于正常。
       /// </summary>
+      [EnumerationDescription("低于正常")]
       BelowNormal = -1,
       /// <summary>
       /// 极高的优先级。
       /// </summary>
+      [EnumerationDescription("最高优先级")]
       Highest = 2,
       /// <summary>
       /// 空闲时运行。
       /// </summary>
+      [EnumerationDescription("空闲时运行")]
       Idle = -15,
       /// <summary>
       /// 最低的优先级。
       /// </summary>
+      [EnumerationDescription("最低优先级")]
       Lowest = -2,
       /// <summary>
       /// 正常的优先级。
       /// </summary>
+      [EnumerationDescription("常规")]
       Normal = 0,
       /// <summary>
       /// 基于时间关键性的优先级。
       /// </summary>
+      [EnumerationDescription("基于时间关键性")]
       TimeCritical = 15
    }
 }

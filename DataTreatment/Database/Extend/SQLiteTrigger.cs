@@ -188,14 +188,17 @@ namespace Cabinink.DataTreatment.Database.Extend
       /// <summary>
       /// 当删除记录的时候触发动作。
       /// </summary>
+      [EnumerationDescription("当删除记录的时候触发动作")]
       WhenDeleted = 0x0000,
       /// <summary>
       /// 当更新数据表的时候触发动作。
       /// </summary>
+      [EnumerationDescription("当更新数据表的时候触发动作")]
       WhenUpdated = 0x0001,
       /// <summary>
       /// 当在数据表中插入新的数据的时候触发动作。
       /// </summary>
+      [EnumerationDescription("当在数据表中插入新的数据的时候触发动作")]
       WhenInserted = 0x0002
    }
    /// <summary>
@@ -206,10 +209,12 @@ namespace Cabinink.DataTreatment.Database.Extend
       /// <summary>
       /// 指示在执行ESQLiteTriggerAction指定动作之前执行操作。
       /// </summary>
+      [EnumerationDescription("在Action之前执行操作")]
       Before = 0x0000,
       /// <summary>
       /// 指示在执行ESQLiteTriggerAction指定动作之后执行操作。
       /// </summary>
+      [EnumerationDescription("在Action之后执行操作")]
       After = 0xffff
    }
 }

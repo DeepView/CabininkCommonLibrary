@@ -2,55 +2,11 @@
 using System.Text;
 using System.Diagnostics;
 using System.Windows.Forms;
+using Cabinink.Windows.Privileges;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 namespace Cabinink.Windows.Energy
 {
-   /// <summary>
-   /// TokenPrivileges 结构包含了一个访问令牌的一组权限信息：即该访问令牌具备的权限。
-   /// </summary>
-   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-   public struct STokenPrivileges
-   {
-      /// <summary>
-      /// 指定了权限数组的容量。
-      /// </summary>
-      public int PrivilegeCount;
-      /// <summary>
-      /// 指定一组的LuidAttributes 结构，每个结构包含了LUID和权限的属性。
-      /// </summary>
-      public SLuidAttributes Privileges;
-   }
-   /// <summary>
-   /// LuidAttributes 结构呈现了本地唯一标志和它的属性。
-   /// </summary>
-   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-   public struct SLuidAttributes
-   {
-      /// <summary>
-      /// 特定的LUID。
-      /// </summary>
-      public SLocallyUniqueIdentifier ParticularLuid;
-      /// <summary>
-      /// 指定了LUID的属性，其值可以是一个32位大小的bit 标志，具体含义根据LUID的定义和使用来看。
-      /// </summary>
-      public int Attributes;
-   }
-   /// <summary>
-   /// 本地唯一标志是一个64位的数值，它被保证在产生它的系统上唯一！LUID的在机器被重启前都是唯一的。
-   /// </summary>
-   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-   public struct SLocallyUniqueIdentifier
-   {
-      /// <summary>
-      /// 本地唯一标志的低32位。
-      /// </summary>
-      public int LowPart;
-      /// <summary>
-      /// 本地唯一标志的高32位。
-      /// </summary>
-      public int HighPart;
-   }
    /// <summary>
    /// Windows电源相关操作类。
    /// </summary>

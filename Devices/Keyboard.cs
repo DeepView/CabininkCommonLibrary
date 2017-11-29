@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-namespace Cabinink.Peripheral
+namespace Cabinink.Devices
 {
    /// <summary>
    /// 键盘基础操作类。

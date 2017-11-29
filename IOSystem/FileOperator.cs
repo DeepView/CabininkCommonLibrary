@@ -155,6 +155,16 @@ namespace Cabinink.IOSystem
          FileSystem.RenameFile(fileUrl, newFileName + extensionName);
       }
       /// <summary>
+      /// 复制文件到指定的地址。
+      /// </summary>
+      /// <param name="sourceFileUrl">需要复制的文件的文件地址。</param>
+      /// <param name="targetFileUrl">复制的目标地址，而非目标目录。</param>
+      /// <param name="isOverwrite">如果目标地址所表示的文件在复制之前就存在，则这个值指示是否覆盖这个文件。</param>
+      public static void CopyFile(string sourceFileUrl, string targetFileUrl, bool isOverwrite)
+      {
+         FileSystem.CopyFile(sourceFileUrl, targetFileUrl, isOverwrite);
+      }
+      /// <summary>
       /// 删除指定目录下的所有文件。
       /// </summary>
       /// <param name="directory">指定的目录。</param>

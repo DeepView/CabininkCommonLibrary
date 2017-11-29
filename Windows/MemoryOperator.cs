@@ -6,7 +6,7 @@ using System.Runtime.ConstrainedExecution;
 namespace Cabinink.Windows
 {
    /// <summary>
-   /// 内存输入输出的类，但这个类不能被继承，另外在使用这个类所包含的函数之前，建议了解一些相关的技术知识。
+   /// 物理内存输入输出的类，但这个类不能被继承，另外在使用这个类所包含的函数之前，建议了解一些相关的技术知识。
    /// </summary>
    [Serializable]
    [ComVisible(true)]

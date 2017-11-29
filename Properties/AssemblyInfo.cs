@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("Cabinink Common Library")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("This is a Microsoft .Net Application extend library, it can fast used developed some Windows Desktop Application!")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Cabinink-TamanyuSmoke")]
 [assembly: AssemblyProduct("Cabinink Common Library")]
-[assembly: AssemblyCopyright("Copyight © 2017 Cabinink. All Rights Reserved")]
+[assembly: AssemblyCopyright("Copyight © 2017 Cabinink-TamanyuSmoke, All Rights Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 //可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.1709.93")]
-[assembly: AssemblyFileVersion("1.0.1709.93")]
+[assembly: AssemblyVersion("1.0.1711.114")]
+[assembly: AssemblyFileVersion("1.0.1711.114")]

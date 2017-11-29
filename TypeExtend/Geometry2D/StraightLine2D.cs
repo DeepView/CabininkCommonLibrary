@@ -62,7 +62,7 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <exception cref="UnknownDirectionLineException">当无法确定所定义的直线的斜率时，则会抛出这个异常。</exception>
       public ExPoint2D LastPoint
       {
-         get => _anyPoint01;
+         get => _anyPoint02;
          set
          {
             if (_anyPoint02.Equals(FirstPoint)) throw new UnknownDirectionLineException();
@@ -95,6 +95,14 @@ namespace Cabinink.TypeExtend.Geometry2D
             else return FirstPoint.YPosition - Slope * FirstPoint.XPosition;
          }
       }
+      /// <summary>
+      /// 获取实例在笛卡尔平面直角坐标系中横坐标的映射长度。
+      /// </summary>
+      public double AbscissaMappingLength => Math.Abs(FirstPoint.XPosition - LastPoint.XPosition);
+      /// <summary>
+      /// 获取实例在笛卡尔平面直角坐标系中纵坐标的映射长度。
+      /// </summary>
+      public double OrdinateMappingLength => Math.Abs(FirstPoint.YPosition - LastPoint.YPosition);
       /// <summary>
       /// 获取当前图形是否被允许在Graphics对象中绘制，不过在不存在数学区域的图形中，这个属性的值都为false。
       /// </summary>
@@ -264,10 +272,12 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <summary>
       /// 弧度制。
       /// </summary>
+      [EnumerationDescription("弧度制")]
       Radian = 0x0000,
       /// <summary>
       /// 角度制。
       /// </summary>
+      [EnumerationDescription("角度制")]
       AngleSystem = 0xffff
    }
    /// <summary>
@@ -278,14 +288,17 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <summary>
       /// 两条直线重合。
       /// </summary>
+      [EnumerationDescription("两条直线重合")]
       Coincidence = 0x0000,
       /// <summary>
       /// 两条直线平行。
       /// </summary>
+      [EnumerationDescription("两条直线平行")]
       Parallel = 0x0001,
       /// <summary>
       /// 两条直线相交。
       /// </summary>
+      [EnumerationDescription("两条直线相交")]
       Intersect = 0x0002
    }
    /// <summary>

@@ -33,14 +33,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.WindowsAPICodePack.DirectX">
-      <HintPath>D:\Installer\Windows API Code Pack 1.1\binaries\DirectX\x86\Microsoft.WindowsAPICodePack.DirectX.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Release\Newtonsoft.Json.dll</HintPath>
@@ -71,8 +68,8 @@
     <Compile Include="Algorithm\NumericalSorting.cs" />
     <Compile Include="Algorithm\NumericalStatistics.cs" />
     <Compile Include="AssemblyInformation.cs" />
+    <Compile Include="CodeHelper.cs" />
     <Compile Include="DataTreatment\Database\DBOIEncapsulation.cs" />
-    <Compile Include="DataTreatment\Database\Extend\AdvancedPlanningTask.cs" />
     <Compile Include="DataTreatment\Database\Extend\IDbOperatorSwitch.cs" />
     <Compile Include="DataTreatment\Database\Extend\PlanningTask.cs" />
     <Compile Include="DataTreatment\Database\MSAccessDBOIEncapsulation.cs" />
@@ -87,13 +84,14 @@
     <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
     <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
+    <Compile Include="Devices\Monitor.cs" />
     <Compile Include="EnumerationDescriptionAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IOSystem\FileOperator.cs" />
     <Compile Include="IOSystem\IObjectAccessSwitch.cs" />
     <Compile Include="IOSystem\RevisionControl\BranchFactory.cs" />
     <Compile Include="IOSystem\RevisionControl\Committer.cs" />
-    <Compile Include="IOSystem\RevisionControl\FileStateMonitor.cs" />
+    <Compile Include="IOSystem\FileStateMonitor.cs" />
     <Compile Include="IOSystem\RevisionControl\IExecuter.cs" />
     <Compile Include="IOSystem\RevisionControl\Puller.cs" />
     <Compile Include="IOSystem\RevisionControl\Pusher.cs" />
@@ -111,7 +109,7 @@
     <Compile Include="Network\InternetDiagnosticsTool.cs" />
     <Compile Include="Network\MailSender.cs" />
     <Compile Include="Network\NtpTimeGetter.cs" />
-    <Compile Include="Peripheral\Keyboard.cs" />
+    <Compile Include="Devices\Keyboard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -124,21 +122,31 @@
     <Compile Include="TypeExtend\Geometry2D\Circular.cs" />
     <Compile Include="TypeExtend\Geometry2D\ExPoint2D.cs" />
     <Compile Include="TypeExtend\Geometry2D\ExRectangle.cs" />
+    <Compile Include="TypeExtend\Geometry2D\IInteriorAngles.cs" />
     <Compile Include="TypeExtend\Geometry2D\IMeasureOfArea.cs" />
     <Compile Include="TypeExtend\Geometry2D\IPerimeter.cs" />
     <Compile Include="TypeExtend\Geometry2D\IRotate.cs" />
     <Compile Include="TypeExtend\Geometry2D\ISize.cs" />
     <Compile Include="TypeExtend\Geometry2D\ITranslation2D.cs" />
+    <Compile Include="TypeExtend\Geometry2D\IVertexesToArray.cs" />
     <Compile Include="TypeExtend\Geometry2D\Quadrilateral.cs" />
     <Compile Include="TypeExtend\Geometry2D\RegionallyShape.cs" />
     <Compile Include="TypeExtend\Geometry2D\Shape2D.cs" />
     <Compile Include="TypeExtend\Geometry2D\StraightLine2D.cs" />
+    <Compile Include="TypeExtend\Geometry2D\Triangle.cs" />
     <Compile Include="TypeExtend\Geometry2D\UnregoinallyShape.cs" />
     <Compile Include="Win32ApiHelper.cs" />
+    <Compile Include="Windows\Applications\AppSettings.cs" />
+    <Compile Include="Windows\Applications\IApplicationBasicIO.cs" />
+    <Compile Include="Windows\Applications\SettingsOption.cs" />
     <Compile Include="Windows\Energy\BatteryUsageInformation .cs" />
     <Compile Include="Windows\EnvironmentInformation.cs" />
     <Compile Include="Windows\Energy\PowerOperator.cs" />
     <Compile Include="Windows\MemoryOperator.cs" />
+    <Compile Include="Windows\Privileges\PrivilegeAttributes.cs" />
+    <Compile Include="Windows\Privileges\PrivilegeGetter.cs" />
+    <Compile Include="Windows\Privileges\PrivilegeConst.cs" />
+    <Compile Include="Windows\Privileges\TokenAccess.cs" />
     <Compile Include="Windows\ProcessManager.cs" />
     <Compile Include="Windows\OSAccountManagement.cs" />
   </ItemGroup>
@@ -150,10 +158,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Peripheral\QRCode\" />
-    <Folder Include="Peripheral\SerialPort\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
       <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>

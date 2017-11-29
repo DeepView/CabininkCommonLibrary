@@ -9,7 +9,7 @@ namespace Cabinink.IOSystem
    /// 非托管内核对象安全属性结构类，该类的部分方法不支持Visual Basic代码访问。
    /// </summary>
    [StructLayout(LayoutKind.Sequential)]
-   public class SecurityAttributes
+   public struct SSecurityAttributes
    {
       /// <summary>
       /// 结构大小。
@@ -28,7 +28,7 @@ namespace Cabinink.IOSystem
    /// 包含了用于异步输入输出的信息的结构类。
    /// </summary>
    [StructLayout(LayoutKind.Sequential)]
-   public class OverLapped
+   public struct SOverLapped
    {
       /// <summary>
       /// 预留给操作系统使用。它指定一个独立于系统的状态，当GetOverlappedResult函数返回时没有设置扩展错误信息ERROR_IO_PENDING时有效。
@@ -104,7 +104,7 @@ namespace Cabinink.IOSystem
       [CLSCompliant(false)]
       [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
       [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-      public unsafe static extern bool WriteFile(SafeFileHandle fileHandle, void* buffer, uint numberOfByteToWrite, ref uint numberOfByteToWriteFinal, OverLapped overLapped);
+      public unsafe static extern bool WriteFile(SafeFileHandle fileHandle, void* buffer, uint numberOfByteToWrite, ref uint numberOfByteToWriteFinal, SOverLapped overLapped);
       /// <summary>
       /// 从文件指针指向的位置开始将数据读出到一个文件中，且支持同步和异步操作。不支持Visual Basic代码访问。
       /// </summary>
@@ -118,7 +118,7 @@ namespace Cabinink.IOSystem
       [CLSCompliant(false)]
       [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
       [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-      public unsafe static extern bool ReadFile(SafeFileHandle fileHandle, void* buffer, uint numberOfByteToRead, ref uint numberOfByteToReadFinal, OverLapped overLapped);
+      public unsafe static extern bool ReadFile(SafeFileHandle fileHandle, void* buffer, uint numberOfByteToRead, ref uint numberOfByteToReadFinal, SOverLapped overLapped);
       /// <summary>
       /// 判断文件长度。不支持Visual Basic代码访问。
       /// </summary>
@@ -168,7 +168,7 @@ namespace Cabinink.IOSystem
       [CLSCompliant(false)]
       public void Load(EKernelObjectAccess access, EShareMode sharedMode)
       {
-         SecurityAttributes attributes = null;
+         SSecurityAttributes attributes = new SSecurityAttributes();
          Load(access, sharedMode, ref attributes, ECreationDisposition.OpenExisting, EFlagsAndAttributes.Normal, IntPtr.Zero);
       }
       /// <summary>
@@ -182,7 +182,7 @@ namespace Cabinink.IOSystem
       /// <param name="handle">一个文件或设备句柄，表示按这个参数给出的句柄为模板创建文件。</param>
       [CLSCompliant(false)]
       [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
-      public void Load(EKernelObjectAccess access, EShareMode sharedMode, ref SecurityAttributes attributes, ECreationDisposition createMode, EFlagsAndAttributes objectAttributes, IntPtr handle)
+      public void Load(EKernelObjectAccess access, EShareMode sharedMode, ref SSecurityAttributes attributes, ECreationDisposition createMode, EFlagsAndAttributes objectAttributes, IntPtr handle)
       {
          GCHandle attributesGCHandle = GCHandle.Alloc(attributes);
          Handle = CreateFile(
@@ -216,22 +216,27 @@ namespace Cabinink.IOSystem
       /// <summary>
       /// 创建新的对象，若对象存在则抛出异常。
       /// </summary>
+      [EnumerationDescription("创建新的对象，若对象存在则抛出异常")]
       CreateNew = 0x0001,
       /// <summary>
       /// 忽略CreateNew的异常来创建对象。
       /// </summary>
+      [EnumerationDescription("忽略CreateNew的异常来创建对象")]
       CreateAlways = 0x0002,
       /// <summary>
       /// 打开一个存在的对象。
       /// </summary>
+      [EnumerationDescription("打开一个存在的对象")]
       OpenExisting = 0x0003,
       /// <summary>
       /// 打开一个对象，若对象不存在则忽略相应的异常。
       /// </summary>
+      [EnumerationDescription("打开一个对象，若对象不存在则忽略相应的异常")]
       OpenAlways = 0x0004,
       /// <summary>
       /// 若对象存在则修改对象大小为0。
       /// </summary>
+      [EnumerationDescription("若对象存在则修改对象大小为0")]
       TruncateExisting = 0x0005
    }
    /// <summary>
@@ -243,14 +248,17 @@ namespace Cabinink.IOSystem
       /// <summary>
       /// 只允许获取设备相关的信息。
       /// </summary>
+      [EnumerationDescription("只允许获取设备相关的信息")]
       GenericGetInfo = 0x00000000,
       /// <summary>
       /// 允许对设备进行读访问。
       /// </summary>
+      [EnumerationDescription("允许对设备进行读访问")]
       GenericRead = 0x80000000,
       /// <summary>
       /// 允许对设备进行写访问。
       /// </summary>
+      [EnumerationDescription("允许对设备进行写访问")]
       GenericWrite = 0x40000000
    }
    /// <summary>
@@ -261,18 +269,22 @@ namespace Cabinink.IOSystem
       /// <summary>
       /// 防止其他进程打开一个文件或设备。
       /// </summary>
+      [EnumerationDescription("防止其他进程打开一个文件或设备")]
       Monopoly = 0x0000,
       /// <summary>
       /// 允许在文件或设备上进行随后的打开操作以请求读取访问权限。
       /// </summary>
+      [EnumerationDescription("允许在文件或设备上进行随后的打开操作以请求读取访问权限")]
       Read = 0x0001,
       /// <summary>
       /// 允许在文件或设备上进行后续的打开操作以请求写访问。
       /// </summary>
+      [EnumerationDescription("允许在文件或设备上进行后续的打开操作以请求写访问")]
       Write = 0x0002,
       /// <summary>
       /// 允许在文件或设备上进行后续的打开操作来请求删除访问。
       /// </summary>
+      [EnumerationDescription("允许在文件或设备上进行后续的打开操作来请求删除访问")]
       Delete = 0x0004
    }
    /// <summary>
@@ -284,78 +296,97 @@ namespace Cabinink.IOSystem
       /// <summary>
       /// 只读。
       /// </summary>
+      [EnumerationDescription("只读")]
       OnlyRead = 0x00000001,
       /// <summary>
       /// 隐藏。
       /// </summary>
+      [EnumerationDescription("隐藏")]
       Hidden = 0x00000002,
       /// <summary>
       /// 系统级别。
       /// </summary>
+      [EnumerationDescription("系统级别")]
       SystemLevel = 0x00000004,
       /// <summary>
       /// 应归档。
       /// </summary>
+      [EnumerationDescription("应归档")]
       Archive = 0x00000020,
       /// <summary>
       /// 常规属性。
       /// </summary>
+      [EnumerationDescription("常规属性")]
       Normal = 0x00000080,
       /// <summary>
       /// 临时存储。
       /// </summary>
+      [EnumerationDescription("临时存储")]
       Temporary = 0x00000100,
       /// <summary>
       /// 数据不能立即使用。
       /// </summary>
+      [EnumerationDescription("数据不能立即使用")]
       Offline = 0x00001000,
       /// <summary>
       /// 被加密。
       /// </summary>
+      [EnumerationDescription("被加密")]
       Encrypted = 0x00004000,
       /// <summary>
       /// 该文件正在被打开或创建用于备份或恢复操作。
       /// </summary>
+      [EnumerationDescription(" 该文件正在被打开或创建用于备份或恢复操作")]
       BackupSemantics = 0x02000000,
       /// <summary>
       /// 该文件将被删除后，它的所有处理都是关闭的，其中包括指定的句柄和任何其他的打开或重复的句柄。
       /// </summary>
+      [EnumerationDescription("在关闭对象之后清空引用并删除文件")]
       DeleteOnClose = 0x04000000,
       /// <summary>
-      /// 该文件或设备正在被打开，没有系统缓存，用于读取和写入数据。
+      /// 该文件或设备正在被打开，没有用于读取和写入数据的系统缓存。
       /// </summary>
+      [EnumerationDescription("该文件或设备正在被打开，没有用于读取和写入数据的系统缓存")]
       NoBuffering = 0x20000000,
       /// <summary>
       /// 被请求的文件数据，但它应该继续位于远程存储。
       /// </summary>
+      [EnumerationDescription("被请求的文件数据，但它应该继续位于远程存储")]
       OpenNoRecall = 0x00100000,
       /// <summary>
       /// 正常的重分析点处理不会发生。
       /// </summary>
+      [EnumerationDescription("正常的重分析点处理不会发生")]
       OpenReparsePoint = 0x00200000,
       /// <summary>
       /// 该文件或设备正在被打开或创建为异步I/O。
       /// </summary>
+      [EnumerationDescription("该文件或设备正在被打开或处于异步I/O")]
       Overlapped = 0x40000000,
       /// <summary>
-      /// 访问将根据POSIX规则。
+      /// 根据POSIX规则访问。
       /// </summary>
+      [EnumerationDescription("根据POSIX规则访问")]
       PosixSemantics = 0x00100000,
       /// <summary>
       /// 访问的目的是随机的。
       /// </summary>
+      [EnumerationDescription("随机访问目的")]
       RandomAccess = 0x10000000,
       /// <summary>
       /// 该文件或设备正在使用。
       /// </summary>
+      [EnumerationDescription("该文件或设备正在使用")]
       SessionAware = 0x00800000,
       /// <summary>
       /// 针对连续访问对文件缓冲进行优化。
       /// </summary>
+      [EnumerationDescription("针对连续访问对文件缓冲进行优化")]
       SequentialScan = 0x08000000,
       /// <summary>
       /// 操作系统不得推迟对文件的写操作。
       /// </summary>
+      [EnumerationDescription("不允许延迟写操作")]
       WriteThrought = 0x80000000
    }
 }

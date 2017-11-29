@@ -46,10 +46,12 @@ namespace Cabinink.IOSystem.Security
       /// <summary>
       /// 操作被授权允许。
       /// </summary>
+      [EnumerationDescription("操作被授权允许")]
       OperationIsAuthorized = 0x0000,
       /// <summary>
       /// 文件被锁定，无法操作。
       /// </summary>
+      [EnumerationDescription("文件被锁定，无法操作")]
       FileIsLocked = 0xffff
    }
 }

@@ -26,9 +26,10 @@ namespace Cabinink
       /// </summary>
       /// <param name="enumeration">需要被获取注释的枚举。</param>
       /// <returns>该操作会返回参数value对应的枚举某一个枚举值的注释。</returns>
+      /// <exception cref="ArgumentException">当指定的枚举不存在时，则会抛出这个异常。</exception>
       public static string GetEnumDescription(Enum enumeration)
       {
-         if (enumeration == null) throw new ArgumentException("value");
+         if (enumeration == null) throw new ArgumentException("指定的枚举不存在！","enumeration");
          string description = enumeration.ToString();
          FieldInfo fieldInfo = enumeration.GetType().GetField(description);
          EnumerationDescriptionAttribute[] attributes =

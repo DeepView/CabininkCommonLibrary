@@ -57,13 +57,6 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <returns>该操作会返回一个旋转整数倍360度的角度实例。</returns>
       public Angle GetCycleRotateAngle(int rotateLimit) => this + GetPerigon() * rotateLimit;
       /// <summary>
-      /// 将当前的角度围绕指定点旋转指定角度，不过这个操作在当前类无意义，因此始终都会返回当前实例。
-      /// </summary>
-      /// <param name="axisPoint"></param>
-      /// <param name="angle"></param>
-      /// <returns></returns>
-      public Shape2D Rotate(ExPoint2D axisPoint, Angle angle) => this;
-      /// <summary>
       /// 获取当前Angle实例所表示的角度的正弦值。
       /// </summary>
       /// <returns>该操作会返回当前角度实例的正弦值，但这个值在数学上可能并不精确。</returns>

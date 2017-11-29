@@ -232,7 +232,7 @@ namespace Cabinink.DataTreatment.Database
       {
          List<string> dtnames = new List<string>();
          if (ConnectionStatus == ConnectionState.Closed) Connect();
-         SQLiteDataReader reader = ExecuteSqlToReader(@"SELECT name FROM sqlite_master WHERE type='table'");
+         SQLiteDataReader reader = ExecuteSqlToReader(@"select name from sqlite_master where type='table'");
          while (reader.Read()) dtnames.Add(reader.GetString(0));
          return dtnames;
       }
@@ -251,18 +251,12 @@ namespace Cabinink.DataTreatment.Database
       /// 为当前数据库设置访问密码。
       /// </summary>
       /// <param name="password">即将生效的数据库访问密码。</param>
-      public void SetDbPassword(string password)
-      {
-         DbConnector.SetPassword(password);
-      }
+      public void SetDbPassword(string password) => DbConnector.SetPassword(password);
       /// <summary>
       /// 更新当前数据库的访问密码。
       /// </summary>
       /// <param name="password">用于重新生效的数据库访问密码。</param>
-      public void UpgradePassword(string password)
-      {
-         DbConnector.ChangePassword(password);
-      }
+      public void UpgradePassword(string password) => DbConnector.ChangePassword(password);
       /// <summary>
       /// 断开当前数据库的连接。
       /// </summary>
@@ -289,10 +283,7 @@ namespace Cabinink.DataTreatment.Database
       /// 获取当前SQLiteDBOIEncapsulation实例的完整类名的字符串表达形式。
       /// </summary>
       /// <returns>该操作会返回一个当前实例的完整类名的字符串表达形式。</returns>
-      public override string ToString()
-      {
-         return "Cabinink.DataTreatment.Database.SQLiteDBOIEncapsulation";
-      }
+      public override string ToString() => @"Cabinink.DataTreatment.Database.SQLiteDBOIEncapsulation";
    }
    /// <summary>
    /// 当SQL语句为NULL的时候抛出的异常。

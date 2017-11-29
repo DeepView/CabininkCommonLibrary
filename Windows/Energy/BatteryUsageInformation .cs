@@ -66,39 +66,39 @@ namespace Cabinink.Windows.Energy
       /// <param name="reserved">此参数是保留供将来使用，必须设置为 NULL。</param>
       /// <param name="guid">电源使用方案的标识符。</param>
       /// <param name="subGroup">电源设置的子群。此参数可以是 WinNT.h 中的定义为下列值之一。使用 NO_SUBGROUP_GUID 来引用的默认电源方案。
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |NO_SUBGROUP_GUID //
-      /// |fea3413e-7e05-4911-9a71-700331f1c294 //
-      /// |Settings in this subgroup are part of the default power scheme.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |GUID_DISK_SUBGROUP //
-      /// |0012ee47-9041-4b5d-9b77-535fba8b1442 //
-      /// |Settings in this subgroup control power management configuration of the system's hard disk drives.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |GUID_SYSTEM_BUTTON_SUBGROUP //
-      /// |4f971e89-eebd-4455-a8de-9e59040e7347 // 
-      /// |Settings in this subgroup control configuration of the system power buttons.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |GUID_PROCESSOR_SETTINGS_SUBGROUP //
-      /// |54533251-82be-4824-96c1-47b60b740d00 // 
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |NO_SUBGROUP_GUID //<br/>
+      /// |fea3413e-7e05-4911-9a71-700331f1c294 //<br/>
+      /// |Settings in this subgroup are part of the default power scheme.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_DISK_SUBGROUP //<br/>
+      /// |0012ee47-9041-4b5d-9b77-535fba8b1442 //<br/>
+      /// |Settings in this subgroup control power management configuration of the system's hard disk drives.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_SYSTEM_BUTTON_SUBGROUP //<br/>
+      /// |4f971e89-eebd-4455-a8de-9e59040e7347 // <br/>
+      /// |Settings in this subgroup control configuration of the system power buttons.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_PROCESSOR_SETTINGS_SUBGROUP //<br/>
+      /// |54533251-82be-4824-96c1-47b60b740d00 // <br/>
       /// |Settings in this subgroup control configuration of processor power management features.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |GUID_VIDEO_SUBGROUP //
-      /// |7516b95f-f776-4464-8c53-06167f40cc99 //
-      /// |Settings in this subgroup control configuration of the video power management features.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |GUID_BATTERY_SUBGROUP //
-      /// |e73a048d-bf27-4f12-9731-8b2076e8891f //
-      /// |Settings in this subgroup control battery alarm trip points and actions.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
-      /// |GUID_SLEEP_SUBGROUP //
-      /// |238C9FA8-0AAD-41ED-83F4-97BE242C8F20 //
-      /// |Settings in this subgroup control system sleep settings.
-      /// |———————————————————————————————————————————————————————————————————————————————————————————————————— 
-      /// |GUID_PCIEXPRESS_SETTINGS_SUBGROUP //
-      /// |501a4d13-42af-4429-9fd1-a8218c268e20 //
-      /// |Settings in this subgroup control PCI Express settings.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_VIDEO_SUBGROUP //<br/>
+      /// |7516b95f-f776-4464-8c53-06167f40cc99 //<br/>
+      /// |Settings in this subgroup control configuration of the video power management features.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_BATTERY_SUBGROUP //<br/>
+      /// |e73a048d-bf27-4f12-9731-8b2076e8891f //<br/>
+      /// |Settings in this subgroup control battery alarm trip points and actions.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_SLEEP_SUBGROUP //<br/>
+      /// |238C9FA8-0AAD-41ED-83F4-97BE242C8F20 //<br/>
+      /// |Settings in this subgroup control system sleep settings.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// |GUID_PCIEXPRESS_SETTINGS_SUBGROUP //<br/>
+      /// |501a4d13-42af-4429-9fd1-a8218c268e20 //<br/>
+      /// |Settings in this subgroup control PCI Express settings.<br/>
+      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
       /// </param>
       /// <param name="settingGuid">电源设置标识符。</param>
       /// <param name="acValueIndexPointer">指向接收 AC 值索引的变量的指针。</param>
@@ -270,14 +270,17 @@ namespace Cabinink.Windows.Energy
       /// <summary>
       /// System执行标志。
       /// </summary>
+      [EnumerationDescription("SYSTEM")]
       System = 0x1,
       /// <summary>
       /// Display执行标志。
       /// </summary>
+      [EnumerationDescription("DISPLAY")]
       Display = 0x2,
       /// <summary>
       /// Continus执行标志。
       /// </summary>
+      [EnumerationDescription("CONTINUS")]
       Continus = 0x80000000u
    }
    /// <summary>
@@ -288,14 +291,17 @@ namespace Cabinink.Windows.Energy
       /// <summary>
       /// 关闭状态。
       /// </summary>
+      [EnumerationDescription("已关闭")]
       TurnOff = 0,
       /// <summary>
       /// 打开状态。
       /// </summary>
+      [EnumerationDescription("已打开")]
       TurnOn = 1,
       /// <summary>
       /// 未知状态。
       /// </summary>
+      [EnumerationDescription("未知")]
       Unknown = 255
    }
    /// <summary>
@@ -306,22 +312,27 @@ namespace Cabinink.Windows.Energy
       /// <summary>
       /// 电量充足。
       /// </summary>
+      [EnumerationDescription("电量充足")]
       High = 1,
       /// <summary>
       /// 电量较低。
       /// </summary>
+      [EnumerationDescription("电量较低")]
       Low = 2,
       /// <summary>
       /// 电量严重不足。
       /// </summary>
+      [EnumerationDescription("电量严重不足")]
       Critical = 4,
       /// <summary>
       /// 正在充电。
       /// </summary>
+      [EnumerationDescription("正在充电")]
       Charging = 8,
       /// <summary>
       /// 无电源。
       /// </summary>
+      [EnumerationDescription("无电源")]
       NoSystemBattery = 128
    }
    /// <summary>

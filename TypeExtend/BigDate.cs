@@ -57,6 +57,14 @@ namespace Cabinink.TypeExtend
          _day = day;
       }
       /// <summary>
+      /// 获取BigDate类型能表示的最大日期。
+      /// </summary>
+      public static BigDate MaximumDate => new BigDate(MaximumYear, 12, 31);
+      /// <summary>
+      /// 获取BigDate类型能表示的最小日期。
+      /// </summary>
+      public static BigDate MinimumDate => new BigDate(MinimumYear, 1, 1);
+      /// <summary>
       /// 获取BigDate能够表示的最大年份。
       /// </summary>
       public static int MaximumYear => int.MaxValue;
@@ -139,7 +147,7 @@ namespace Cabinink.TypeExtend
       /// 获取当前实例的日期是从-6000年01月01日开始的第几天。
       /// </summary>
       [CLSCompliant(false)]
-      public ulong DaysBeginWithMinimumYear
+      public ulong DaysBeginWithZero
       {
          get
          {
@@ -211,7 +219,7 @@ namespace Cabinink.TypeExtend
       [CLSCompliant(false)]
       public ulong GetDifferenceOfDay(BigDate differentDate)
       {
-         return (ulong)Math.Abs(DaysBeginWithMinimumYear - (decimal)differentDate.DaysBeginWithMinimumYear);
+         return (ulong)Math.Abs(DaysBeginWithZero - (decimal)differentDate.DaysBeginWithZero);
       }
       /// <summary>
       /// 获取当前实例的指定格式的字符串。
@@ -235,7 +243,7 @@ namespace Cabinink.TypeExtend
             case EDateDisplayCategory.PointSegmentation:
                datest = Year.ToString() + "." + Month.ToString("D2") + "." + Day.ToString("D2");
                break;
-            case EDateDisplayCategory.VolnaSegmentation:
+            case EDateDisplayCategory.WavyLineSegmentation:
                datest = Year.ToString() + "~" + Month.ToString("D2") + "~" + Day.ToString("D2");
                break;
             case EDateDisplayCategory.ChineseSegmentation:
@@ -257,37 +265,6 @@ namespace Cabinink.TypeExtend
       }
    }
    /// <summary>
-   /// 关系运算符的枚举。
-   /// </summary>
-   [Obsolete("Do not use it")]
-   public enum ERelationalOperator : int
-   {
-      /// <summary>
-      /// 等于。
-      /// </summary>
-      Equal = 0x0000,
-      /// <summary>
-      /// 大于。
-      /// </summary>
-      GreaterThan = 0x0001,
-      /// <summary>
-      /// 小于。
-      /// </summary>
-      LessThan = 0x0002,
-      /// <summary>
-      /// 大于等于。
-      /// </summary>
-      GtEqual = 0x0003,
-      /// <summary>
-      /// 小于等于。
-      /// </summary>
-      LtEqual = 0x0004,
-      /// <summary>
-      /// 不等于。
-      /// </summary>
-      NotEqual = 0x0005
-   }
-   /// <summary>
    /// 日期显示方式的枚举。
    /// </summary>
    public enum EDateDisplayCategory : int
@@ -295,26 +272,32 @@ namespace Cabinink.TypeExtend
       /// <summary>
       /// 序列表示。
       /// </summary>
+      [EnumerationDescription("纯序列表示")]
       OnlySerial = 0x0000,
       /// <summary>
       /// 斜线符号分割。
       /// </summary>
+      [EnumerationDescription("斜线符号分割")]
       SolidusSegmentation = 0x0001,
       /// <summary>
       /// 短横线符号分割。
       /// </summary>
+      [EnumerationDescription("短横线符号分割")]
       DashedSegmentation = 0x0002,
       /// <summary>
       /// 句点符号分割。
       /// </summary>
+      [EnumerationDescription("句点符号分割")]
       PointSegmentation = 0x0003,
       /// <summary>
       /// 波浪号分割。
       /// </summary>
-      VolnaSegmentation = 0x0004,
+      [EnumerationDescription("波浪号分割")]
+      WavyLineSegmentation = 0x0004,
       /// <summary>
       /// 中文单位分割。
       /// </summary>
+      [EnumerationDescription("汉字计量单位分割")]
       ChineseSegmentation = 0x0006
    }
    /// <summary>

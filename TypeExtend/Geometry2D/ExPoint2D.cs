@@ -126,6 +126,11 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <returns>该操作将会返回两个点之间的中点坐标，这个返回结果类型为PointF。</returns>
       public ExPoint2D GetMidpoint(ExPoint2D point) => ((XPosition + point.XPosition) / 2, (YPosition + point.YPosition) / 2);
       /// <summary>
+      /// 将当前实例转换为Syste.Drawing.Point实例。
+      /// </summary>
+      /// <returns>该操作会获取一个Syste.Drawing.Point实例。</returns>
+      public Point ToClrPoint() => new Point((int)XPosition, (int)YPosition);
+      /// <summary>
       /// 隐式转换操作符重载（To ExPoint2D）。
       /// </summary>
       /// <param name="point">隐式转换操作符的源类型。</param>

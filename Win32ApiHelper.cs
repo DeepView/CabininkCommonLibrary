@@ -11,6 +11,7 @@ namespace Cabinink
    public sealed class Win32ApiHelper
    {
       private const int FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;//API常量，指定了函数需要为请求消息查找系统消息表资源。
+      private const int FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;//API常量，在消息定义中的插入序列将会被忽略，这个标示符在获取一个格式化好的消息十分有用，如果这个标示符设置好了，那么Arguments参数将被忽略。
       /// <summary>
       /// FormatMessage格式化消息字符串。
       /// </summary>
@@ -22,8 +23,8 @@ namespace Cabinink
       /// <param name="charSize">如果没有设置 FORMAT_MESSAGE_ALLOCATE_BUFFER 标志, 此参数指定了输出缓冲区可以容纳的TCHARS最大个数. 如果设置了 FORMAT_MESSAGE_ALLOCATE_BUFFER 标志，则此参数指定了输出缓冲区可以容纳的TCHARs 的最小个数. 对于ANSI文本, 容量为bytes的个数; 对于Unicode 文本, 容量为字符的个数.</param>
       /// <param name="arguments">数组指针,用于在格式化消息中插入信息. 格式字符串中的 A %1 指示参数数组中的第一值; a %2 表示第二个值; 以此类推.</param>
       /// <returns>如果执行成功, 返回值为存储在输出缓冲区的TCHARs个数, 包括了null结束符。如果执行失败, 返回值为0。 如果要获取更多的错误信息, 请调用 Marshal.GetLastWin32Error或者调用Win32Api函数GetLastError。</returns>
-      [DllImport("user32.dll", EntryPoint = "FormatMessageA", CharSet = CharSet.Ansi)]
-      private extern static int FormatMessage(int flags, IntPtr messageDefineSource, int messageId, int languageId, StringBuilder buffer, int charSize, int arguments);
+      [DllImport("kernel32.dll", EntryPoint = "FormatMessage", CharSet = CharSet.Ansi)]
+      private extern static int FormatMessage(int flags, IntPtr messageDefineSource, int messageId, int languageId, [Out]StringBuilder buffer, int charSize, int arguments);
       /// <summary>
       /// 返回调用线程最近的错误代码值，错误代码以单线程为基础来维护的，多线程不重写各自的错误代码值。
       /// </summary>
@@ -71,22 +72,20 @@ namespace Cabinink
       /// </summary>
       /// <returns>该操作将会返回一个64位的整型数据，这个数据表示了最近一次Windows应用程序所执行的API的错误代码。</returns>
       [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
-      public static long GetLastWin32ApiError()
-      {
-         return GetLastError();
-      }
+      public static long GetLastWin32ApiError() => GetLastError();
       /// <summary>
       /// 将错误号转换为错误消息。
       /// </summary>
-      /// <param name="errorCode">需要转换的错误号。</param>
+      /// <param name="errorCode">需要转换的Win32Api错误代码。</param>
       /// <returns>代表指定错误号的字符串。</returns>
       /// <exception cref="DataTypeConvertFailedException">当强制数据类型转换失败时，则会抛出这个异常。</exception> 
       [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
       public static string FormatErrorCode(long errorCode)
       {
-         if (errorCode > int.MaxValue) throw new DataTypeConvertFailedException();
+         if (errorCode > long.MaxValue) throw new DataTypeConvertFailedException();
+         int flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
          StringBuilder buffer = new StringBuilder(255);
-         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, IntPtr.Zero, (int)errorCode, 0, buffer, buffer.Capacity, 0);
+         FormatMessage(flags, IntPtr.Zero, (int)errorCode, 0, buffer, buffer.Capacity, 0);
          return buffer.ToString();
       }
       /// <summary>

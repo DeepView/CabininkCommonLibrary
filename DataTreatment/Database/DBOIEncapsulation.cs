@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Runtime.CompilerServices;
 namespace Cabinink.DataTreatment.Database
 {
    /// <summary>
@@ -29,10 +30,12 @@ namespace Cabinink.DataTreatment.Database
       /// <summary>
       /// 连接当前实例指定的数据库。
       /// </summary>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       public abstract void Connect();
       /// <summary>
       /// 断开当前数据库的连接。
       /// </summary>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       public abstract void Disconnect();
       /// <summary>
       /// 执行指定的SQL语句。
@@ -43,6 +46,7 @@ namespace Cabinink.DataTreatment.Database
       /// <summary>
       /// 初始化当前的数据库连接。
       /// </summary>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       public abstract bool InitializeConnection();
    }
 }

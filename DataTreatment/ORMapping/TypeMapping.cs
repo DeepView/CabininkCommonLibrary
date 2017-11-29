@@ -12,6 +12,15 @@ namespace Cabinink.DataTreatment.ORMapping
       private object _beforeObject;//进行类型映射之前的实例。
       private ESupportedDbSystem _supportedDbSystem;//CCL支持的数据库系统。
       /// <summary>
+      /// 构造函数，创建一个指定受CCL（Cabinink Common Library）支持的数据库系统类型映射的空数据类型映射实例。
+      /// </summary>
+      /// <param name="supportedDbSystem">CCL支持的数据库系统类型映射的数据库系统。</param>
+      public TypeMapping(ESupportedDbSystem supportedDbSystem)
+      {
+         _beforeObject = null;
+         _supportedDbSystem = supportedDbSystem;
+      }
+      /// <summary>
       /// 构造函数，创建一个默认为SQLite数据库系统类型映射的数据类型映射实例。
       /// </summary>
       /// <param name="mappingObject">需要被映射的数据类型或者实例。</param>
@@ -476,14 +485,17 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <summary>
       /// SQL Server数据库系统。
       /// </summary>
+      [EnumerationDescription("Microsoft SQL Server")]
       SQLServer = 0x0000,
       /// <summary>
       /// SQLite数据库系统。
       /// </summary>
+      [EnumerationDescription("SQLite")]
       SQLite = 0x0001,
       /// <summary>
       /// Microsoft Access 97-2003数据库系统。
       /// </summary>
+      [EnumerationDescription("Microsoft Access 97-2003")]
       MSAccess2003 = 0x0002
    }
 }

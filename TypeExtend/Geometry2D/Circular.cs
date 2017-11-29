@@ -135,14 +135,17 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// <summary>
       /// 两圆相交。
       /// </summary>
+      [EnumerationDescription("相交")]
       Intersect = -0x0001,
       /// <summary>
       /// 两圆相切。
       /// </summary>
+      [EnumerationDescription("相切")]
       NotDistance = 0x0000,
       /// <summary>
       /// 两圆相离。
       /// </summary>
+      [EnumerationDescription("相离")]
       HaveDistance = 0x0001
    }
    /// <summary>
