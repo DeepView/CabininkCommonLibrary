@@ -79,7 +79,7 @@ namespace Cabinink.TypeExtend
       {
          get
          {
-            byte maxdays = 30;
+            byte maxDays = 30;
             switch (Month)
             {
                case 1:
@@ -89,19 +89,19 @@ namespace Cabinink.TypeExtend
                case 8:
                case 10:
                case 12:
-                  maxdays = 31;
+                  maxDays = 31;
                   break;
                case 4:
                case 6:
                case 9:
                case 11:
-                  maxdays = 30;
+                  maxDays = 30;
                   break;
                case 2:
-                  if (IsIntercalaryYear()) maxdays = 29; else maxdays = 28;
+                  if (IsIntercalaryYear()) maxDays = 29; else maxDays = 28;
                   break;
             }
-            return maxdays;
+            return maxDays;
          }
       }
       /// <summary>

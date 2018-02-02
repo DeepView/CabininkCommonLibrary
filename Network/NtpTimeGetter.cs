@@ -77,6 +77,16 @@ namespace Cabinink.Network
       [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
       private static extern bool SetLocalTime([In] ref SLocalSystemTime systemTime);
       /// <summary>
+      /// 构造函数，创建一个指定NTP服务器的NTP时间获取实例。
+      /// </summary>
+      /// <param name="ntpServer">指定的NTP服务器。</param>
+      public NtpTimeGetter(string ntpServer)
+      {
+         _dateTime = DateTime.Now;
+         _ntpServer = ntpServer;
+         _doneEvent = new ManualResetEvent(false);
+      }
+      /// <summary>
       /// 构造函数，创建一个指定NTP服务器和线程等待通知事件的NTP时间获取实例。
       /// </summary>
       /// <param name="ntpServer">指定的NTP服务器。</param>

@@ -24,6 +24,9 @@
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -85,6 +88,8 @@
     <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
     <Compile Include="Devices\Monitor.cs" />
+    <Compile Include="Devices\PositionIndicator.cs" />
+    <Compile Include="Devices\Sound.cs" />
     <Compile Include="EnumerationDescriptionAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IOSystem\FileOperator.cs" />
@@ -93,6 +98,7 @@
     <Compile Include="IOSystem\RevisionControl\Committer.cs" />
     <Compile Include="IOSystem\FileStateMonitor.cs" />
     <Compile Include="IOSystem\RevisionControl\IExecuter.cs" />
+    <Compile Include="IOSystem\RevisionControl\ILogOperator.cs" />
     <Compile Include="IOSystem\RevisionControl\Puller.cs" />
     <Compile Include="IOSystem\RevisionControl\Pusher.cs" />
     <Compile Include="IOSystem\RevisionControl\ActivityRecorder.cs" />
@@ -117,6 +123,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="TypeExtend\BigDate.cs" />
+    <Compile Include="TypeExtend\Collections\BiDirectionalLinkedList.cs" />
+    <Compile Include="TypeExtend\Collections\ListNode.cs" />
     <Compile Include="TypeExtend\ExString.cs" />
     <Compile Include="TypeExtend\Geometry2D\Angle.cs" />
     <Compile Include="TypeExtend\Geometry2D\Circular.cs" />

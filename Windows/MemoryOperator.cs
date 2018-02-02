@@ -1,10 +1,65 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
+using Cabinink.DataTreatment.ORMapping;
 using System.Runtime.ConstrainedExecution;
 namespace Cabinink.Windows
 {
+   /// <summary>
+   /// 包含有关物理内存、扩展内存和虚拟内存当前状态的信息的结构体。
+   /// </summary>
+   /// <remarks>该结构反映了通信时的记忆状态，同时也反映了当时分页文件的大小，操作系统可以将分页文件放大到管理员设置的最大大小，返回的物理内存大小包含所有节点的内存。</remarks>
+   [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+   public struct SMemoryStatus
+   {
+      /// <summary>
+      /// 结构的大小，以字节为单位，必须在调用GlobalMemoryStatusEx之前设置此成员。
+      /// </summary>
+      [CLSCompliant(false)]
+      public uint Length;
+      /// <summary>
+      /// 介于0和100之间的数字，指定正在使用的物理内存的近似百分比（0表示不使用内存，100表示​​使用全部内存）。
+      /// </summary>
+      [CLSCompliant(false)]
+      public uint MemoryLoad;
+      /// <summary>
+      /// 实际物理内存的数量，以字节为单位。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong TotalPhysicalMemory;
+      /// <summary>
+      /// 当前可用的物理内存量，以字节为单位。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong AvailablePhysicalMemory;
+      /// <summary>
+      /// 当前提交的系统或当前进程的内存限制，以较小者为准，以字节为单位。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong TotalPageFile;
+      /// <summary>
+      /// 当前进程可以提交的最大内存量，以字节为单位。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong AvailablePageFile;
+      /// <summary>
+      /// 调用进程的虚拟地址空间的用户模式部分的大小（以字节为单位），此值取决于进程的类型，处理器的类型以及操作系统的配置。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong TotalVirtualMemory;
+      /// <summary>
+      /// 当前在调用进程的虚拟地址空间的用户模式部分中的未保留和未提交的内存量，以字节为单位。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong AvailableVirtualMemory;
+      /// <summary>
+      /// 保留，该值始终为0。
+      /// </summary>
+      [CLSCompliant(false)]
+      public ulong AvailableExtendedVirtualMemory;
+   }
    /// <summary>
    /// 物理内存输入输出的类，但这个类不能被继承，另外在使用这个类所包含的函数之前，建议了解一些相关的技术知识。
    /// </summary>
@@ -15,6 +70,22 @@ namespace Cabinink.Windows
       private const int TOKEN_QUERY = 0x00000008;//令牌查询。
       private const int PROCESS_ALL_ACCESS = 0x1f0fff;//获取最高权限。
       private const int TOKEN_ADJUST_PRIVILEGES = 0x00000020;//权限提升标记。
+      /// <summary>
+      /// 检索有关系统当前使用物理和虚拟内存的信息。
+      /// </summary>
+      /// <param name="buffer">指向SMemoryStatus（Win32Api中为MEMORYSTATUSEX结构）结构的指针，用于接收有关当前内存可用性的信息。</param>
+      /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
+      [return: MarshalAs(UnmanagedType.Bool)]
+      [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+      private static extern bool GlobalMemoryStatusEx(ref SMemoryStatus buffer);
+      /// <summary>
+      /// 将指定的内存块清零。
+      /// </summary>
+      /// <param name="initalizeLocation">指向一块准备用0来填充的内存区域的开始地址。</param>
+      /// <param name="size">准备用0来填充的内存区域的大小，按字节来计算。</param>
+      /// <remarks>使用结构前清零，而不让结构的成员数值具有不确定性，是一个好的编程习惯。</remarks>
+      [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
+      private static extern void ZeroMemory(IntPtr initalizeLocation, IntPtr size);
       /// <summary>
       /// 获取当前进程的一个伪句柄。
       /// </summary>
@@ -41,7 +112,7 @@ namespace Cabinink.Windows
       /// <param name="numberOfBytesRead">实际传送的字节数。</param>
       /// <returns>如果执行成功，返回true，如果执行失败，返回false，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
       [DllImport("kernel32.dll", EntryPoint = "ReadProcessMemory")]
-      public static extern bool ReadProcessMemory(IntPtr processHandle, IntPtr baseAddress, IntPtr buffer, int size, IntPtr numberOfBytesRead);
+      private static extern bool ReadProcessMemory(IntPtr processHandle, IntPtr baseAddress, IntPtr buffer, int size, IntPtr numberOfBytesRead);
       /// <summary>
       /// 打开一个已存在的进程对象，并返回进程的句柄。
       /// </summary>
@@ -50,7 +121,7 @@ namespace Cabinink.Windows
       /// <param name="processId">进程标示符。</param>
       /// <returns>如果操作成功，返回值为指定进程的句柄，否则返回值为空，如果要获取更多的错误信息，请调用Marshal.GetLastWin32Error。</returns>
       [DllImport("kernel32.dll", EntryPoint = "OpenProcess")]
-      public static extern IntPtr OpenProcess(int desiredAccess, bool inheritHandle, int processId);
+      private static extern IntPtr OpenProcess(int desiredAccess, bool inheritHandle, int processId);
       /// <summary>
       /// 关闭包含句柄的对象。
       /// </summary>
@@ -156,6 +227,64 @@ namespace Cabinink.Windows
          {
             throw new MemoryIOException();
          }
+      }
+      /// <summary>
+      /// 将指定的内存块清零，只适用于值类型和结构体。
+      /// </summary>
+      /// <param name="valueTypeObject">需要用于清零内存块的变量或者结构。</param>
+      /// <param name="size">准备用0来填充的内存区域的大小，按字节来计算。</param>
+      public static void ResetMemoryContext(ValueType valueTypeObject, int size)
+      {
+         GCHandle gcHandle = GCHandle.Alloc(valueTypeObject, GCHandleType.Pinned);
+         ZeroMemory(gcHandle.AddrOfPinnedObject(), new IntPtr(size));
+         gcHandle.Free();
+      }
+      /// <summary>
+      /// 以更加安全的方式将指定的内存块清零，如果参数valueTypeObject的值为一个结构实例，则会检索这个结构的成员是否合法，该操作只适用于值类型和结构体。
+      /// </summary>
+      /// <param name="valueTypeObject">需要用于清零内存块的变量或者结构。</param>
+      /// <param name="size">准备用0来填充的内存区域的大小，按字节来计算。</param>
+      /// <returns>如果操作无异常并且成功，则会返回true，否则返回false。</returns>
+      public static bool SecurityResetMemoryContext(ValueType valueTypeObject, int size)
+      {
+         FieldInfo[] fInfos = valueTypeObject.GetType().GetFields();
+         TypeMapping mapping = new TypeMapping();
+         bool canResetMemory = false;
+         if (!mapping.IsNonStructOrEnumValueType(valueTypeObject))
+         {
+            foreach (FieldInfo item in fInfos)
+            {
+               if (item.GetType().BaseType.Name == @"System.ValueType") canResetMemory = true;
+               else
+               {
+                  canResetMemory = false;
+                  break;
+               }
+            }
+         }
+         if (canResetMemory) ResetMemoryContext(valueTypeObject, size);
+         return canResetMemory;
+      }
+      /// <summary>
+      /// 获取当前计算机的内存状态。
+      /// </summary>
+      /// <returns>该操作如果无异常，则会返回一个包含内存信息和状态的结构。</returns>
+      public static SMemoryStatus GetMemoryStatus()
+      {
+         SMemoryStatus status = new SMemoryStatus
+         {
+            Length = (uint)Marshal.SizeOf(typeof(SMemoryStatus)),
+            MemoryLoad = 0,
+            TotalPhysicalMemory = 0,
+            AvailablePhysicalMemory = 0,
+            TotalPageFile = 0,
+            AvailablePageFile = 0,
+            TotalVirtualMemory = 0,
+            AvailableVirtualMemory = 0,
+            AvailableExtendedVirtualMemory = 0
+         };
+         GlobalMemoryStatusEx(ref status);
+         return status;
       }
       /// <summary>
       /// 获取指定变量的物理内存地址，不过该方法可能不适用于引用类型和其他托管类型变量。

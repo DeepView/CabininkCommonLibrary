@@ -11,7 +11,7 @@ namespace Cabinink.IOSystem.RevisionControl
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class StagingArea
+   public class StagingArea : ILogOperator
    {
       private FileStateMonitor _monitor;//工作区状态监视器。
       private RepositoryManager _repoManager;//文件仓库管理。
@@ -19,6 +19,7 @@ namespace Cabinink.IOSystem.RevisionControl
       private long _lastTimeMonitorChangedCount;//上一次文件状态监视更新计数。
       private long _storageTimeTicks;//暂存区更新时间。
       private const string VCS_LOGDB_FILE = @"\vcsdb.sqlite3";//本地文件版本控制系统工作日志数据库名称。
+      private const string VCS_STAGING_LOG_DBTABLE = @"stagingLog";//本地文件版本控制系统暂存区日志数据表名称。
       /// <summary>
       /// 构造函数，创建一个指定监视器和项目仓库的暂存区。
       /// </summary>
@@ -64,6 +65,10 @@ namespace Cabinink.IOSystem.RevisionControl
       /// </summary>
       public void ClearMonitorRecords() => Monitor.Records.Clear();
       /// <summary>
+      /// 获取本地文件版本控制系统暂存区日志数据表名称。
+      /// </summary>
+      internal static string StagingLogDbTableName => VCS_STAGING_LOG_DBTABLE;
+      /// <summary>
       /// 将已经更改的文件更新并存储到暂存工作区。
       /// </summary>
       /// <returns>如果暂存工作区的文件已经被更新，则返回true，否则返回false。</returns>
@@ -91,9 +96,9 @@ namespace Cabinink.IOSystem.RevisionControl
       /// <summary>
       /// 向数据库中更新本次的暂存操作记录。
       /// </summary>
-      public void UpdateStagingLog()
+      public void UpdateLog()
       {
-         string sqlSentence = @"create table stagingLog(storageTime BIGINT, changedTime BIGINT, fileUrl TEXT);";
+         string sqlSentence = @"create table " + StagingLogDbTableName + @"(storageTime BIGINT, changedTime BIGINT, fileUrl TEXT);";
          SQLiteDBOIEncapsulation sqlite = new SQLiteDBOIEncapsulation(new Uri(StagingDirectory + VCS_LOGDB_FILE));
          sqlite.InitializeConnection();
          sqlite.Connect();
@@ -122,7 +127,7 @@ namespace Cabinink.IOSystem.RevisionControl
       /// <summary>
       /// 清空数据库中的暂存操作记录。
       /// </summary>
-      public void ClearStagingLog()
+      public void ClearLog()
       {
          SQLiteDBOIEncapsulation sqlite = new SQLiteDBOIEncapsulation(new Uri(StagingDirectory + VCS_LOGDB_FILE));
          sqlite.InitializeConnection();

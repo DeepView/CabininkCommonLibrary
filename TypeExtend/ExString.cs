@@ -23,53 +23,41 @@ namespace Cabinink.TypeExtend
       /// <summary>
       /// 构造函数，创建一个空字符串的扩展字符串实例。
       /// </summary>
-      public ExString()
-      {
-         _clrString = string.Empty;
-      }
+      public ExString() => _clrString = string.Empty;
       /// <summary>
       /// 构造函数，创建一个指定字符串的扩展字符串实例。
       /// </summary>
       /// <param name="clrString">指定的字符串，用于给当前实例赋值。</param>
-      public ExString(string clrString)
-      {
-         _clrString = clrString;
-      }
+      public ExString(string clrString) => _clrString = clrString;
       /// <summary>
       /// 构造函数，创建一个由指定StringBuilder所指示的扩展字符串实例。
       /// </summary>
       /// <param name="stringBuilder">指定的StringBuilder实例。</param>
-      public ExString(StringBuilder stringBuilder)
-      {
-         _clrString = stringBuilder.ToString();
-      }
+      public ExString(StringBuilder stringBuilder) => _clrString = stringBuilder.ToString();
       /// <summary>
       /// 构造函数，将当前实例初始化为由Unicode字符数组指示的值。
       /// </summary>
       /// <param name="chars">需要用于初始化当前实例的字符数组。</param>
       [CLSCompliant(false)]
-      public ExString(char[] chars)
-      {
-         _clrString = new string(chars);
-      }
+      public ExString(char[] chars) => _clrString = new string(chars);
+      /// <summary>
+      /// 构造函数，将当前实例初始化为由指定的带符号字节数组指针指示的值。
+      /// </summary>
+      /// <param name="unicodeBytes">带符号字节数组指针。</param>
+      [CLSCompliant(false)]
+      public unsafe ExString(sbyte* unicodeBytes) => _clrString = new string(unicodeBytes);
       /// <summary>
       /// 构造函数，将当前实例初始化为由指向Unicode字符数组的指定指针指示的值。
       /// </summary>
       /// <param name="chars">指向以null终止的Unicode字符数组的指针。</param>
       [CLSCompliant(false)]
-      public unsafe ExString(char* chars)
-      {
-         _clrString = new string(chars);
-      }
+      public unsafe ExString(char* chars) => _clrString = new string(chars);
       /// <summary>
       /// 构造函数，从指定的文件中以指定编码方式读取文件内容文本并用来实例化当前的实例。
       /// </summary>
       /// <param name="fileUrl">被用来获取文本的文件的文件地址。</param>
       /// <param name="encoding">读取文件的编码格式。</param>
-      public ExString(string fileUrl, Encoding encoding)
-      {
-         _clrString = FileOperator.ReadFileContext(fileUrl, true, encoding);
-      }
+      public ExString(string fileUrl, Encoding encoding) => _clrString = FileOperator.ReadFileContext(fileUrl, true, encoding);
       /// <summary>
       /// 获取或设置当前实例的字符串文本。
       /// </summary>
@@ -94,6 +82,15 @@ namespace Cabinink.TypeExtend
             stringChars[index] = value;
          }
       }
+      /// <summary>
+      /// 将当前实例重置为空字符串状态，而非NULL状态。
+      /// </summary>
+      public void ResetToEmpty() => StringContext = string.Empty;
+      /// <summary>
+      /// 判定当前字符串是否为空字符串。
+      /// </summary>
+      /// <returns>如果当前实例为空字符串（Empty）则会返回true，否则会返回false。</returns>
+      public bool IsEmpty() => Length == 0 ? true : false;
       /// <summary>
       /// 在当前实例获取指定的字符串，起始位置为index，长度等于索引开始到字符串结尾的长度。
       /// </summary>
@@ -144,6 +141,18 @@ namespace Cabinink.TypeExtend
          resultPointer.Free();
          return charsPointer;
       }
+      /// <summary>
+      /// 首部截取指定长度的字符串。
+      /// </summary>
+      /// <param name="interceptLength">需要截取的长度。</param>
+      /// <returns>操作完成并没有任何异常抛出之后，则会返回一个从当前实例索引0开始截取指定长度的ExString字符串实例。</returns>
+      public ExString FirstIntercept(int interceptLength) => SubString(0, interceptLength);
+      /// <summary>
+      /// 尾部截取指定长度的字符串。
+      /// </summary>
+      /// <param name="interceptLength">需要截取的长度。</param>
+      /// <returns>操作完成并没有任何异常抛出之后，则会返回一个从当前实例尾部截取指定长度的ExString字符串实例。</returns>
+      public ExString TailIntercept(int interceptLength) => SubString(Length - interceptLength);
       /// <summary>
       /// 删除实例的前导空格，但是会忽略尾部空格，并且原有实例不会发生变化，操作之后会返回一个新的实例。
       /// </summary>
@@ -223,6 +232,7 @@ namespace Cabinink.TypeExtend
       /// 返回当前扩展字符串实例的十六进制ASCII序列。
       /// </summary>
       /// <returns>如果该操作没有产生任何异常，则会得到一个当前实例的十六进制ASCII序列字符串。</returns>
+
       public ExString ToAsciiHexSerial()
       {
          char[] strArray = ConvertToCharArray();

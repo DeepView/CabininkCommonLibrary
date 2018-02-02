@@ -12,6 +12,14 @@ namespace Cabinink.DataTreatment.ORMapping
       private object _beforeObject;//进行类型映射之前的实例。
       private ESupportedDbSystem _supportedDbSystem;//CCL支持的数据库系统。
       /// <summary>
+      /// 构造函数，创建一个SQLite数据库系统类型映射的空数据类型映射实例。
+      /// </summary>
+      public TypeMapping()
+      {
+         _beforeObject = null;
+         _supportedDbSystem = ESupportedDbSystem.SQLite;
+      }
+      /// <summary>
       /// 构造函数，创建一个指定受CCL（Cabinink Common Library）支持的数据库系统类型映射的空数据类型映射实例。
       /// </summary>
       /// <param name="supportedDbSystem">CCL支持的数据库系统类型映射的数据库系统。</param>
@@ -420,7 +428,7 @@ namespace Cabinink.DataTreatment.ORMapping
       /// </summary>
       /// <param name="obj">用于判断的数据类型实例。</param>
       /// <returns>如果指定的数据类型是CTS支持的数据类型，则会返回true，否则返回false。</returns>
-      public bool IsCtsDefinedType(Object obj)
+      public bool IsCtsDefinedType(object obj)
       {
          bool isCtsDefinedType;
          switch (obj.GetType().FullName)
@@ -450,6 +458,40 @@ namespace Cabinink.DataTreatment.ORMapping
                break;
          }
          return isCtsDefinedType;
+      }
+      /// <summary>
+      /// 指示指定的类型是否是除结构和枚举外的值类型。
+      /// </summary>
+      /// <param name="obj">需要被判断的类型。</param>
+      /// <returns>如果指定的数据类型是除结构和枚举外的值类型，则会返回true，否则返回false。</returns>
+      public bool IsNonStructOrEnumValueType(object obj)
+      {
+         bool isNonStructOrEnumCtsDefinedType;
+         switch (obj.GetType().FullName)
+         {
+            case @"System.Byte":
+            case @"System.SByte":
+            case @"System.Int16":
+            case @"System.Int32":
+            case @"System.Int64":
+            case @"System.UInt16":
+            case @"System.UInt32":
+            case @"System.UInt64":
+            case @"System.Single":
+            case @"System.Double":
+            case @"System.Boolean":
+            case @"System.Char":
+            case @"System.Decimal":
+            case @"System.IntPtr":
+            case @"System.UIntPtr":
+            case @"System.DateTime":
+               isNonStructOrEnumCtsDefinedType = true;
+               break;
+            default:
+               isNonStructOrEnumCtsDefinedType = false;
+               break;
+         }
+         return isNonStructOrEnumCtsDefinedType;
       }
       /// <summary>
       /// 获取日期时间类型映射到当前实例指定的数据库系统的数据类型的名称字符串。

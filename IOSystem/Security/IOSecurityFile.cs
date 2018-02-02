@@ -8,7 +8,6 @@ using System.Runtime.Serialization;
 using System.Security.AccessControl;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-
 namespace Cabinink.IOSystem.Security
 {
    /// <summary>
@@ -39,7 +38,7 @@ namespace Cabinink.IOSystem.Security
       public IOSecurityFile(string fileUrl)
       {
          if (!FileOperator.FileExists(fileUrl)) throw new FileNotFoundException("指定的文件找不到！", fileUrl);
-         ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
+         ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_STOP);
          CloseWritePassageway();
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
@@ -67,7 +66,7 @@ namespace Cabinink.IOSystem.Security
          {
             if (!FileOperator.FileExists(fileUrl)) throw new FileNotFoundException("指定的文件找不到！", fileUrl);
          }
-         ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
+         ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_STOP);
          CloseWritePassageway();
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
@@ -200,6 +199,7 @@ namespace Cabinink.IOSystem.Security
       /// </summary>
       /// <param name="encoding">指定的编码方式，这个编码决定了文件读取的编码方式。</param>
       /// <exception cref="CodeSecurityNotMatchException">当代码操作在允许的构造逻辑或者操作安全范围外时，则会抛出这个异常。</exception>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       public void ReadUnencrypted(Encoding encoding)
       {
          if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
@@ -211,6 +211,7 @@ namespace Cabinink.IOSystem.Security
       /// <param name="fileUrl">文件副本的地址。</param>
       /// <param name="encoding">文件内容需要采用的编码格式。</param>
       /// <exception cref="FileIsExistedException">如果参数fileUrl指定的文件地址存在时，则会抛出这个异常。</exception>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       public void SaveAsUnencryptedCopy(string fileUrl, Encoding encoding)
       {
          if (FileOperator.FileExists(fileUrl)) throw new FileIsExistedException();
@@ -321,6 +322,7 @@ namespace Cabinink.IOSystem.Security
       /// <param name="isAppend">用于决定文件内容的存取方式，如果这个参数值为true，则意味着该操作将会以追加的方式把文本内容追加到文件末尾，反之将会以覆盖原本内容的方式存取文件。</param>
       /// <param name="encoding">指定的编码方式，这个编码决定了文件存取的编码方式。</param>
       /// <exception cref="CodeSecurityNotMatchException">当代码操作在允许的构造逻辑或者操作安全范围外时，则会抛出这个异常。</exception>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       public void WriteUnencrypted(bool isAppend, Encoding encoding)
       {
          if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP || _isReadOnly) throw new CodeSecurityNotMatchException();
@@ -331,6 +333,7 @@ namespace Cabinink.IOSystem.Security
       /// </summary>
       /// <param name="flag">用于被变更的代码安全标识符。</param>
       /// <exception cref="ArgumentOutOfRangeException">当参数超出范围时，则会抛出这个异常。</exception>
+      [MethodImpl(MethodImplOptions.Synchronized)]
       private void ChangeCodeSecurityFlag(int flag)
       {
          _codeSecurityFlag = flag;

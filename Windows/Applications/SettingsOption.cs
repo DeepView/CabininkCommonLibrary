@@ -19,6 +19,8 @@ namespace Cabinink.Windows.Applications
       /// </summary>
       /// <param name="name">指定的设置选项名称。</param>
       /// <param name="value">指定的选项值。</param>
+      /// <exception cref="ArgumentException">当设置选项名称为空时，则会抛出这个异常。</exception>
+      /// <exception cref="NullReferenceException">当设置项的值为空引用时则会抛出这个异常。</exception>
       public SettingsOption(string name, T value)
       {
          if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("设置选项名称不能为空！", "name");
@@ -35,6 +37,8 @@ namespace Cabinink.Windows.Applications
       /// <param name="description">指定的设置选项注释或者帮助信息。</param>
       /// <param name="value">指定的选项值。</param>
       /// <param name="effectiveMode">指定的生效模式。</param>
+      /// <exception cref="ArgumentException">当设置选项名称为空时，则会抛出这个异常。</exception>
+      /// <exception cref="NullReferenceException">当设置项的值为空引用时则会抛出这个异常。</exception>
       public SettingsOption(string name, string description, T value, EEffectiveMode effectiveMode)
       {
          if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("设置选项名称不能为空！", "name");
@@ -47,6 +51,7 @@ namespace Cabinink.Windows.Applications
       /// <summary>
       /// 获取或设置当前实例的设置选项名称。
       /// </summary>
+      /// <exception cref="ArgumentException">当设置选项名称为空时，则会抛出这个异常。</exception>
       public string Name
       {
          get => _name;
@@ -63,6 +68,7 @@ namespace Cabinink.Windows.Applications
       /// <summary>
       /// 获取或设置当前实例的选项值。
       /// </summary>
+      /// <exception cref="NullReferenceException">当设置项的值为空引用时则会抛出这个异常。</exception>
       public T Value
       {
          get => _value;

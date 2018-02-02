@@ -66,39 +66,39 @@ namespace Cabinink.Windows.Energy
       /// <param name="reserved">此参数是保留供将来使用，必须设置为 NULL。</param>
       /// <param name="guid">电源使用方案的标识符。</param>
       /// <param name="subGroup">电源设置的子群。此参数可以是 WinNT.h 中的定义为下列值之一。使用 NO_SUBGROUP_GUID 来引用的默认电源方案。
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |NO_SUBGROUP_GUID //<br/>
-      /// |fea3413e-7e05-4911-9a71-700331f1c294 //<br/>
-      /// |Settings in this subgroup are part of the default power scheme.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_DISK_SUBGROUP //<br/>
-      /// |0012ee47-9041-4b5d-9b77-535fba8b1442 //<br/>
-      /// |Settings in this subgroup control power management configuration of the system's hard disk drives.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_SYSTEM_BUTTON_SUBGROUP //<br/>
-      /// |4f971e89-eebd-4455-a8de-9e59040e7347 // <br/>
-      /// |Settings in this subgroup control configuration of the system power buttons.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_PROCESSOR_SETTINGS_SUBGROUP //<br/>
-      /// |54533251-82be-4824-96c1-47b60b740d00 // <br/>
-      /// |Settings in this subgroup control configuration of processor power management features.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_VIDEO_SUBGROUP //<br/>
-      /// |7516b95f-f776-4464-8c53-06167f40cc99 //<br/>
-      /// |Settings in this subgroup control configuration of the video power management features.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_BATTERY_SUBGROUP //<br/>
-      /// |e73a048d-bf27-4f12-9731-8b2076e8891f //<br/>
-      /// |Settings in this subgroup control battery alarm trip points and actions.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_SLEEP_SUBGROUP //<br/>
-      /// |238C9FA8-0AAD-41ED-83F4-97BE242C8F20 //<br/>
-      /// |Settings in this subgroup control system sleep settings.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_PCIEXPRESS_SETTINGS_SUBGROUP //<br/>
-      /// |501a4d13-42af-4429-9fd1-a8218c268e20 //<br/>
-      /// |Settings in this subgroup control PCI Express settings.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|NO_SUBGROUP_GUID //</para>
+      /// <para>|fea3413e-7e05-4911-9a71-700331f1c294 //</para>
+      /// <para>|Settings in this subgroup are part of the default power scheme.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_DISK_SUBGROUP //</para>
+      /// <para>|0012ee47-9041-4b5d-9b77-535fba8b1442 //</para>
+      /// <para>|Settings in this subgroup control power management configuration of the system's hard disk drives.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_SYSTEM_BUTTON_SUBGROUP //</para>
+      /// <para>|4f971e89-eebd-4455-a8de-9e59040e7347 //</para>
+      /// <para>|Settings in this subgroup control configuration of the system power buttons.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_PROCESSOR_SETTINGS_SUBGROUP //</para>
+      /// <para>|54533251-82be-4824-96c1-47b60b740d00 //</para>
+      /// <para>|Settings in this subgroup control configuration of processor power management features.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_VIDEO_SUBGROUP //</para>
+      /// <para>|7516b95f-f776-4464-8c53-06167f40cc99 //</para>
+      /// <para>|Settings in this subgroup control configuration of the video power management features.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_BATTERY_SUBGROUP //</para>
+      /// <para>|e73a048d-bf27-4f12-9731-8b2076e8891f //</para>
+      /// <para>|Settings in this subgroup control battery alarm trip points and actions.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_SLEEP_SUBGROUP //</para>
+      /// <para>|238C9FA8-0AAD-41ED-83F4-97BE242C8F20 //</para>
+      /// <para>|Settings in this subgroup control system sleep settings.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_PCIEXPRESS_SETTINGS_SUBGROUP //</para>
+      /// <para>|501a4d13-42af-4429-9fd1-a8218c268e20 //</para>
+      /// <para>|Settings in this subgroup control PCI Express settings.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
       /// </param>
       /// <param name="settingGuid">电源设置标识符。</param>
       /// <param name="acValueIndexPointer">指向接收 AC 值索引的变量的指针。</param>
@@ -111,39 +111,39 @@ namespace Cabinink.Windows.Energy
       /// <param name="reserved">此参数是保留供将来使用，必须设置为 NULL。</param>
       /// <param name="guid">指定电源方案的GUID。</param>
       /// <param name="subGroup">电源设置的子群。此参数可以是 WinNT.h 中的定义为下列值之一。使用 NO_SUBGROUP_GUID 来引用的默认电源方案。
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |NO_SUBGROUP_GUID //<br/>
-      /// |fea3413e-7e05-4911-9a71-700331f1c294 //<br/>
-      /// |Settings in this subgroup are part of the default power scheme.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_DISK_SUBGROUP //<br/>
-      /// |0012ee47-9041-4b5d-9b77-535fba8b1442 //<br/>
-      /// |Settings in this subgroup control power management configuration of the system's hard disk drives.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_SYSTEM_BUTTON_SUBGROUP //<br/>
-      /// |4f971e89-eebd-4455-a8de-9e59040e7347 // <br/>
-      /// |Settings in this subgroup control configuration of the system power buttons.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_PROCESSOR_SETTINGS_SUBGROUP //<br/>
-      /// |54533251-82be-4824-96c1-47b60b740d00 // <br/>
-      /// |Settings in this subgroup control configuration of processor power management features.
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_VIDEO_SUBGROUP //<br/>
-      /// |7516b95f-f776-4464-8c53-06167f40cc99 //<br/>
-      /// |Settings in this subgroup control configuration of the video power management features.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_BATTERY_SUBGROUP //<br/>
-      /// |e73a048d-bf27-4f12-9731-8b2076e8891f //<br/>
-      /// |Settings in this subgroup control battery alarm trip points and actions.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_SLEEP_SUBGROUP //<br/>
-      /// |238C9FA8-0AAD-41ED-83F4-97BE242C8F20 //<br/>
-      /// |Settings in this subgroup control system sleep settings.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
-      /// |GUID_PCIEXPRESS_SETTINGS_SUBGROUP //<br/>
-      /// |501a4d13-42af-4429-9fd1-a8218c268e20 //<br/>
-      /// |Settings in this subgroup control PCI Express settings.<br/>
-      /// |————————————————————————————————————————————————————————————————————————————————————————————————————<br/>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|NO_SUBGROUP_GUID //</para>
+      /// <para>|fea3413e-7e05-4911-9a71-700331f1c294 //</para>
+      /// <para>|Settings in this subgroup are part of the default power scheme.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_DISK_SUBGROUP //</para>
+      /// <para>|0012ee47-9041-4b5d-9b77-535fba8b1442 //</para>
+      /// <para>|Settings in this subgroup control power management configuration of the system's hard disk drives.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_SYSTEM_BUTTON_SUBGROUP //</para>
+      /// <para>|4f971e89-eebd-4455-a8de-9e59040e7347 //</para>
+      /// <para>|Settings in this subgroup control configuration of the system power buttons.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_PROCESSOR_SETTINGS_SUBGROUP //</para>
+      /// <para>|54533251-82be-4824-96c1-47b60b740d00 //</para>
+      /// <para>|Settings in this subgroup control configuration of processor power management features.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_VIDEO_SUBGROUP //</para>
+      /// <para>|7516b95f-f776-4464-8c53-06167f40cc99 //</para>
+      /// <para>|Settings in this subgroup control configuration of the video power management features.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_BATTERY_SUBGROUP //</para>
+      /// <para>|e73a048d-bf27-4f12-9731-8b2076e8891f //</para>
+      /// <para>|Settings in this subgroup control battery alarm trip points and actions.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_SLEEP_SUBGROUP //</para>
+      /// <para>|238C9FA8-0AAD-41ED-83F4-97BE242C8F20 //</para>
+      /// <para>|Settings in this subgroup control system sleep settings.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
+      /// <para>|GUID_PCIEXPRESS_SETTINGS_SUBGROUP //</para>
+      /// <para>|501a4d13-42af-4429-9fd1-a8218c268e20 //</para>
+      /// <para>|Settings in this subgroup control PCI Express settings.</para>
+      /// <para>|————————————————————————————————————————————————————————————————————————————————————————————————————</para>
       /// </param>
       /// <param name="settingGuid">电源设置的标识符。</param>
       /// <param name="acValueIndexPointer">AC 值的索引。</param>

@@ -17,10 +17,28 @@ namespace Cabinink
       /// <returns>如果该操作不会抛出任何异常，则将会返回false，但是在抛出任何异常的情况下，该方法都会抛出true。</returns>
       public static bool IsThrowedException(Action executedCode, ref Exception throwedException)
       {
+         int returnValue = 0;
+         Func<int> executed = new Func<int>(delegate
+         {
+            executedCode.Invoke();
+            return 0;
+         });
+         return IsThrowedException(executed, ref returnValue, ref throwedException);
+      }
+      /// <summary>
+      /// 执行参数executedCode包含存在返回值的代码并检查是否会抛出异常。
+      /// </summary>
+      /// <typeparam name="T">用于表示参数executedCode所封装委托的返回值类型。</typeparam>
+      /// <param name="executedCode">需要执行的代码。</param>
+      /// <param name="returnValue">参数executedCode封装的委托的返回值。</param>
+      /// <param name="throwedException">用于保存已经抛出的异常，但这里只能捕获到最先抛出的异常。</param>
+      /// <returns>如果该操作不会抛出任何异常，则将会返回false，但是在抛出任何异常的情况下，该方法都会抛出true。</returns>
+      public static bool IsThrowedException<T>(Func<T> executedCode, ref T returnValue, ref Exception throwedException)
+      {
          bool result = false;
          try
          {
-            executedCode.Invoke();
+            returnValue = executedCode.Invoke();
          }
          catch (Exception exception)
          {
@@ -40,9 +58,27 @@ namespace Cabinink
       /// <returns>如果该操作不会写入新的Win32错误代码，则将会返回false，但是在写入任何Win32错误代码的情况下，该方法都会抛出true。</returns>
       public static bool IsWritedWin32ErrorCode(Action executedUnmanagedCode, ref long win32ErrorCode)
       {
+         int returnValue = 0;
+         Func<int> executed = new Func<int>(delegate
+         {
+            executedUnmanagedCode.Invoke();
+            return 0;
+         });
+         return IsWritedWin32ErrorCode(executed, ref returnValue, ref win32ErrorCode);
+      }
+      /// <summary>
+      /// 执行参数executedUnmanagedCode包含存在返回值的非托管代码并检查是否写入了新的Win32错误代码。
+      /// </summary>
+      /// <typeparam name="T">用于表示参数executedUnmanagedCode所封装委托的返回值类型。</typeparam>
+      /// <param name="executedUnmanagedCode">需要执行的非托管代码。</param>
+      /// <param name="returnValue">参数executedUnmanagedCode封装的委托的返回值。</param>
+      /// <param name="win32ErrorCode">用于已写入的新的Win32错误代码，如果该方法没有写入新的错误代码，则该参数将会保存操作系统中上一个Win32错误代码。</param>
+      /// <returns>如果该操作不会写入新的Win32错误代码，则将会返回false，但是在写入任何Win32错误代码的情况下，该方法都会抛出true。</returns>
+      public static bool IsWritedWin32ErrorCode<T>(Func<T> executedUnmanagedCode, ref T returnValue, ref long win32ErrorCode)
+      {
          bool result = false;
          long lastWin32ErrorCode = Win32ApiHelper.GetLastWin32ApiError();
-         executedUnmanagedCode.Invoke();
+         returnValue = executedUnmanagedCode.Invoke();
          win32ErrorCode = Win32ApiHelper.GetLastWin32ApiError();
          if (lastWin32ErrorCode != win32ErrorCode) result = true;
          else win32ErrorCode = lastWin32ErrorCode;

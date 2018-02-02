@@ -108,7 +108,7 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <param name="isNullField">一个列表集合，用于存储所对应字段是否允许为空字段，如果某个索引上的值为true，则表示这个这个索引所对应的字段允许为空，否则不允许为空。</param>
       public void GenerateSqlForCreateTable(string tableName, string primaryKey, List<bool> isNullField)
       {
-         ExString baseSql = @"create table" + tableName + "(";
+         ExString baseSql = @"create table " + tableName + "(";
          List<(string, string)> propInfos = PropertiesInfo;
          if (isNullField.Count < propInfos.Count)
          {
