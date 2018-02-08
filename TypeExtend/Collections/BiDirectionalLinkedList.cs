@@ -58,6 +58,7 @@ namespace Cabinink.TypeExtend.Collections
       /// 获取当前实例所表示的双向链表指定索引所对应的节点。
       /// </summary>
       /// <param name="index">指定的索引。</param>
+      /// <exception cref="ArgumentOutOfRangeException">当参数index指定的索引超出范围时，则会抛出这个异常。</exception>
       public ListNode<T> this[int index]
       {
          get
@@ -82,12 +83,13 @@ namespace Cabinink.TypeExtend.Collections
       /// <param name="index">指定的索引。</param>
       /// <param name="element">需要插入的元素。</param>
       /// <returns>如果操作成功，则返回true，否则返回false。</returns>
+      /// <exception cref="ArgumentOutOfRangeException">当参数index指定的索引超出范围时，则会抛出这个异常。</exception>
       public bool Insert(int index, T element)
       {
          int countBeforeIns = Count;
          int counter = 0;
          ListNode<T> node = _headNode;
-         ListNode<T> inserted = new ListNode<T>(element, null);
+         ListNode<T> inserted = new ListNode<T>(element);
          if (index >= Count || index < 0) throw new ArgumentOutOfRangeException("index", "索引超出检索范围！");
          else
          {
@@ -95,6 +97,7 @@ namespace Cabinink.TypeExtend.Collections
             {
                inserted.Next = _headNode;
                _headNode = inserted;
+               return true;
             }
             while (counter < index - 1)
             {
@@ -111,6 +114,7 @@ namespace Cabinink.TypeExtend.Collections
       /// </summary>
       /// <param name="index">需要被移除的节点所对应的索引。</param>
       /// <returns>如果操作成功，则返回true，否则返回false。</returns>
+      /// <exception cref="ArgumentOutOfRangeException">当参数index指定的索引超出范围时，则会抛出这个异常。</exception>
       public bool Remove(int index)
       {
          int countBeforeRemove = Count;
@@ -119,7 +123,11 @@ namespace Cabinink.TypeExtend.Collections
          if (index >= Count || index < 0) throw new ArgumentOutOfRangeException("index", "索引超出检索范围！");
          else
          {
-            if (index == 0) _headNode.BackwardsPointer();
+            if (index == 0)
+            {
+               _headNode.BackwardsPointer();
+               return true;
+            }
             while (counter < index - 1)
             {
                counter++;
@@ -160,8 +168,12 @@ namespace Cabinink.TypeExtend.Collections
       {
          int countBeforeAdd = Count;
          ListNode<T> node = new ListNode<T>();
-         ListNode<T> inserted = new ListNode<T>(element, null);
-         if (_headNode == null) _headNode = inserted;
+         ListNode<T> inserted = new ListNode<T>(element);
+         if (_headNode == null)
+         {
+            _headNode = inserted;
+            return true;
+         }
          node = _headNode;
          while (node.Next != null) node = node.Next;
          node.Next = inserted;
@@ -235,9 +247,22 @@ namespace Cabinink.TypeExtend.Collections
       /// </summary>
       public void Reverse()
       {
-         T[] array = ToArray();
-         array.Reverse();
-         if (Clear()) AddRange(array);
+         ListNode<T> node = _headNode;
+         ListNode<T> nhNode = _headNode;
+         ListNode<T> tempNode = node;
+         node = node.Next;
+         nhNode.NextToNull();
+         while (node.Next != null)
+         {
+            tempNode = node;
+            node = node.Next;
+            tempNode.Next = nhNode;
+            nhNode = tempNode;
+         }
+         tempNode = node;
+         tempNode.Next = nhNode;
+         nhNode = node;
+         _headNode = nhNode;
       }
       /// <summary>
       /// 同时获取指定元素所对应节点的第一个索引和最后一个索引。

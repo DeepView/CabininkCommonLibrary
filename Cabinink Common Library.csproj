@@ -147,6 +147,7 @@
     <Compile Include="Windows\Applications\AppSettings.cs" />
     <Compile Include="Windows\Applications\IApplicationBasicIO.cs" />
     <Compile Include="Windows\Applications\SettingsOption.cs" />
+    <Compile Include="Windows\Applications\ShortcutCreator.cs" />
     <Compile Include="Windows\Energy\BatteryUsageInformation .cs" />
     <Compile Include="Windows\EnvironmentInformation.cs" />
     <Compile Include="Windows\Energy\PowerOperator.cs" />
@@ -168,6 +169,15 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="Microsoft.Office.Core">
       <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
       <VersionMajor>2</VersionMajor>

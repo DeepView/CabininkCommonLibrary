@@ -23,3 +23,4 @@ E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Libr
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csproj.CoreCompileInputs.cache
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.dll
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.pdb
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Interop.IWshRuntimeLibrary.dll
