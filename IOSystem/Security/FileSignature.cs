@@ -127,21 +127,20 @@ namespace Cabinink.IOSystem.Security
       /// <returns>该操作如果无异常发生，将会返回当前实例指定文件的CRC32值文本。</returns>
       public ExString GetCRC32String()
       {
-         uint crc = 0xffffffffu;
-         FileStream fp1;
+         FileStream fStream = new FileStream(FileUrl, FileMode.Open);
          byte ch;
-         fp1 = new FileStream(FileUrl, FileMode.Open);
-         long len = fp1.Length;
+         uint crc = 0xffffffffu;
+         long len = fStream.Length;
          long i = 0;
          while (i < len)
          {
-            ch = (byte)fp1.ReadByte();
+            ch = (byte)fStream.ReadByte();
             crc = ((crc >> 8) & 0xffffff) ^ _crc32Table[((int)crc ^ ch) & 0xff];
             Math.Max(System.Threading.Interlocked.Increment(ref i), i - 1);
          }
          crc = crc ^ 0xffffffffu;
-         fp1.Close();
-         fp1.Dispose();
+         fStream.Close();
+         fStream.Dispose();
          return crc.ToString("X");
       }
       /// <summary>

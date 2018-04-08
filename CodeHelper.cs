@@ -21,7 +21,7 @@ namespace Cabinink
          Func<int> executed = new Func<int>(delegate
          {
             executedCode.Invoke();
-            return 0;
+            return returnValue;
          });
          return IsThrowedException(executed, ref returnValue, ref throwedException);
       }
@@ -62,7 +62,7 @@ namespace Cabinink
          Func<int> executed = new Func<int>(delegate
          {
             executedUnmanagedCode.Invoke();
-            return 0;
+            return returnValue;
          });
          return IsWritedWin32ErrorCode(executed, ref returnValue, ref win32ErrorCode);
       }
@@ -82,6 +82,20 @@ namespace Cabinink
          win32ErrorCode = Win32ApiHelper.GetLastWin32ApiError();
          if (lastWin32ErrorCode != win32ErrorCode) result = true;
          else win32ErrorCode = lastWin32ErrorCode;
+         return result;
+      }
+      /// <summary>
+      /// 执行参数executedUnmanagedCode包含存在返回值的非托管代码并检查是否写入了新的Win32错误代码，这个方法会返回一个表示执行结果的Win32ApiExecutedResult实例。
+      /// </summary>
+      /// <typeparam name="T">用于表示参数executedUnmanagedCode所封装委托的返回值类型。</typeparam>
+      /// <param name="executedUnmanagedCode">需要执行的非托管代码。</param>
+      /// <param name="returnValue">参数executedUnmanagedCode封装的委托的返回值。</param>
+      /// <returns>这个操作无论是否写入了新的Win32错误代码，都会返回一个Win32ApiExecutedResult实例。</returns>
+      public static Win32ApiExecutedResult IsWritedWin32ErrorCode<T>(Func<T> executedUnmanagedCode, ref T returnValue)
+      {
+         Win32ApiExecutedResult result = new Win32ApiExecutedResult();
+         returnValue = executedUnmanagedCode.Invoke();
+         result.UpdateErrorCode();
          return result;
       }
       /// <summary>

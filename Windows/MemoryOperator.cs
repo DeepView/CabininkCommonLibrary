@@ -65,7 +65,7 @@ namespace Cabinink.Windows
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public sealed class MemoryOperator
+   public sealed unsafe class MemoryOperator
    {
       private const int TOKEN_QUERY = 0x00000008;//令牌查询。
       private const int PROCESS_ALL_ACCESS = 0x1f0fff;//获取最高权限。
@@ -84,8 +84,8 @@ namespace Cabinink.Windows
       /// <param name="initalizeLocation">指向一块准备用0来填充的内存区域的开始地址。</param>
       /// <param name="size">准备用0来填充的内存区域的大小，按字节来计算。</param>
       /// <remarks>使用结构前清零，而不让结构的成员数值具有不确定性，是一个好的编程习惯。</remarks>
-      [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
-      private static extern void ZeroMemory(IntPtr initalizeLocation, IntPtr size);
+      [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = true, ExactSpelling = true)]
+      private static extern void ZeroMemory(IntPtr initalizeLocation, int size);
       /// <summary>
       /// 获取当前进程的一个伪句柄。
       /// </summary>
@@ -203,10 +203,7 @@ namespace Cabinink.Windows
             WriteProcessMemory(hProcess, (IntPtr)baseAddress, new int[] { value }, 4, IntPtr.Zero);
             CloseHandle(new SafeFileHandle(hProcess, true));
          }
-         catch
-         {
-            throw new MemoryIOException();
-         }
+         catch { throw new MemoryIOException(); }
       }
       /// <summary>
       /// 将数据写入PID所对应的某个进程中指定的内存地址。
@@ -233,10 +230,11 @@ namespace Cabinink.Windows
       /// </summary>
       /// <param name="valueTypeObject">需要用于清零内存块的变量或者结构。</param>
       /// <param name="size">准备用0来填充的内存区域的大小，按字节来计算。</param>
+      [Obsolete("NEED_RESTRUCTURE")]
       public static void ResetMemoryContext(ValueType valueTypeObject, int size)
       {
          GCHandle gcHandle = GCHandle.Alloc(valueTypeObject, GCHandleType.Pinned);
-         ZeroMemory(gcHandle.AddrOfPinnedObject(), new IntPtr(size));
+         ZeroMemory(gcHandle.AddrOfPinnedObject(), size);
          gcHandle.Free();
       }
       /// <summary>
@@ -245,6 +243,7 @@ namespace Cabinink.Windows
       /// <param name="valueTypeObject">需要用于清零内存块的变量或者结构。</param>
       /// <param name="size">准备用0来填充的内存区域的大小，按字节来计算。</param>
       /// <returns>如果操作无异常并且成功，则会返回true，否则返回false。</returns>
+      [Obsolete("NEED_RESTRUCTURE")]
       public static bool SecurityResetMemoryContext(ValueType valueTypeObject, int size)
       {
          FieldInfo[] fInfos = valueTypeObject.GetType().GetFields();

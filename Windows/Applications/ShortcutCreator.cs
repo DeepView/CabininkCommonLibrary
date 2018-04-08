@@ -22,7 +22,7 @@ namespace Cabinink.Windows.Applications
       public ShortcutCreator()
       {
          _name = "Shortcut_" + base.GetHashCode();
-         _webOrFileUrl = new Uri("http://localhost/");
+         _webOrFileUrl = new Uri("http://127.0.0.1/");
          _localDirectory = string.Empty;
          _icon = null;
          _description = _name;
@@ -85,7 +85,8 @@ namespace Cabinink.Windows.Applications
          get => _localDirectory;
          set
          {
-            if (!FileOperator.DirectoryExists(value)) throw new DirectoryNotFoundException("找不到这个目录！");
+            bool condition = !FileOperator.DirectoryExists(value) && value != string.Empty;
+            if (condition) throw new DirectoryNotFoundException("找不到这个目录！");
             else _localDirectory = value;
          }
       }
@@ -107,12 +108,12 @@ namespace Cabinink.Windows.Applications
       /// </summary>
       /// <param name="shortcutDirectory">用于保存快捷方式的目录，比如说桌面，或者其他目录，举例：C:\Users\Cabinink\Desktop\。</param>
       /// <param name="windowStyle">这个参数用于决定打开快捷方式后，窗口该如何显示，可以为以下任意值之一：
-      /// <para>WshWindowStyle.WshHide：0，隐藏窗体运行。</para>
-      /// <para>WshWindowStyle.WshNormalFocus：1，通过正常的模式打开窗体。</para>
-      /// <para>WshWindowStyle.WshMinimizedFocus：2，最小化窗体运行。</para>
-      /// <para>WshWindowStyle.WshMaximizedFocus：3，最大化窗体运行。</para>
-      /// <para>WshWindowStyle.WshNormalNoFocus：4，以正常的模式打开窗体，但是会取消焦点。</para>
-      /// <para>WshWindowStyle.WshMinimizedNoFocus：6，最小化窗体运行，但是会取消焦点。</para>
+      /// <para>EWindowStyle.Hide：0，隐藏窗体运行。</para>
+      /// <para>EWindowStyle.NormalFocus：1，通过正常的模式打开窗体。</para>
+      /// <para>EWindowStyle.MinimizedFocus：2，最小化窗体运行。</para>
+      /// <para>EWindowStyle.MaximizedFocus：3，最大化窗体运行。</para>
+      /// <para>EWindowStyle.NormalNoFocus：4，以正常的模式打开窗体，但是会取消焦点。</para>
+      /// <para>EWindowStyle.MinimizedNoFocus：6，最小化窗体运行，但是会取消焦点。</para>
       /// </param>
       /// <returns>该操作如果成功的创建了这个快捷方式，则会返回true，否则将会返回false，这个检测是基于文件存在性来实现的。</returns>
       [CLSCompliant(false)]
@@ -134,12 +135,12 @@ namespace Cabinink.Windows.Applications
       /// 根据指定的窗口启动样式在桌面创建快捷方式。
       /// </summary>
       /// <param name="windowStyle">这个参数用于决定打开快捷方式后，窗口该如何显示，可以为以下任意值之一：
-      /// <para>WshWindowStyle.WshHide：0，隐藏窗体运行。</para>
-      /// <para>WshWindowStyle.WshNormalFocus：1，通过正常的模式打开窗体。</para>
-      /// <para>WshWindowStyle.WshMinimizedFocus：2，最小化窗体运行。</para>
-      /// <para>WshWindowStyle.WshMaximizedFocus：3，最大化窗体运行。</para>
-      /// <para>WshWindowStyle.WshNormalNoFocus：4，以正常的模式打开窗体，但是会取消焦点。</para>
-      /// <para>WshWindowStyle.WshMinimizedNoFocus：6，最小化窗体运行，但是会取消焦点。</para>
+      /// <para>EWindowStyle.Hide：0，隐藏窗体运行。</para>
+      /// <para>EWindowStyle.NormalFocus：1，通过正常的模式打开窗体。</para>
+      /// <para>EWindowStyle.MinimizedFocus：2，最小化窗体运行。</para>
+      /// <para>EWindowStyle.MaximizedFocus：3，最大化窗体运行。</para>
+      /// <para>EWindowStyle.NormalNoFocus：4，以正常的模式打开窗体，但是会取消焦点。</para>
+      /// <para>EWindowStyle.MinimizedNoFocus：6，最小化窗体运行，但是会取消焦点。</para>
       /// </param>
       /// <returns>该操作如果成功的创建了这个快捷方式，则会返回true，否则将会返回false，这个检测是基于文件存在性来实现的。</returns>
       [CLSCompliant(false)]

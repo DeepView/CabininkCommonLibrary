@@ -24,9 +24,9 @@
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\Cabinink Common Library.xml</DocumentationFile>
     <RegisterForComInterop>false</RegisterForComInterop>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +40,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.DirectX.AudioVideoPlayback, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.AudioVideoPlayback.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3D, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.Direct3D.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -70,6 +78,7 @@
     <Compile Include="Algorithm\MathConstant.cs" />
     <Compile Include="Algorithm\NumericalSorting.cs" />
     <Compile Include="Algorithm\NumericalStatistics.cs" />
+    <Compile Include="Algorithm\PhysicsConstant.cs" />
     <Compile Include="AssemblyInformation.cs" />
     <Compile Include="CodeHelper.cs" />
     <Compile Include="DataTreatment\Database\DBOIEncapsulation.cs" />
@@ -89,7 +98,9 @@
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
     <Compile Include="Devices\Monitor.cs" />
     <Compile Include="Devices\PositionIndicator.cs" />
-    <Compile Include="Devices\Sound.cs" />
+    <Compile Include="Devices\SerialPortCommunication.cs" />
+    <Compile Include="Devices\SoundPlayer.cs" />
+    <Compile Include="Devices\VideoPlayer.cs" />
     <Compile Include="EnumerationDescriptionAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IOSystem\FileOperator.cs" />
@@ -143,6 +154,7 @@
     <Compile Include="TypeExtend\Geometry2D\StraightLine2D.cs" />
     <Compile Include="TypeExtend\Geometry2D\Triangle.cs" />
     <Compile Include="TypeExtend\Geometry2D\UnregoinallyShape.cs" />
+    <Compile Include="Win32ApiExecutedResult.cs" />
     <Compile Include="Win32ApiHelper.cs" />
     <Compile Include="Windows\Applications\AppSettings.cs" />
     <Compile Include="Windows\Applications\IApplicationBasicIO.cs" />

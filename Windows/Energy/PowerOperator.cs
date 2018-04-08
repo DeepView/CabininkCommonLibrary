@@ -77,7 +77,7 @@ namespace Cabinink.Windows.Energy
       /// <param name="buffer">用来放置格式化消息(以null结束)的缓冲区.如果 dwFlags 参数包括 FORMAT_MESSAGE_ALLOCATE_BUFFER, 本函数将使用LocalAlloc函数定位一个缓冲区，然后将缓冲区指针放到 lpBuffer 指向的地址.</param>
       /// <param name="size">如果没有设置 FORMAT_MESSAGE_ALLOCATE_BUFFER 标志, 此参数指定了输出缓冲区可以容纳的TCHARs最大个数. 如果设置了 FORMAT_MESSAGE_ALLOCATE_BUFFER 标志，则此参数指定了输出缓冲区可以容纳的TCHARs 的最小个数. 对于ANSI文本, 容量为bytes的个数; 对于Unicode 文本, 容量为字符的个数.</param>
       /// <param name="arguments">数组指针,用于在格式化消息中插入信息. 格式字符串中的 A %1 指示参数数组中的第一值; a %2 表示第二个值; 以此类推.</param>
-      /// <returns>如果执行成功, 返回值为存储在输出缓冲区的TCHARs个数, 包括了null结束符。如果执行失败, 返回值为0。 如果要获取更多的错误信息, 请调用 Marshal.GetLastWin32Error或者调用Win32Api函数GetLastError。</returns>
+      /// <returns>如果执行成功, 返回值为存储在输出缓冲区的TCHARs个数, 包括了null结束符。如果执行失败, 返回值为0。 如果要获取更多的错误信息, 请调用 Marshal.GetLastWin32Error或者调用Win32Api函数Win32ApiHelper.GetLastWin32ApiError。</returns>
       [DllImport("user32.dll", EntryPoint = "FormatMessageA", CharSet = CharSet.Ansi)]
       private extern static int FormatMessage(int flags, IntPtr source, int messageId, int languageId, StringBuilder buffer, int size, int arguments);
       /// <summary>
@@ -103,12 +103,6 @@ namespace Cabinink.Windows.Energy
       [DllImport("kernel32.dll", EntryPoint = "GetProcAddress", CharSet = CharSet.Ansi)]
       private extern static IntPtr GetProcAddress(IntPtr dllHandle, string memeberName);
       /// <summary>
-      /// 返回调用线程最近的错误代码值，错误代码以单线程为基础来维护的，多线程不重写各自的错误代码值。
-      /// </summary>
-      /// <returns>返回值为调用的线程的错误代码值(unsigned long)，函数通过调 SetLastError 函数来设置此值，每个函数资料的返回值部分都注释了函数设置错误代码的情况。</returns>
-      [DllImport("kernel32.dll", EntryPoint = "GetLastError", CharSet = CharSet.Ansi)]
-      private static extern long GetLastError();
-      /// <summary>
       /// 注销当前用户，但是不退出Windows。
       /// </summary>
       /// <returns>如果操作成功，则返回ERROR_SUCCESS（API定义：#define ERROR_SUCCESS 0L），否则将会显示其他的错误代码。</returns>
@@ -116,7 +110,7 @@ namespace Cabinink.Windows.Energy
       {
          GetSystemAuthority(SE_SHUTDOWN_NAME);
          ExitWindowsEx(EWX_LOGOFF, 0);
-         return GetLastError();
+         return Win32ApiHelper.GetLastWin32ApiError();
       }
       /// <summary>
       /// 重新启动Windows。
@@ -126,7 +120,7 @@ namespace Cabinink.Windows.Energy
       {
          GetSystemAuthority(SE_SHUTDOWN_NAME);
          ExitWindowsEx(EWX_REBOOT, 0);
-         return GetLastError();
+         return Win32ApiHelper.GetLastWin32ApiError();
       }
       /// <summary>
       /// 强制中断当前用户的所有进程，即强制注销。
@@ -136,7 +130,7 @@ namespace Cabinink.Windows.Energy
       {
          GetSystemAuthority(SE_SHUTDOWN_NAME);
          ExitWindowsEx(EWX_FORCE, 0);
-         return GetLastError();
+         return Win32ApiHelper.GetLastWin32ApiError();
       }
       /// <summary>
       /// 关闭Windows。
@@ -146,38 +140,26 @@ namespace Cabinink.Windows.Energy
       {
          GetSystemAuthority(SE_SHUTDOWN_NAME);
          ExitWindowsEx(EWX_SHUTDOWN, 0);
-         return GetLastError();
+         return Win32ApiHelper.GetLastWin32ApiError();
       }
       /// <summary>
       /// 使Windows强制进入休眠状态。
       /// </summary>
-      public static void Hibernate()
-      {
-         Application.SetSuspendState(PowerState.Hibernate, false, true);
-      }
+      public static void Hibernate() => Application.SetSuspendState(PowerState.Hibernate, false, true);
       /// <summary>
       /// 使Windows进入休眠状态，并告知其他进程使其进入休眠状态。
       /// </summary>
       /// <param name="force">决定是否强制休眠。</param>
-      public static void Hibernate(bool force)
-      {
-         Application.SetSuspendState(PowerState.Hibernate, force, true);
-      }
+      public static void Hibernate(bool force) => Application.SetSuspendState(PowerState.Hibernate, force, true);
       /// <summary>
       /// 强制挂起Windows，即睡眠模式。
       /// </summary>
-      public static void Suspend()
-      {
-         Application.SetSuspendState(PowerState.Suspend, false, false);
-      }
+      public static void Suspend() => Application.SetSuspendState(PowerState.Suspend, false, false);
       /// <summary>
       /// 挂起Windows，并通知其他进程是否决定该操作。
       /// </summary>
       /// <param name="force">决定是否强制挂起。</param>
-      public static void Suspend(bool force)
-      {
-         Application.SetSuspendState(PowerState.Suspend, force, false);
-      }
+      public static void Suspend(bool force) => Application.SetSuspendState(PowerState.Suspend, force, false);
       /// <summary>
       /// 获取更高级别的操作系统权限。
       /// </summary>

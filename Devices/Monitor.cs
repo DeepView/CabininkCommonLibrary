@@ -303,11 +303,15 @@ namespace Cabinink.Devices
       /// </summary>
       public string Name => _thisComputer.Screen.DeviceName;
       /// <summary>
-      /// 获取当前图形监视器的像素深度。
+      /// 获取或设置当前图形监视器的像素深度。
       /// </summary>
-      public int BitsPerPixel => _thisComputer.Screen.BitsPerPixel;
+      public int BitsPerPixel
+      {
+         get => _thisComputer.Screen.BitsPerPixel;
+         set => ChangeResolving((int)Width, (int)Height, RefreshRate, value);
+      }
       /// <summary>
-      /// 获取当前显示器的刷新率。
+      /// 获取或设置当前显示器的刷新率。
       /// </summary>
       public int RefreshRate
       {
@@ -316,6 +320,7 @@ namespace Cabinink.Devices
             IntPtr desktopDC = GetDC(GetDesktopWindow());
             return GetDeviceCaps(desktopDC, 116);
          }
+         set => ChangeResolving((int)Width, (int)Height, value, BitsPerPixel);
       }
       /// <summary>
       /// 获取当前计算机显示器的全屏幕快照。
@@ -365,7 +370,8 @@ namespace Cabinink.Devices
       /// </summary>
       /// <param name="width">指定分辨率的宽度。</param>
       /// <param name="height">指定分辨率的高度。</param>
-      public void ChangeResolving(int width, int height) => ChangeResolving(width, height, RefreshRate, BitsPerPixel);
+      /// <returns>该操作会返回一个Win32Api错误代码，如果这个错误代码为非0，则表示操作失败，否则表示操作成功。</returns>
+      public long ChangeResolving(int width, int height) => ChangeResolving(width, height, RefreshRate, BitsPerPixel);
       /// <summary>
       /// 设置当前图形监视器的分辨率，并重新指定屏幕刷新率和像素色彩深度。
       /// </summary>
@@ -373,7 +379,8 @@ namespace Cabinink.Devices
       /// <param name="height">指定分辨率的高度。</param>
       /// <param name="refreshRate">指定的屏幕刷新率。</param>
       /// <param name="bitsPerPixel">指定的像素色彩深度。</param>
-      public void ChangeResolving(int width, int height, int refreshRate, int bitsPerPixel)
+      /// <returns>该操作会返回一个Win32Api错误代码，如果这个错误代码为非0，则表示操作失败，否则表示操作成功。</returns>
+      public long ChangeResolving(int width, int height, int refreshRate, int bitsPerPixel)
       {
          SDevicesMode devM = new SDevicesMode
          {
@@ -385,7 +392,7 @@ namespace Cabinink.Devices
          devM.DisplayFrequency = refreshRate;
          devM.BitsPerPel = bitsPerPixel;
          long result = ChangeDisplaySettings(ref devM, 0);
-
+         return result;
       }
       /// <summary>
       /// 从Gamma值的基础上设置当前显示设备的亮度。

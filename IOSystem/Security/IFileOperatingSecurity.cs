@@ -24,7 +24,7 @@ namespace Cabinink.IOSystem.Security
       /// </summary>
       /// <param name="password">在进行权限恢复之前需要进行身份验证的有效密码。</param>
       /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
-      bool RrecoveryJurisdiction(ExString password);
+      bool RecoveryJurisdiction(ExString password);
       /// <summary>
       /// 更新用于操作当前实例的IO权限密码。
       /// </summary>

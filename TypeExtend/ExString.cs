@@ -61,10 +61,7 @@ namespace Cabinink.TypeExtend
       /// <summary>
       /// 获取或设置当前实例的字符串文本。
       /// </summary>
-      public string StringContext
-      {
-         get => _clrString; set => _clrString = value;
-      }
+      public string StringContext { get => _clrString; set => _clrString = value; }
       /// <summary>
       /// 获取当前实例的字符串文本长度。
       /// </summary>
@@ -229,10 +226,24 @@ namespace Cabinink.TypeExtend
       /// <returns>执行这个操作之后会获取当前实例所表示字符串中每一个字符的字节码的有序集合，在这里值得一提的是，这个有序集合的顺序和当前字符串实例中字符排序是相吻合的。</returns>
       public byte[] ToBytecodeArray(Encoding encoding) => encoding.GetBytes(StringContext);
       /// <summary>
+      /// 将当前的字符串实例转换为十六进制字节码数组。
+      /// </summary>
+      /// <returns>执行这个操作之后会获取当前实例所表示字符串中每一个字符的十六进制字节码的有序集合。</returns>
+      public byte[] ToHexadecimalArray()
+      {
+         ExString hexString = ReplaceAll(" ", "");
+         if ((Length % 2) != 0) hexString += " ";
+         byte[] code = new byte[hexString.Length / 2];
+         for (int i = 0; i < code.Length; i++)
+         {
+            code[i] = Convert.ToByte(hexString.SubString(i * 2, 2).ReplaceAll(" ", ""), 16);
+         }
+         return code;
+      }
+      /// <summary>
       /// 返回当前扩展字符串实例的十六进制ASCII序列。
       /// </summary>
       /// <returns>如果该操作没有产生任何异常，则会得到一个当前实例的十六进制ASCII序列字符串。</returns>
-
       public ExString ToAsciiHexSerial()
       {
          char[] strArray = ConvertToCharArray();
@@ -648,18 +659,12 @@ namespace Cabinink.TypeExtend
       /// 隐式转换操作符重载（To ExString）。
       /// </summary>
       /// <param name="v">隐式转换操作符的源类型。</param>
-      public static implicit operator ExString(string v)
-      {
-         return new ExString(v);
-      }
+      public static implicit operator ExString(string v) => new ExString(v);
       /// <summary>
       /// 隐式转换操作符重载（To String）。
       /// </summary>
       /// <param name="v">隐式转换操作符的源类型。</param>
-      public static implicit operator string(ExString v)
-      {
-         return v.StringContext;
-      }
+      public static implicit operator string(ExString v) => v.StringContext;
       /// <summary>
       /// 加密指定的ExString实例。
       /// </summary>

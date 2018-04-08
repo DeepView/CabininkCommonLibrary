@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Cabinink.IOSystem;
 using System.Collections;
 using System.Diagnostics;
@@ -11,7 +10,7 @@ using System.Runtime.InteropServices;
 namespace Cabinink.DataTreatment.DocumentData
 {
    /// <summary>
-   /// 逗号分隔符文件操作类，可用于实现一些最基本的CSV文件操作。
+   /// 逗号分隔符文件操作类，可用于实现一些最基本的CSV文件操作，不过需要注意的是，该类继承自Cabinink.IOSystem.Security.IOSecurityFile类，因此存在与之相同的权限管理操作。
    /// </summary>
    [Serializable]
    [ComVisible(true)]
@@ -20,13 +19,18 @@ namespace Cabinink.DataTreatment.DocumentData
    {
       private List<string> _csvDataElements;//用于存放CSV文件元素的泛型列表。
       /// <summary>
-      /// 构造函数，创建一个指定文件的CSV文件操作实例。
+      /// 构造函数，创建一个指定文件的CSV文件操作实例，该操作会自动启用写操作通道（即自动执行OpenWritePassageway方法），与之对应的，Dispose方法也会自动执行CloseWritePassageway方法关闭写操作通道。
       /// </summary>
       /// <param name="csvFileUrl">指定的CSV文件的文件地址。</param>
       /// <exception cref="FileTypeNotLegitimateException">如果文件类型不符合匹配条件，则将会抛出这个异常。</exception>
       public CsvFileOperator(string csvFileUrl) : base(csvFileUrl, true)
       {
          if (FileOperator.GetFileExtension(csvFileUrl) != ".csv") throw new FileTypeNotLegitimateException();
+         else
+         {
+            _csvDataElements = new List<string>();
+            OpenWritePassageway();
+         }
       }
       /// <summary>
       /// 获取当前实例所操作的CSV文件转换为List实例之后的CSV元素数量。
@@ -40,7 +44,8 @@ namespace Cabinink.DataTreatment.DocumentData
          get
          {
             char[] separator = new char[] { ',' };
-            return FileContext.Split(separator).ToList();
+            //return FileContext.Split(separator).ToList();
+            return _csvDataElements;
          }
          set => _csvDataElements = value;
       }
@@ -53,18 +58,17 @@ namespace Cabinink.DataTreatment.DocumentData
       /// </summary>
       /// <param name="index">指定的索引，但是这个索引必须在当前实例的列表的有效索引范围之内才有效。</param>
       /// <exception cref="ArgumentOutOfRangeException">当指定索引超出列表的检索范围之后，则会抛出这个异常。</exception>
-      [CLSCompliant(false)]
-      public ExString this[uint index]
+      public ExString this[int index]
       {
          get
          {
             if ((index < 0) || (index > Count)) throw new ArgumentOutOfRangeException("index", "指定索引所对应的元素不存在！");
-            return Elements[(int)index];
+            return Elements[index];
          }
          set
          {
             if ((index < 0) || (index > Count)) throw new ArgumentOutOfRangeException("index", "指定索引所对应的元素不存在！");
-            Elements[(int)index] = value;
+            Elements[index] = value;
          }
       }
       /// <summary>
@@ -129,6 +133,15 @@ namespace Cabinink.DataTreatment.DocumentData
       /// <param name="other">用于比较的另一个CSV文件。</param>
       /// <returns>如果两个CSV文件的文件路径和MD5都相同，则操作的这两个CSV文件属于同一个文件，那么这个操作就会返回true，否则将会返回false。</returns>
       public override bool Equals(IOSecurityFile other) => base.Equals((CsvFileOperator)other);
+      /// <summary>
+      /// 释放该对象引用的所有内存资源。
+      /// </summary>
+      /// <param name="disposing">用于指示是否释放托管资源。</param>
+      protected override void Dispose(bool disposing)
+      {
+         base.Dispose(disposing);
+         CloseWritePassageway();
+      }
    }
    /// <summary>
    /// 当文件类型不符合匹配条件时需要抛出的异常。
