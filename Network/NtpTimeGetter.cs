@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Net.Sockets;
+using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 namespace Cabinink.Network
@@ -168,6 +169,7 @@ namespace Cabinink.Network
       /// <param name="win32ErrorCode">需要传递并且用于开发者参考的错误代码。</param>
       /// <param name="win32ErrorInformation">需要传递并且用于开发者参考的错误消息。</param>
       /// <returns>如果操作成功则会返回true，否则会返回false。</returns>
+      [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
       public bool UpdateLocalTime(ref long win32ErrorCode, ref string win32ErrorInformation)
       {
          bool result = true;

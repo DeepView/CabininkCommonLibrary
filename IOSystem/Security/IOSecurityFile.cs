@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 namespace Cabinink.IOSystem.Security
 {
    /// <summary>
-   /// IO操作安全文件类。
+   /// IO操作安全文件类，可以实现更加安全的文件IO操作。
    /// </summary>
    [Serializable]
    [ComVisible(true)]
@@ -26,7 +26,7 @@ namespace Cabinink.IOSystem.Security
       private bool _isApplyAccessRule;//指示是否应用文件安全访问规则。
       private bool _isReadOnly;//指示当前文件是否只读，这个是基于当前实例，而非基于整个操作系统。
       private string _initializeHashCode;//文件未作出更改时的MD5哈希代码。
-      private bool disposedValue = false;//检测冗余调用。
+      private bool _disposedValue = false;//检测冗余调用。
       private const int CODE_SECURITY_FLAG_STOP = 0x0000;//代码安全标识符常量，操作非法。
       private const int CODE_SECURITY_FLAG_NORMAL = 0xffff;//代码安全标识符常量，操作合法。
       private const string FILE_SECURITY_KEY = @"cabinink";//文件加密和解密用的安全密钥。
@@ -78,7 +78,7 @@ namespace Cabinink.IOSystem.Security
       /// <summary>
       /// 获取或设置当前实例的IO操作安全文件地址。
       /// </summary>
-      /// <exception cref="FileNotFoundException">当参数fileUrl指定的文件找不到时，则会抛出这个异常。</exception>
+      /// <exception cref="FileNotFoundException">当参数value指定的文件找不到时，则会抛出这个异常。</exception>
       public string FileUrl
       {
          get => _securityFileUrl;
@@ -394,7 +394,7 @@ namespace Cabinink.IOSystem.Security
          int urlMaxGene = GC.GetGeneration(FileUrl);
          int initHashMaxGene = GC.GetGeneration(_initializeHashCode);
          int maxGene = urlMaxGene >= initHashMaxGene ? urlMaxGene : initHashMaxGene;
-         if (!disposedValue)
+         if (!_disposedValue)
          {
             if (disposing)
             {
@@ -406,7 +406,7 @@ namespace Cabinink.IOSystem.Security
                bool condition = GC.CollectionCount(urlMaxGene) == 0 && GC.CollectionCount(initHashMaxGene) == 0;
                if (condition) GC.Collect(maxGene, GCCollectionMode.Forced, true);
             }
-            disposedValue = true;
+            _disposedValue = true;
          }
       }
       /// <summary>

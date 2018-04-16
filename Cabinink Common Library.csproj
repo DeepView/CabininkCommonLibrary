@@ -40,6 +40,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DirectX.AudioVideoPlayback, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.AudioVideoPlayback.dll</HintPath>
@@ -90,11 +94,11 @@
     <Compile Include="DataTreatment\Database\SQLServerDBOIEncapsulation.cs" />
     <Compile Include="DataTreatment\DocumentData\SpreadsheetDataOperator.cs" />
     <Compile Include="DataTreatment\IDatabasesOperationBase.cs" />
+    <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
+    <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\ORMapping\ObjectMemberGetter.cs" />
     <Compile Include="DataTreatment\ORMapping\SQLGenerator.cs" />
     <Compile Include="DataTreatment\ORMapping\TypeMapping.cs" />
-    <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
-    <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
     <Compile Include="Devices\Monitor.cs" />
     <Compile Include="Devices\PositionIndicator.cs" />
@@ -105,17 +109,8 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IOSystem\FileOperator.cs" />
     <Compile Include="IOSystem\IObjectAccessSwitch.cs" />
-    <Compile Include="IOSystem\RevisionControl\BranchFactory.cs" />
-    <Compile Include="IOSystem\RevisionControl\Committer.cs" />
     <Compile Include="IOSystem\FileStateMonitor.cs" />
-    <Compile Include="IOSystem\RevisionControl\IExecuter.cs" />
-    <Compile Include="IOSystem\RevisionControl\ILogOperator.cs" />
-    <Compile Include="IOSystem\RevisionControl\Puller.cs" />
-    <Compile Include="IOSystem\RevisionControl\Pusher.cs" />
-    <Compile Include="IOSystem\RevisionControl\ActivityRecorder.cs" />
-    <Compile Include="IOSystem\RevisionControl\RepositoryManager.cs" />
-    <Compile Include="IOSystem\RevisionControl\StagingArea.cs" />
-    <Compile Include="IOSystem\RevisionControl\VersionComparer.cs" />
+    <Compile Include="IOSystem\MemoryIOFile.cs" />
     <Compile Include="IOSystem\Security\FileSignature.cs" />
     <Compile Include="IOSystem\Security\IOSecurityFile.cs" />
     <Compile Include="IOSystem\Security\IOAccessRuleManagement.cs" />

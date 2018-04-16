@@ -4,13 +4,16 @@ using System.Drawing;
 using Cabinink.IOSystem;
 using System.Windows.Forms;
 using Microsoft.DirectX.Direct3D;
+using System.Runtime.InteropServices;
 using Microsoft.DirectX.AudioVideoPlayback;
 namespace Cabinink.Devices
 {
    /// <summary>
    /// 视频播放类，可用于播放一些基本格式的视频。
    /// </summary>
-   public class VideoPlayer
+   [Serializable]
+   [ComVisible(true)]
+   public class VideoPlayer : IDisposable
    {
       private Video _video;//一个用于播放视频的Microsoft.DirectX.AudioVideoPlayback.Video实例。
       private string _videoFileUrl;//指定的视频文件地址。
@@ -296,6 +299,10 @@ namespace Cabinink.Devices
       /// </summary>
       /// <param name="graphicsDevice">指定的Microsoft.DirectX.Direct3D.Device呈现视频纹理的父Direct3D.Device对象。</param>
       public void RenderToTexture(Device graphicsDevice) => DirectXVideoInstance.RenderToTexture(graphicsDevice);
+      /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public void Dispose() => DirectXVideoInstance.Dispose();
    }
    /// <summary>
    /// 音频视频的播放状态枚举。

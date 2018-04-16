@@ -306,5 +306,10 @@ namespace Cabinink.TypeExtend.Collections
       /// </summary>
       /// <returns>该操作会返回一个当前链表所对应的List&lt;T&gt;实例。</returns>
       public List<T> ToList() => ToArray().ToList();
+      /// <summary>
+      /// 获取当前类的字符串表达形式。
+      /// </summary>
+      /// <returns>该操作返回当前类的字符串表达形式，这个字符串是当前类的一段Debug描述文本。</returns>
+      public override string ToString() => "BiDirectionalLinkedList:{Count=" + Count + "};";
    }
 }

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using Cabinink.Windows.Privileges;
 using System.Runtime.InteropServices;
 namespace Cabinink.Windows
@@ -442,6 +443,7 @@ namespace Cabinink.Windows
       /// </summary>
       /// <param name="processName">指定的进程名称，注意这里的进程名称不需要在后面添加后缀名。</param>
       /// <returns>该操作会返回一个进程句柄，如果操作出现异常，则可能会返回一个Zero句柄。</returns>
+      [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
       public static IntPtr GetHandleByImageName(string processName)
       {
          IntPtr processHandle = IntPtr.Zero;

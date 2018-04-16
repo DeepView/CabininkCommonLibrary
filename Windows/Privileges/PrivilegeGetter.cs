@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Principal;
+using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 namespace Cabinink.Windows.Privileges
@@ -55,7 +57,7 @@ namespace Cabinink.Windows.Privileges
    [ComVisible(true)]
    public sealed class PrivilegeGetter
    {
-      public const int ERROR_NOT_ALL_ASSIGNED = 1300;//如果进程的访问令牌中没有关联某权限，则AdjustTokenPrivileges函数调用将会返回错误码ERROR_NOT_ALL_ASSIGNED（值为1300）。
+      private const int ERROR_NOT_ALL_ASSIGNED = 1300;//如果进程的访问令牌中没有关联某权限，则AdjustTokenPrivileges函数调用将会返回错误码ERROR_NOT_ALL_ASSIGNED（值为1300）。
       /// <summary>
       /// 获取当前进程的一个伪句柄。
       /// </summary>
@@ -191,6 +193,20 @@ namespace Cabinink.Windows.Privileges
             return false;
          }
          catch { return false; }
+      }
+      /// <summary>
+      /// 要求需要执行的操作必须具备Windows管理员组权限，执行这个操作才允许用管理员身份运行您需要运行的应用程序。
+      /// </summary>
+      public static void NeedAdministratorsPrivilege() => ChangePrivilegeRole("Administrators");
+      /// <summary>
+      /// 修改代码的执行用户或者安全组，修改之后只允许该用户或者安全组才能执行指定的代码区域。
+      /// </summary>
+      /// <param name="userOrGroupName">可允许的执行用户或者安全组。</param>
+      public static void ChangePrivilegeRole(string userOrGroupName)
+      {
+         AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+         PrincipalPermission principalPerm = new PrincipalPermission(null, userOrGroupName);
+         principalPerm.Demand();
       }
    }
 }

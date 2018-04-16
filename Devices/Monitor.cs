@@ -213,7 +213,7 @@ namespace Cabinink.Devices
       /// 该函数用来访问使用设备描述表的设备数据，应用程序指定相应设备描述表的句柄和说明该函数访问数据类型的索引来访问这些数据。
       /// </summary>
       /// <param name="hdc">设备上下文环境的句柄。</param>
-      /// <param name="index">指定返回项，该参数取下列一值，可以取的值如下所示：</param>
+      /// <param name="index">指定返回项，该参数取下列一值，可以取的值如下所示：
       /// <para>DRIVERVERSION = 0</para>
       /// <para>TECHNOLOGY = 2</para>
       /// <para>HORZSIZE = 4</para>
@@ -252,7 +252,7 @@ namespace Cabinink.Devices
       /// <para>VREFRESH = 116</para>
       /// <para>DESKTOPVERTRES = 117</para>
       /// <para>DESKTOPHORZRES = 118</para>
-      /// <para>BLTALIGNMENT = 119</para>
+      /// <para>BLTALIGNMENT = 119</para></param>
       /// <returns>返回值指定所需项的值，当索引为BITSPIXEL且设备有15bpp或16bpp时，返回值为16。</returns>
       [DllImport("gdi32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
       private static extern int GetDeviceCaps(IntPtr hdc, int index);
