@@ -237,6 +237,16 @@ namespace Cabinink.TypeExtend.Geometry2D
          ((ITranslation2D)LastPoint).Translation(offsetPoint);
       }
       /// <summary>
+      /// 解构函数，适用于当前实例的元组化之后的初始化以及分量的快捷调用。
+      /// </summary>
+      /// <param name="firstPoint">直线上的第一个已知的二维点。</param>
+      /// <param name="lastPoint">直线上的最后一个已知的二维点。</param>
+      public void Deconstruct(out ExPoint2D firstPoint,out ExPoint2D lastPoint)
+      {
+         firstPoint = FirstPoint;
+         lastPoint = LastPoint;
+      }
+      /// <summary>
       /// 确定此实例是否与另一个指定的StraightLine2D对象具有相同的值。
       /// </summary>
       /// <param name="other">要与此实例进行比较的二维直线实例。</param>

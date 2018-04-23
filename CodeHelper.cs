@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 namespace Cabinink
 {
@@ -123,6 +124,48 @@ namespace Cabinink
          bool isSwaped = false;
          if (isAppliedCompareOperation) isSwaped = !arg01.Equals(arg02);
          if (isSwaped) Swap(ref arg01, ref arg02);
+      }
+      /// <summary>
+      /// 执行Windows命令行，并获取执行的结果。
+      /// </summary>
+      /// <param name="commandLineString">需要执行的命令行。</param>
+      /// <returns>该操作会返回一个System.String实例，这个实例包含了命令行执行之后的所有文本结果。</returns>
+      public static string ExecuteCommandLine(string commandLineString) => ExecuteCommandLine(commandLineString, 0);
+      /// <summary>
+      /// 指定一个超时时间来执行Windows命令行，并获取执行的结果。
+      /// </summary>
+      /// <param name="commandLineString">需要执行的命令行。</param>
+      /// <param name="timeOut">命令行的执行等待时间，如果为0则表示无限等待，单位：毫秒。</param>
+      /// <returns>该操作会返回一个System.String实例，这个实例包含了命令行执行之后的所有文本结果。</returns>
+      public static string ExecuteCommandLine(string commandLineString, int timeOut)
+      {
+         string outputString = string.Empty;
+         if (commandLineString != null && !commandLineString.Equals(""))
+         {
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+               FileName = "cmd.exe",
+               Arguments = "/C " + commandLineString,
+               UseShellExecute = false,
+               RedirectStandardInput = false,
+               RedirectStandardOutput = true,
+               CreateNoWindow = true
+            };
+            process.StartInfo = startInfo;
+            try
+            {
+               if (process.Start())
+               {
+                  if (timeOut == 0) process.WaitForExit();
+                  else process.WaitForExit(timeOut);
+                  outputString = process.StandardOutput.ReadToEnd();
+               }
+            }
+            catch (Exception throwedException) { if (throwedException != null) throw throwedException.InnerException; }
+            finally { if (process != null) process.Close(); }
+         }
+         return outputString;
       }
    }
 }

@@ -13,28 +13,28 @@ namespace Cabinink.Devices
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class SerialPortCommunication
+   public class SerialPortCommunication : IDisposable
    {
-      private SerialPort comDevice;//COM串行端口设备。
+      private SerialPort _comDevice;//COM串行端口设备。
       /// <summary>
       /// 构造函数，创建一个默认构造的SerialPortCommunication实例。
       /// </summary>
-      public SerialPortCommunication() => comDevice = new SerialPort();
+      public SerialPortCommunication() => _comDevice = new SerialPort();
       /// <summary>
       /// 构造函数，创建一个指定端口名称的SerialPortCommunication实例。
       /// </summary>
       /// <param name="serialPortName">指定的端口名称。</param>
-      public SerialPortCommunication(string serialPortName) => comDevice = new SerialPort(serialPortName);
+      public SerialPortCommunication(string serialPortName) => _comDevice = new SerialPort(serialPortName);
       /// <summary>
       /// 构造函数，创建一个指定端口名称和波特率的SerialPortCommunication实例。
       /// </summary>
       /// <param name="serialPortName">指定的端口名称。</param>
       /// <param name="baudRate">指定的波特率。</param>
-      public SerialPortCommunication(string serialPortName, int baudRate) => comDevice = new SerialPort(serialPortName, baudRate);
+      public SerialPortCommunication(string serialPortName, int baudRate) => _comDevice = new SerialPort(serialPortName, baudRate);
       /// <summary>
       /// 获取或设置当前实例的端口设备实例。
       /// </summary>
-      public SerialPort COMDevice { get => comDevice; set => comDevice = value; }
+      public SerialPort COMDevice { get => _comDevice; set => _comDevice = value; }
       /// <summary>
       /// 获取或设置当前实例所表示的串行端口的端口名称。
       /// </summary>
@@ -60,6 +60,7 @@ namespace Cabinink.Devices
       /// <param name="dataBits">指定的字节标准数据位长度。</param>
       /// <param name="stopBits">指定的字节标准停止位数。</param>
       /// <returns>如果该操作正常或者成功打开端口，则会返回true，否则会返回false。</returns>
+      /// <exception cref="NotFoundAnyCOMDeviceException">当实例未找到任何COM设备或者可用接口时，则将会抛出这个异常。</exception>
       public bool Open(int baudRate, Parity parity, int dataBits, StopBits stopBits)
       {
          bool result = false;
@@ -109,6 +110,7 @@ namespace Cabinink.Devices
       /// <param name="offset">指定的偏移量。</param>
       /// <param name="count">指定的发送量。</param>
       /// <returns>如果这组数据已经被发送出去，则将会返回true，否则返回false。</returns>
+      /// <exception cref="NotFoundEnabledPortOrInterfaceException">当串行端口或者相关接口未启用时，则将会抛出这个异常。</exception>
       public bool SendData(byte[] data, int offset, int count)
       {
          bool result = false;
@@ -138,7 +140,7 @@ namespace Cabinink.Devices
             case EDataConvertedType.Hexadecimal:
                data = ((ExString)originalData).ToHexadecimalArray();
                break;
-            case EDataConvertedType.ASCIICode:
+            case EDataConvertedType.AsciiCode:
                data = Encoding.ASCII.GetBytes(originalData);
                break;
             case EDataConvertedType.UTF8Code:
@@ -175,6 +177,14 @@ namespace Cabinink.Devices
       /// </summary>
       /// <returns>这个方法会返回当前实例的全局名称，即包含命名空间的类名称。</returns>
       public override string ToString() => GetType().Namespace + ".SerialPortCommunication";
+      /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public void Dispose()
+      {
+         if (IsOpened) Close();
+         ((IDisposable)COMDevice).Dispose();
+      }
    }
    /// <summary>
    /// 数据发送或者接收的类型的枚举。
@@ -190,7 +200,7 @@ namespace Cabinink.Devices
       /// ASCII数据。
       /// </summary>
       [EnumerationDescription("ASCII")]
-      ASCIICode = 0x0001,
+      AsciiCode = 0x0001,
       /// <summary>
       /// UTF8编码的字符数据。
       /// </summary>

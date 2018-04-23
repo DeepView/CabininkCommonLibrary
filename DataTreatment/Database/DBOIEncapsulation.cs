@@ -6,7 +6,7 @@ namespace Cabinink.DataTreatment.Database
    /// <summary>
    /// 数据库操作傻瓜式接口封装基类。
    /// </summary>
-   public abstract class DBOIEncapsulation : IDatabasesOperationBase
+   public abstract class DBOIEncapsulation : IDatabasesOperationBase,IDisposable
    {
       [CLSCompliant(false)]
       protected string _dbConnectionString;//数据库连接字符串。
@@ -48,5 +48,9 @@ namespace Cabinink.DataTreatment.Database
       /// </summary>
       [MethodImpl(MethodImplOptions.Synchronized)]
       public abstract bool InitializeConnection();
+      /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public virtual void Dispose() => Disconnect();
    }
 }

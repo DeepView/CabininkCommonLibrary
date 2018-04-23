@@ -666,6 +666,41 @@ namespace Cabinink.TypeExtend
       /// <param name="v">隐式转换操作符的源类型。</param>
       public static implicit operator string(ExString v) => v.StringContext;
       /// <summary>
+      /// 随机生成指定长度的字符串。
+      /// </summary>
+      /// <param name="length">需要生成的字符串的长度。</param>
+      /// <param name="isIncludeSymbol">决定这个随机字符串是否包含在ASCII码中的标点符号。</param>
+      /// <returns>该方法在执行之后会返回一个随机生成的字符串。</returns>
+      public static ExString GenerateRandomString(int length, bool isIncludeSymbol)
+      {
+         DateTime utcNow = DateTime.UtcNow;
+         int seed = utcNow.Day * utcNow.Hour * utcNow.Minute * utcNow.Second * utcNow.Millisecond;
+         return GenerateRandomString(length, seed, isIncludeSymbol);
+      }
+      /// <summary>
+      /// 通过一个种子值来随机生成指定长度的字符串。
+      /// </summary>
+      /// <param name="length">需要生成的字符串的长度。</param>
+      /// <param name="seed">用于随机生成的种子值，这个种子值可随意设置，但是范围需要在Int32的有效范围中。</param>
+      /// <param name="isIncludeSymbol">决定这个随机字符串是否包含在ASCII码中的标点符号。</param>
+      /// <returns>该方法在执行之后会返回一个随机生成的字符串。</returns>
+      public static ExString GenerateRandomString(int length, int seed, bool isIncludeSymbol)
+      {
+         ExString randomString = string.Empty;
+         Random random = new Random(seed);
+         string numAndLetter = "0123456789ABCDEFGHIJKMLNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+         string onlySymbol = "~`!@#$%^&*()_+-=[]\\{}|;':\x22,./<>?";
+         if (isIncludeSymbol) randomString = numAndLetter + onlySymbol;
+         else randomString = numAndLetter;
+         string returnValue = string.Empty;
+         for (int i = 0; i < length; i++)
+         {
+            int randomInt = random.Next(0, randomString.Length - 1);
+            returnValue += randomString[randomInt];
+         }
+         return returnValue;
+      }
+      /// <summary>
       /// 加密指定的ExString实例。
       /// </summary>
       /// <param name="plaintext">需要被加密的明文。</param>

@@ -12,9 +12,10 @@ namespace Cabinink.TypeExtend.Collections
    [Serializable]
    [ComVisible(true)]
    [DebuggerDisplay("BiDirectionalLinkedList={Count:Count}")]
-   public class BiDirectionalLinkedList<T>
+   public class BiDirectionalLinkedList<T> : IDisposable
    {
       private ListNode<T> _headNode;//链表的表头节点。
+      private bool _disposedValue = false;//检测冗余调用
       /// <summary>
       /// 构造函数，创建一个链表表头为空的双向链表。
       /// </summary>
@@ -44,7 +45,7 @@ namespace Cabinink.TypeExtend.Collections
       {
          get
          {
-            ListNode<T> node = _headNode;
+            ListNode<T> node = Head;
             int count = 0;
             while (node != null)
             {
@@ -63,7 +64,7 @@ namespace Cabinink.TypeExtend.Collections
       {
          get
          {
-            ListNode<T> node = _headNode;
+            ListNode<T> node = Head;
             int counter = 0;
             if (index >= Count || index < 0) throw new ArgumentOutOfRangeException("index", "索引超出检索范围！");
             else
@@ -78,6 +79,22 @@ namespace Cabinink.TypeExtend.Collections
          }
       }
       /// <summary>
+      /// 获取或设置（set代码对外不可见，因为权限为private）当前链表中的第一个节点。
+      /// </summary>
+      public ListNode<T> Head { get => _headNode; private set => _headNode = value; }
+      /// <summary>
+      /// 获取当前链表中的最后一个节点。
+      /// </summary>
+      public ListNode<T> Tail
+      {
+         get
+         {
+            ListNode<T> node = Head;
+            while (node.Next != null) node = node.Next;
+            return node;
+         }
+      }
+      /// <summary>
       /// 在指定索引所对应的节点插入一个元素。
       /// </summary>
       /// <param name="index">指定的索引。</param>
@@ -88,15 +105,15 @@ namespace Cabinink.TypeExtend.Collections
       {
          int countBeforeIns = Count;
          int counter = 0;
-         ListNode<T> node = _headNode;
+         ListNode<T> node = Head;
          ListNode<T> inserted = new ListNode<T>(element);
          if (index >= Count || index < 0) throw new ArgumentOutOfRangeException("index", "索引超出检索范围！");
          else
          {
             if (index == 0)
             {
-               inserted.Next = _headNode;
-               _headNode = inserted;
+               inserted.Next = Head;
+               Head = inserted;
                return true;
             }
             while (counter < index - 1)
@@ -119,13 +136,13 @@ namespace Cabinink.TypeExtend.Collections
       {
          int countBeforeRemove = Count;
          int counter = 0;
-         ListNode<T> node = _headNode;
+         ListNode<T> node = Head;
          if (index >= Count || index < 0) throw new ArgumentOutOfRangeException("index", "索引超出检索范围！");
          else
          {
             if (index == 0)
             {
-               _headNode.BackwardsPointer();
+               Head.BackwardsPointer();
                return true;
             }
             while (counter < index - 1)
@@ -145,8 +162,8 @@ namespace Cabinink.TypeExtend.Collections
       public bool Remove(T element)
       {
          int countBeforeRemove = Count;
-         while (_headNode.Element.Equals(element)) _headNode = _headNode.Next;
-         ListNode<T> node = _headNode;
+         while (Head.Element.Equals(element)) Head = Head.Next;
+         ListNode<T> node = Head;
          while (node.Next.Next != null)
          {
             if (node.Next.Element.Equals(element))
@@ -169,12 +186,12 @@ namespace Cabinink.TypeExtend.Collections
          int countBeforeAdd = Count;
          ListNode<T> node = new ListNode<T>();
          ListNode<T> inserted = new ListNode<T>(element);
-         if (_headNode == null)
+         if (Head == null)
          {
-            _headNode = inserted;
+            Head = inserted;
             return true;
          }
-         node = _headNode;
+         node = Head;
          while (node.Next != null) node = node.Next;
          node.Next = inserted;
          return countBeforeAdd < Count ? true : false;
@@ -197,7 +214,7 @@ namespace Cabinink.TypeExtend.Collections
       /// <returns>如果操作成功，则返回这个元素所对应节点的索引，否则返回-1。</returns>
       public int FirstIndexOf(T element)
       {
-         ListNode<T> node = _headNode;
+         ListNode<T> node = Head;
          int counter = 0;
          while (node.Next != null)
          {
@@ -215,7 +232,7 @@ namespace Cabinink.TypeExtend.Collections
       /// <returns>如果操作成功，则返回这个元素所对应节点的索引，否则返回-1。</returns>
       public int LastIndexOf(T element)
       {
-         ListNode<T> node = _headNode;
+         ListNode<T> node = Head;
          int index = -1;
          int counter = 0;
          while (node.Next != null)
@@ -234,7 +251,7 @@ namespace Cabinink.TypeExtend.Collections
       /// <param name="element">被替换的元素的新元素值。</param>
       public void Replace(T replaced, T element)
       {
-         ListNode<T> node = _headNode;
+         ListNode<T> node = Head;
          while (node.Next != null)
          {
             if (node.Element.Equals(replaced)) node.Element = element;
@@ -247,8 +264,8 @@ namespace Cabinink.TypeExtend.Collections
       /// </summary>
       public void Reverse()
       {
-         ListNode<T> node = _headNode;
-         ListNode<T> nhNode = _headNode;
+         ListNode<T> node = Head;
+         ListNode<T> nhNode = Head;
          ListNode<T> tempNode = node;
          node = node.Next;
          nhNode.NextToNull();
@@ -262,7 +279,7 @@ namespace Cabinink.TypeExtend.Collections
          tempNode = node;
          tempNode.Next = nhNode;
          nhNode = node;
-         _headNode = nhNode;
+         Head = nhNode;
       }
       /// <summary>
       /// 同时获取指定元素所对应节点的第一个索引和最后一个索引。
@@ -274,14 +291,14 @@ namespace Cabinink.TypeExtend.Collections
       /// 判断当前的链表是否为空链表。
       /// </summary>
       /// <returns>如果链表为空链表，则返回true，否则返回false。</returns>
-      public bool IsEmpty() => _headNode == null ? true : false;
+      public bool IsEmpty() => Head == null ? true : false;
       /// <summary>
       /// 清除当前链表的所有节点。
       /// </summary>
       /// <returns>如果操作成功，则返回true，否则返回false。</returns>
       public bool Clear()
       {
-         _headNode = null;
+         Head = null;
          return Count == 0 ? true : false;
       }
       /// <summary>
@@ -291,7 +308,7 @@ namespace Cabinink.TypeExtend.Collections
       public T[] ToArray()
       {
          T[] array = new T[Count];
-         ListNode<T> node = _headNode;
+         ListNode<T> node = Head;
          int index = 0;
          while (node.Next != null)
          {
@@ -311,5 +328,35 @@ namespace Cabinink.TypeExtend.Collections
       /// </summary>
       /// <returns>该操作返回当前类的字符串表达形式，这个字符串是当前类的一段Debug描述文本。</returns>
       public override string ToString() => "BiDirectionalLinkedList:{Count=" + Count + "};";
+      #region IDisposable Support
+      /// <summary>
+      /// 释放该对象引用的所有内存资源。
+      /// </summary>
+      /// <param name="disposing">用于指示是否释放托管资源。</param>
+      protected virtual void Dispose(bool disposing)
+      {
+         int headNodeMaxGene = GC.GetGeneration(Head);
+         if (!_disposedValue)
+         {
+            if (disposing)
+            {
+               ListNode<T> node;
+               while (null != Head)
+               {
+                  node = Head;
+                  Head = Head.Next;
+                  node = null;
+               }
+               bool condition = GC.CollectionCount(headNodeMaxGene) == 0;
+               if (condition) GC.Collect(headNodeMaxGene, GCCollectionMode.Forced, true);
+            }
+            _disposedValue = true;
+         }
+      }
+      /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public void Dispose() => Dispose(true);
+      #endregion
    }
 }

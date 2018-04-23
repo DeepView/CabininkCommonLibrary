@@ -12,6 +12,80 @@ using System.Runtime.InteropServices;
 namespace Cabinink.IOSystem
 {
    /// <summary>
+   /// 包含ShellExecuteEx使用的信息的一个非托管结构。
+   /// </summary>
+   [StructLayout(LayoutKind.Sequential)]
+   public struct SShellExecuteInfo
+   {
+      /// <summary>
+      /// 结构体所占用的大小，SHELLEXECUTEINFO结构的CLR实现版本，详情请参考https://msdn.microsoft.com/en-us/library/bb759784%28VS.85%29.aspx?f=255&MSPPError=-2147217396。
+      /// </summary>
+      public int SizeOfStructure;
+      /// <summary>
+      /// 表明其他结构成员的内容和有效性的标志。
+      /// </summary>
+      [CLSCompliant(false)]
+      public uint Flags;
+      /// <summary>
+      /// 可选值，父窗口句柄，用于显示执行此功能时系统可能产生的任何消息框，该值可以是NULL。
+      /// </summary>
+      public IntPtr Handle;
+      /// <summary>
+      /// 用于指定要执行的操作，可用Verb的集合取决于特定的文件或文件夹。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Verb;
+      /// <summary>
+      /// 空终止字符串的地址，它指定ShellExecuteEx将执行由Verb参数指定的操作的文件或对象的名称。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string FileUrl;
+      /// <summary>
+      /// 包含应用程序参数的以空字符结尾的字符串的地址。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Parameters;
+      /// <summary>
+      /// 指定工作目录名称的以空字符结尾的字符串的地址。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Directory;
+      /// <summary>
+      /// 指定应用程序在打开时如何显示的标志。
+      /// </summary>
+      public int ShowFlags;
+      /// <summary>
+      /// 如果设置了SEE_MASK_NOCLOSEPROCESS并且ShellExecuteEx调用成功，则它将此成员设置为大于32的值，如果该函数失败，则将其设置为指示失败原因的SE_ERR_XXX错误值。虽然这个参数为了兼容16位Windows应用程序而声明为HINSTANCE，但它并不是真正的HINSTANCE，它只能转换为int，并与32或以下SE_ERR_XXX错误代码进行比较。
+      /// </summary>
+      public IntPtr InstanceApp;
+      /// <summary>
+      /// 一个ITEMIDLIST结构（PCIDLIST_ABSOLUTE）的地址，用于包含唯一标识要执行的文件的项目标识符列表。
+      /// </summary>
+      public IntPtr ItemIdList;
+      /// <summary>
+      /// 以空值终止的字符串的地址。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Class;
+      /// <summary>
+      /// 文件类型的注册表项句柄，此注册表项的访问权限应设置为KEY_READ。
+      /// </summary>
+      public IntPtr RegistryHandle;
+      /// <summary>
+      /// 与应用程序关联的键盘快捷键，低位字是虚拟键码，高位字是修饰符标志（HOTKEYF_），有关修饰符标志的列表，请参阅WM_SETHOTKEY消息的描述。
+      /// </summary>
+      [CLSCompliant(false)]
+      public uint ShortcutKey;
+      /// <summary>
+      /// 文件类型图标的句柄。
+      /// </summary>
+      public IntPtr Icon;
+      /// <summary>
+      /// 新启动的应用程序的句柄。
+      /// </summary>
+      public IntPtr Process;
+   }
+   /// <summary>
    /// 文件操作类，用于实现文件的常用操作，例如创建文、打开、读写文件等等。
    /// </summary>
    [Serializable]
@@ -19,6 +93,15 @@ namespace Cabinink.IOSystem
    public sealed class FileOperator
    {
       private const int DEFAULT_BUFFER_SIZE = 4096;//默认文件缓冲大小
+      private const int SW_SHOW = 5;//API常量，激活窗口并以当前的大小和位置显示它。
+      private const uint SEE_MASK_INVOKEIDLIST = 12;//API常量，使用所选项目快捷菜单处理程序的IContextMenu界面。
+      /// <summary>
+      /// 对指定的文件执行操作。
+      /// </summary>
+      /// <param name="executeInfo">一个指向SShellExecuteInfo（Windows编程下为SHELLEXECUTEINFO结构）结构的指针，该结构包含并接收有关正在执行的应用程序的信息。</param>
+      /// <returns>如果函数成功，返回值为非零，如果函数失败，返回值为零。若想获得更多错误信息，请调用GetLastError函数。</returns>
+      [DllImport("shell32.dll")]
+      private static extern bool ShellExecuteEx(ref SShellExecuteInfo executeInfo);
       /// <summary>
       /// 仅通过一个文件路径来创建一个文件
       /// </summary>
@@ -427,7 +510,7 @@ namespace Cabinink.IOSystem
       /// <param name="directory">需要进行搜寻的目录，即匹配的范围。</param>
       /// <param name="isSorted">是否将匹配结果进行排序之后并作为返回值提交给用户。</param>
       /// <returns>如果搜寻到完全一样的文件，则会返回这些文件地址所构成的List实例。</returns>
-      /// <remarks>该方法的原理是基于哈希验证的，但为了提高函数的效率，因此采用了文件名称对比、文件大小对比和文件SHA1代码对比来实现更加高效的运行，因为在哈希代码上完全相同的文件，其文件名称（不包含目录）和文件大小是完全相同的，但是当需要进行匹配的文件大小过大（比如说一个Windows离线安装镜像），则该操作将会非常的消耗时间。</remarks>
+      /// <remarks>该方法的原理是基于哈希验证的，但为了提高函数的效率，因此采用了文件名称对比、文件大小对比和文件SHA1代码对比来实现更加高效的运行，因为在哈希代码上完全相同的文件，其文件名称（不包含目录）和文件大小是完全相同的，但是当需要进行匹配的文件大小过大（比如说一个Windows离线安装镜像），则该操作将会非常的消耗时间，因此为了避免这种情况导致的应用程序性能下降，建议使用异步操作模式保证其他诸如UI线程的正常工作。</remarks>
       public static List<string> SearchIdenticalFiles(string fileUrl, string directory, bool isSorted)
       {
          List<string> searchResult = new List<string>();
@@ -511,6 +594,24 @@ namespace Cabinink.IOSystem
             }
          }
          return directorySize;
+      }
+      /// <summary>
+      /// 显示指定文件的文件属性对话框。
+      /// </summary>
+      /// <param name="fileUrl">指定的文件，如果这个文件不存在，则将会抛出异常。</param>
+      public static void ShowFileAttributesDialog(string fileUrl)
+      {
+         if (!FileExists(fileUrl)) throw new FileNotFoundException("指定的文件找不到", fileUrl);
+         else
+         {
+            SShellExecuteInfo info = new SShellExecuteInfo();
+            info.SizeOfStructure = Marshal.SizeOf(info);
+            info.Verb = "properties";
+            info.FileUrl = fileUrl;
+            info.ShowFlags = SW_SHOW;
+            info.Flags = SEE_MASK_INVOKEIDLIST;
+            ShellExecuteEx(ref info);
+         }
       }
    }
    /// <summary>

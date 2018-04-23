@@ -280,6 +280,15 @@ namespace Cabinink.DataTreatment.Database
          }
       }
       /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public override void Dispose()
+      {
+         base.Dispose();
+         DbConnector.Dispose();
+         _sqlCommand.Dispose();
+      }
+      /// <summary>
       /// 获取当前SQLiteDBOIEncapsulation实例的完整类名的字符串表达形式。
       /// </summary>
       /// <returns>该操作会返回一个当前实例的完整类名的字符串表达形式。</returns>

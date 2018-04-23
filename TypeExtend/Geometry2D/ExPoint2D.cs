@@ -120,6 +120,16 @@ namespace Cabinink.TypeExtend.Geometry2D
          return new ExPoint2D(xPos, yPos);
       }
       /// <summary>
+      /// 解构函数，适用于当前实例的元组化之后的初始化以及分量的快捷调用。
+      /// </summary>
+      /// <param name="x">二维点的横坐标。</param>
+      /// <param name="y">二维点的纵坐标。</param>
+      public void Deconstruct(out double x, out double y)
+      {
+         x = XPosition;
+         y = YPosition;
+      }
+      /// <summary>
       /// 获取两个点的中点坐标。
       /// </summary>
       /// <param name="point">用于获取中点坐标的另一个二维点。</param>
