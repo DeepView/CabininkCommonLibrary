@@ -93,7 +93,7 @@ namespace Cabinink.Devices
          long win32ErrorCode = 0;
          Action executed = new Action(delegate { mouse_event(flags, dx, dy, data, extraInfo); });
          exceptionInfo = string.Empty;
-         CodeHelper.IsWritedWin32ErrorCode(executed, ref win32ErrorCode);
+         CodeHelper.IsWritedWin32ErrorCode(executed, out win32ErrorCode);
          exceptionInfo = Win32ApiHelper.FormatErrorCode(win32ErrorCode);
          return win32ErrorCode == 0 ? true : false;
       }

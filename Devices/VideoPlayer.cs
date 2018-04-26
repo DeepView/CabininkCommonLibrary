@@ -13,7 +13,7 @@ namespace Cabinink.Devices
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class VideoPlayer : IDisposable
+   public class VideoPlayer : IPlaybackControl, IVolumeControl, IPlaybackProgressControl, IDisposable
    {
       private Video _video;//一个用于播放视频的Microsoft.DirectX.AudioVideoPlayback.Video实例。
       private string _videoFileUrl;//指定的视频文件地址。
@@ -78,7 +78,7 @@ namespace Cabinink.Devices
       /// </summary>
       public string FileUrl => _videoFileUrl;
       /// <summary>
-      /// 获取或设置当前实例的Microsoft.DirectX.AudioVideoPlayback.Video实例。
+      /// 获取或设置当前实例中包含的Microsoft.DirectX.AudioVideoPlayback.Video实例。
       /// </summary>
       public Video DirectXVideoInstance { get => _video; set => _video = value; }
       /// <summary>
@@ -146,7 +146,21 @@ namespace Cabinink.Devices
       /// <summary>
       /// 获取或设置当前播放实例的播放进度（单位：秒）。
       /// </summary>
-      public double Position { get => DirectXVideoInstance.CurrentPosition; set => DirectXVideoInstance.CurrentPosition = value; }
+      /// <exception cref="ArgumentOutOfRangeException">当用户指定的播放进度不在有效范围内，则将会抛出这个异常。</exception>
+      public double Position
+      {
+         get => DirectXVideoInstance.CurrentPosition;
+         set
+         {
+            bool condition = value > Length || value < 0;
+            if (condition) throw new ArgumentOutOfRangeException("value", "需要调整的播放进度必须在有效范围内！");
+            else DirectXVideoInstance.CurrentPosition = value;
+         }
+      }
+      /// <summary>
+      /// 获取当前播放实例其媒体文件在停止播放时的播放进度（单位：秒）。
+      /// </summary>
+      public double StopPosition => DirectXVideoInstance.StopPosition;
       /// <summary>
       /// 获取或设置当前播放实例的全屏状态。
       /// </summary>
@@ -188,7 +202,7 @@ namespace Cabinink.Devices
       public void SetChannelDeviation(int deviationAmount)
       {
          int converted = deviationAmount * VOLUME_RATE_CONST;
-         if (deviationAmount < 0 || deviationAmount > 100)
+         if (deviationAmount < -100 || deviationAmount > 100)
          {
             throw new ArgumentOutOfRangeException("deviationAmount", "声道偏移量超出范围！");
          }

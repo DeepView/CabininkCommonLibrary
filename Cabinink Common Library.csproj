@@ -79,7 +79,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\IntelligentLearning\TspSolution.cs" />
     <Compile Include="Algorithm\MathConstant.cs" />
+    <Compile Include="Algorithm\IntelligentLearning\BPDeepLearningNetwork.cs" />
     <Compile Include="Algorithm\NumericalSorting.cs" />
     <Compile Include="Algorithm\NumericalStatistics.cs" />
     <Compile Include="Algorithm\PhysicsConstant.cs" />
@@ -100,10 +102,14 @@
     <Compile Include="DataTreatment\ORMapping\SQLGenerator.cs" />
     <Compile Include="DataTreatment\ORMapping\TypeMapping.cs" />
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
+    <Compile Include="Devices\IPlaybackControl.cs" />
+    <Compile Include="Devices\IPlaybackProgressControl.cs" />
+    <Compile Include="Devices\IVolumeControl.cs" />
     <Compile Include="Devices\Monitor.cs" />
     <Compile Include="Devices\PositionIndicator.cs" />
     <Compile Include="Devices\SerialPortCommunication.cs" />
     <Compile Include="Devices\SoundPlayer.cs" />
+    <Compile Include="Devices\Win32SoundPlayer.cs" />
     <Compile Include="Devices\VideoPlayer.cs" />
     <Compile Include="EnumerationDescriptionAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />

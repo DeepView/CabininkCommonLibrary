@@ -1,162 +1,227 @@
 ﻿using System;
 using System.IO;
 using Cabinink.IOSystem;
-using Cabinink.TypeExtend;
 using System.Runtime.InteropServices;
+using Microsoft.DirectX.AudioVideoPlayback;
 namespace Cabinink.Devices
 {
    /// <summary>
-   /// 音频播放类，用于在Windows指定有效的音频设备中播放音频。
+   /// 音频播放类，可用于播放一些基本格式的音频。
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class SoundPlayer : IDisposable
+   public class SoundPlayer : IPlaybackControl, IVolumeControl, IPlaybackProgressControl, IDisposable
    {
-      private ExString _soundFileUrl;//音频资源文件的文件地址。
-      private bool disposedValue = false;//检测冗余调用
+      private Audio _audio;//一个用于播放音频的Microsoft.DirectX.AudioVideoPlayback.Audio实例。
+      private string _soundFileUrl;//指定的音频文件地址。
+      public const int VOLUME_RATE_CONST = 100;//音量倍率常量。
       /// <summary>
-      /// 用于在Windows中播放音频。
+      /// 构造函数，创建一个空的音频播放类的实例。
       /// </summary>
-      /// <param name="sound">音频资源描述符。</param>
-      /// <param name="instanceHandle">应用程序的实例句柄，除非sound的指向一个资源标识符（即flag被定义为SND_RESOURCE，在这里为ESoundFlgas.ResourceOrAtom），否则必须设置为NULL。</param>
-      /// <param name="flag">标志的组合。</param>
-      /// <returns>若成功则函数返回true，否则返回false。</returns>
-      [DllImport("winmm.dll", SetLastError = true)]
-      private static extern bool PlaySound(string sound, UIntPtr instanceHandle, uint flag);
+      public SoundPlayer() => DirectXAudioInstance = null;
       /// <summary>
-      /// 构造函数，初始化一个指定音频资源文件的Sound实例。
+      /// 构造函数，创建一个指定音频文件地址的SoundPlayer实例。
       /// </summary>
-      /// <param name="soundFileUrl">指定的音频资源文件。</param>
-      /// <exception cref="FileNotFoundException">当参数soundFileUrl指定的文件未找到时，则会抛出这个异常。</exception>
-      public SoundPlayer(ExString soundFileUrl)
+      /// <param name="soundFileUrl">指定的音频文件地址。</param>
+      /// <exception cref="FileNotFoundException">当指定的音频文件找不到时，则将会抛出这个异常。</exception>
+      public SoundPlayer(string soundFileUrl)
       {
-         if (!FileOperator.FileExists(soundFileUrl)) throw new FileNotFoundException("指定的文件找不到！", soundFileUrl);
-         else _soundFileUrl = soundFileUrl;
+         if (!FileOperator.FileExists(soundFileUrl)) throw new FileNotFoundException("指定的音频文件找不到！", soundFileUrl);
+         else
+         {
+            DirectXAudioInstance = new Audio(soundFileUrl, false);
+            _soundFileUrl = soundFileUrl;
+         }
       }
       /// <summary>
-      /// 获取或设置当前实例的音频资源文件地址。
+      /// 构造函数，创建一个指定音频文件地址和渲染目标和SoundPlayer实例，并决定是否自动播放这个音频。
       /// </summary>
-      public ExString SourceFile
+      /// <param name="soundFileUrl">指定的音频文件地址。</param>
+      /// <param name="isAutoPlay">用于指示是否自动播放参数soundFileUrl指定的音频。</param>
+      /// <exception cref="FileNotFoundException">当指定的音频文件找不到时，则将会抛出这个异常。</exception>
+      public SoundPlayer(string soundFileUrl, bool isAutoPlay)
       {
-         get => _soundFileUrl;
+         if (!FileOperator.FileExists(soundFileUrl)) throw new FileNotFoundException("指定的音频文件找不到！", soundFileUrl);
+         else
+         {
+            DirectXAudioInstance = new Audio(soundFileUrl, isAutoPlay);
+            _soundFileUrl = soundFileUrl;
+         }
+      }
+      /// <summary>
+      /// 获取或设置当前实例中包含的Microsoft.DirectX.AudioVideoPlayback.Audio实例。
+      /// </summary>
+      public Audio DirectXAudioInstance { get => _audio; set => _audio = value; }
+      /// <summary>
+      /// 获取当前播放实例的音频文件地址。
+      /// </summary>
+      public string FileUrl => _soundFileUrl;
+      /// <summary>
+      /// 获取或设置当前媒体播放器的媒体音量。
+      /// </summary>
+      /// <exception cref="ArgumentOutOfRangeException">当音量设置超出范围时，则将会抛出这个异常。</exception>
+      public int Volume
+      {
+         get => DirectXAudioInstance.Volume / VOLUME_RATE_CONST + VOLUME_RATE_CONST;
          set
          {
-            if (!FileOperator.FileExists(value)) throw new FileNotFoundException("指定的文件找不到！", value);
-            else _soundFileUrl = value;
+            if (value < 0 || value > 100) throw new ArgumentOutOfRangeException("value", "音量设置超出范围！");
+            else DirectXAudioInstance.Volume = -((VOLUME_RATE_CONST - value) * VOLUME_RATE_CONST);
          }
       }
       /// <summary>
-      /// 播放实例指定的音频文件。
+      /// 获取当前播放实例的媒体播放状态。
       /// </summary>
-      public void Play() => Play(ESoundFlags.FileName | ESoundFlags.Synchronously | ESoundFlags.NoStop);
-      /// <summary>
-      /// 播放实例指定的音频文件，并指定播放标识。
-      /// </summary>
-      /// <param name="flags">指定的标识或者标志组合。</param>
-      [CLSCompliant(false)]
-      public void Play(ESoundFlags flags) => PlaySound(SourceFile, UIntPtr.Zero, (uint)flags);
-      /// <summary>
-      /// 结束音频文件的播放。
-      /// </summary>
-      public void Stop() => PlaySound(null, UIntPtr.Zero, (uint)ESoundFlags.FileName);
-      #region IDisposable Support
-      /// <summary>
-      /// 释放该对象引用的所有内存资源。
-      /// </summary>
-      /// <param name="disposing">用于指示是否释放托管资源。</param>
-      protected virtual void Dispose(bool disposing)
+      public EPlayerStatue PlayerStatue
       {
-         if (!disposedValue)
+         get
          {
-            if (disposing)
-            {
-               _soundFileUrl.Dispose();
-               PlaySound(null, UIntPtr.Zero, (uint)ESoundFlags.FileName);
-               GC.Collect();
-            }
-            disposedValue = true;
+            EPlayerStatue statue = EPlayerStatue.Unknown;
+            if (DirectXAudioInstance.Playing) statue = EPlayerStatue.Playing;
+            if (DirectXAudioInstance.Paused) statue = EPlayerStatue.Paused;
+            if (DirectXAudioInstance.Stopped) statue = EPlayerStatue.Stoped;
+            return statue;
          }
       }
       /// <summary>
-      /// 析构函数，释放该对象引用的所有内存资源和非托管资源。
+      /// 获取当前播放实例的媒体长度（即最大播放时间，单位：秒）。
       /// </summary>
-      ~SoundPlayer() => Dispose(false);
+      public double Length => DirectXAudioInstance.Duration;
+      /// <summary>
+      /// 获取当前播放实例其媒体文件在停止播放时的播放进度（单位：秒）。
+      /// </summary>
+      public double StopPosition => DirectXAudioInstance.StopPosition;
+      /// <summary>
+      /// 获取或设置当前播放实例的播放进度（单位：秒）。
+      /// </summary>
+      /// <exception cref="ArgumentOutOfRangeException">当用户指定的播放进度不在有效范围内，则将会抛出这个异常。</exception>
+      public double Position
+      {
+         get => DirectXAudioInstance.CurrentPosition;
+         set
+         {
+            bool condition = value > Length || value < 0;
+            if (condition) throw new ArgumentOutOfRangeException("value", "需要调整的播放进度必须在有效范围内！");
+            else DirectXAudioInstance.CurrentPosition = value;
+         }
+      }
+      /// <summary>
+      /// 暂停播放当前的媒体文件。
+      /// </summary>
+      public void Pause() => DirectXAudioInstance.Pause();
+      /// <summary>
+      /// 开始或者继续播放当前的媒体文件。
+      /// </summary>
+      public void Play() => DirectXAudioInstance.Play();
+      /// <summary>
+      /// 停止播放当前的媒体文件。
+      /// </summary>
+      public void Stop() => DirectXAudioInstance.Stop();
+      /// <summary>
+      /// 当播放器对象准备好时停止播放。
+      /// </summary>
+      public void StopWhenReady() => DirectXAudioInstance.StopWhenReady();
+      /// <summary>
+      /// 获取当前正在播放的媒体文件的声道偏移量。
+      /// </summary>
+      /// <returns>该操作会返回一个32位整数数值，这个数值如果为负数则表示为当前正在播放的媒体文件的音轨被设置为了左声道，正数为右声道，0为立体声。</returns>
+      public int GetChannelDeviation() => DirectXAudioInstance.Balance / 100;
+      /// <summary>
+      /// 通过声道偏移枚举来获取正在播放的媒体文件的声道偏移量。
+      /// </summary>
+      /// <param name="channelDeviation">在方法执行之后，用于描述当前正在播放的媒体文件的声道。</param>
+      /// <returns>该操作会返回一个32位整数数值，但这个数值为声道偏移量的绝对值，具体判定方式取决于channelDeviation这个引用传递的参数，如果这个最终参数值为EChannelDeviation.LeftChannel则表示为当前正在播放的媒体文件的音轨被设置为了左声道，参数最终值为EChannelDeviation.Stereo则表示为立体声，最终参数值为EChannelDeviation.RightChannel则表示右声道。</returns>
+      public int GetChannelDeviation(ref EChannelDeviation channelDeviation)
+      {
+         int deviationAmount = GetChannelDeviation();
+         if (deviationAmount > 0) channelDeviation = EChannelDeviation.RightChannel;
+         if (deviationAmount == 0) channelDeviation = EChannelDeviation.Stereo;
+         if (deviationAmount < 0) channelDeviation = EChannelDeviation.LeftChannel;
+         return Math.Abs(deviationAmount);
+      }
+      /// <summary>
+      /// 设置当前正在播放的媒体文件的音轨的声道。
+      /// </summary>
+      /// <param name="channelDeviation">设置音轨的声道偏移方向。</param>
+      public void SetChannelDeviation(EChannelDeviation channelDeviation)
+      {
+         int deviationAmount = 100;
+         SetChannelDeviation(channelDeviation, deviationAmount);
+      }
+      /// <summary>
+      /// 设置当前正在播放的媒体文件的音轨的声道偏移量。
+      /// </summary>
+      /// <param name="deviationAmount">设置音轨的偏移量，如果为负数则表示为左声道，正数为右声道，0为立体声。</param>
+      /// <exception cref="ArgumentOutOfRangeException">当声道偏移量超出范围时，则将会抛出这个异常。</exception>
+      public void SetChannelDeviation(int deviationAmount)
+      {
+         int converted = deviationAmount * VOLUME_RATE_CONST;
+         if (deviationAmount < -100 || deviationAmount > 100)
+         {
+            throw new ArgumentOutOfRangeException("deviationAmount", "声道偏移量超出范围！");
+         }
+         else DirectXAudioInstance.Balance = converted;
+      }
+      /// <summary>
+      /// 通过声道偏移枚举来设置当前正在播放的媒体文件的音轨的声道偏移量。
+      /// </summary>
+      /// <param name="channelDeviation">设置音轨的声道偏移方向。</param>
+      /// <param name="deviationAmount">设置音轨的偏移量。</param>
+      /// <exception cref="ArgumentOutOfRangeException">当声道偏移量超出范围时，则将会抛出这个异常。</exception>
+      public void SetChannelDeviation(EChannelDeviation channelDeviation, int deviationAmount)
+      {
+         if (deviationAmount < 0 || deviationAmount > 100)
+         {
+            throw new ArgumentOutOfRangeException("deviationAmount", "声道偏移量超出范围！");
+         }
+         else
+         {
+            switch (channelDeviation)
+            {
+               case EChannelDeviation.LeftChannel:
+                  DirectXAudioInstance.Balance = -(deviationAmount * VOLUME_RATE_CONST);
+                  break;
+               case EChannelDeviation.Stereo:
+                  DirectXAudioInstance.Balance = deviationAmount - deviationAmount;
+                  break;
+               case EChannelDeviation.RightChannel:
+                  DirectXAudioInstance.Balance = deviationAmount * VOLUME_RATE_CONST;
+                  break;
+               default:
+                  DirectXAudioInstance.Balance = deviationAmount - deviationAmount;
+                  break;
+            }
+         }
+      }
+      /// <summary>
+      /// 寻求特定的播放位置。
+      /// </summary>
+      /// <param name="time">指定的时间位置。</param>
+      /// <returns>该操作会返回操作之后的媒体文件播放进度。</returns>
+      public double SeekCurrentPosition(double time) => DirectXAudioInstance.SeekCurrentPosition(time, SeekPositionFlags.AbsolutePositioning);
+      /// <summary>
+      /// 寻求特定的播放位置，并指定探寻标识。
+      /// </summary>
+      /// <param name="time">指定的时间位置。</param>
+      /// <param name="flags">指定的探寻标识。</param>
+      /// <returns>该操作会返回操作之后的媒体文件播放进度。</returns>
+      public double SeekCurrentPosition(double time, SeekPositionFlags flags) => DirectXAudioInstance.SeekCurrentPosition(time, flags);
+      /// <summary>
+      /// 在播放中设置新的停止位置。
+      /// </summary>
+      /// <param name="time">播放的新停止时间。</param>
+      /// <returns>该操作将会返回新的停止位置。</returns>
+      public double SeekStopPosition(double time) => DirectXAudioInstance.SeekStopPosition(time, SeekPositionFlags.AbsolutePositioning);
+      /// <summary>
+      /// 在播放中设置新的停止位置，并指定探寻标识。
+      /// </summary>
+      /// <param name="time">指定的时间位置。</param>
+      /// <param name="flags">指定的探寻标识。</param>
+      /// <returns>该操作将会返回新的停止位置。</returns>
+      public double SeekStopPosition(double time, SeekPositionFlags flags) => DirectXAudioInstance.SeekStopPosition(time, flags);
       /// <summary>
       /// 手动释放该对象引用的所有内存资源。
       /// </summary>
-      public void Dispose()
-      {
-         Dispose(true);
-         GC.SuppressFinalize(this);
-      }
-      #endregion
-   }
-   /// <summary>
-   /// 音频播放标识枚举。
-   /// </summary>
-   [Flags]
-   [CLSCompliant(false)]
-   public enum ESoundFlags : uint
-   {
-      /// <summary>
-      /// 同步播放（默认）。
-      /// </summary>  
-      [EnumerationDescription("同步播放")]
-      Synchronously = 0x0000,
-      /// <summary>
-      /// 异步播放。
-      /// </summary>  
-      [EnumerationDescription("异步播放")]
-      Asynchronously = 0x0001,
-      /// <summary>
-      /// 在没有找到音频的情况下保持静音。
-      /// </summary>  
-      [EnumerationDescription("无任务时静音")]
-      NoDefault = 0x0002,
-      /// <summary>
-      /// 首参数指向一个内存文件。
-      /// </summary>  
-      [EnumerationDescription("指向内存文件")]
-      Memory = 0x0004,
-      /// <summary>
-      /// 循环播放声音直到指定下一个音频播放任务。
-      /// </summary>  
-      [EnumerationDescription("循环播放")]
-      Loop = 0x0008,
-      /// <summary>
-      /// 不要停止任何正在播放的声音。
-      /// </summary>  
-      [EnumerationDescription("禁止停止播放")]
-      NoStop = 0x0010,
-      /// <summary>
-      /// 停止正在播放的任务。
-      /// </summary>  
-      [EnumerationDescription("停止播放")]
-      StopPlaying = 0x40,
-      /// <summary>
-      /// 当设备繁忙时则不需要等待。
-      /// </summary>  
-      [EnumerationDescription("无需等待")]
-      NoWait = 0x00002000,
-      /// <summary>
-      /// 资源描述字符串为注册表别名。
-      /// </summary>  
-      [EnumerationDescription("注册表别名")]
-      Alias = 0x00010000,
-      /// <summary>
-      /// 资源描述字符串为预定义ID。
-      /// </summary>  
-      [EnumerationDescription("预定义ID")]
-      AliasIsPredefinedId = 0x00110000,
-      /// <summary>
-      /// 资源描述字符串为文件地址。
-      /// </summary>  
-      [EnumerationDescription("文件地址")]
-      FileName = 0x00020000,
-      /// <summary>
-      /// 资源描述字符串为资源名称或者Atom。
-      /// </summary>  
-      [EnumerationDescription("资源名或者ATOM")]
-      ResourceOrAtom = 0x00040004
+      public void Dispose() => DirectXAudioInstance.Dispose();
    }
 }

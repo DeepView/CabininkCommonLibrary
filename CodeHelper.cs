@@ -57,7 +57,7 @@ namespace Cabinink
       /// <param name="executedUnmanagedCode">需要执行的非托管代码。</param>
       /// <param name="win32ErrorCode">用于已写入的新的Win32错误代码，如果该方法没有写入新的错误代码，则该参数将会保存操作系统中上一个Win32错误代码。</param>
       /// <returns>如果该操作不会写入新的Win32错误代码，则将会返回false，但是在写入任何Win32错误代码的情况下，该方法都会抛出true。</returns>
-      public static bool IsWritedWin32ErrorCode(Action executedUnmanagedCode, ref long win32ErrorCode)
+      public static bool IsWritedWin32ErrorCode(Action executedUnmanagedCode, out long win32ErrorCode)
       {
          int returnValue = 0;
          Func<int> executed = new Func<int>(delegate
@@ -65,7 +65,7 @@ namespace Cabinink
             executedUnmanagedCode.Invoke();
             return returnValue;
          });
-         return IsWritedWin32ErrorCode(executed, ref returnValue, ref win32ErrorCode);
+         return IsWritedWin32ErrorCode(executed, out returnValue, out win32ErrorCode);
       }
       /// <summary>
       /// 执行参数executedUnmanagedCode包含存在返回值的非托管代码并检查是否写入了新的Win32错误代码。
@@ -75,7 +75,7 @@ namespace Cabinink
       /// <param name="returnValue">参数executedUnmanagedCode封装的委托的返回值。</param>
       /// <param name="win32ErrorCode">用于已写入的新的Win32错误代码，如果该方法没有写入新的错误代码，则该参数将会保存操作系统中上一个Win32错误代码。</param>
       /// <returns>如果该操作不会写入新的Win32错误代码，则将会返回false，但是在写入任何Win32错误代码的情况下，该方法都会抛出true。</returns>
-      public static bool IsWritedWin32ErrorCode<T>(Func<T> executedUnmanagedCode, ref T returnValue, ref long win32ErrorCode)
+      public static bool IsWritedWin32ErrorCode<T>(Func<T> executedUnmanagedCode, out T returnValue, out long win32ErrorCode)
       {
          bool result = false;
          long lastWin32ErrorCode = Win32ApiHelper.GetLastWin32ApiError();
@@ -92,7 +92,7 @@ namespace Cabinink
       /// <param name="executedUnmanagedCode">需要执行的非托管代码。</param>
       /// <param name="returnValue">参数executedUnmanagedCode封装的委托的返回值。</param>
       /// <returns>这个操作无论是否写入了新的Win32错误代码，都会返回一个Win32ApiExecutedResult实例。</returns>
-      public static Win32ApiExecutedResult IsWritedWin32ErrorCode<T>(Func<T> executedUnmanagedCode, ref T returnValue)
+      public static Win32ApiExecutedResult IsWritedWin32ErrorCode<T>(Func<T> executedUnmanagedCode, out T returnValue)
       {
          Win32ApiExecutedResult result = new Win32ApiExecutedResult();
          returnValue = executedUnmanagedCode.Invoke();

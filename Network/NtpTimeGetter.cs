@@ -201,7 +201,7 @@ namespace Cabinink.Network
       /// <returns>返回一个交换字节顺序之后的结果。</returns>
       private static uint SwapEndianness(ulong swapedNum)
       {
-         return (uint)(((swapedNum & 0x000000ff) << 24) + ((swapedNum & 0x0000ff00) << 8) + ((swapedNum & 0x00ff0000) >> 8) + ((swapedNum & 0xff000000) >> 24));
+         return (uint)(((swapedNum & 0xff) << 24) + ((swapedNum & 0xff00) << 8) + ((swapedNum & 0xff0000) >> 8) + ((swapedNum & 0xff000000) >> 24));
       }
       /// <summary>
       /// 线程池回调。

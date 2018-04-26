@@ -18,7 +18,7 @@ namespace Cabinink.IOSystem
    public struct SShellExecuteInfo
    {
       /// <summary>
-      /// 结构体所占用的大小，SHELLEXECUTEINFO结构的CLR实现版本，详情请参考https://msdn.microsoft.com/en-us/library/bb759784%28VS.85%29.aspx?f=255&MSPPError=-2147217396。
+      /// 结构体所占用的大小，SHELLEXECUTEINFO结构的CLR实现版本，详情请参考https://msdn.microsoft.com/en-us/library/bb759784%28VS.85%29.aspx?f=255&amp;MSPPError=-2147217396。
       /// </summary>
       public int SizeOfStructure;
       /// <summary>
@@ -184,7 +184,7 @@ namespace Cabinink.IOSystem
       /// <param name="isAppend">一个Boolean类型参数，用于决定该操作应该以追加还是覆盖的方式存储文本，如果该参数为true，则该操作会以追加方式存储文本，否则会以覆盖方式存储文本。</param>
       public static void WriteFile(string fileUrl, string writedContext, bool isAppend)
       {
-         WriteFile(fileUrl, writedContext, false, Encoding.GetEncoding("GB2312"));
+         WriteFile(fileUrl, writedContext, isAppend, Encoding.GetEncoding("GB2312"));
       }
       /// <summary>
       /// 通过一个追加指示和编码格式向指定的文件存储文本内容。
