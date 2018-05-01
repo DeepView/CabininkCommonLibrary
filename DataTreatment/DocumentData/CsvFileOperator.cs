@@ -14,6 +14,7 @@ namespace Cabinink.DataTreatment.DocumentData
    /// </summary>
    [Serializable]
    [ComVisible(true)]
+   [Obsolete("Will restructure.")]
    [DebuggerDisplay("CsvFileOperator = FileUrl:{FileUrl};SecurityFlag:{SecurityFlag}")]
    public class CsvFileOperator : IOSecurityFile, ICollection<string>
    {

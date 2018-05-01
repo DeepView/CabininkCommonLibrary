@@ -47,6 +47,7 @@ namespace Cabinink
       /// <summary>
       /// 获取当前实例存储的上一个错误代码。
       /// </summary>
+      [Obsolete("Will delete.")]
       public long PreviousErrorCode => _previousWin32ApiErrorCode;
       /// <summary>
       /// 获取当前实例所存储的错误代码对应的详细信息。
