@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 namespace Cabinink.IOSystem.Security
 {
    /// <summary>
-   /// IO操作安全文件类。
+   /// IO操作安全文件类，可以实现更加安全的文件IO操作。
    /// </summary>
    [Serializable]
    [ComVisible(true)]
@@ -26,7 +26,7 @@ namespace Cabinink.IOSystem.Security
       private bool _isApplyAccessRule;//指示是否应用文件安全访问规则。
       private bool _isReadOnly;//指示当前文件是否只读，这个是基于当前实例，而非基于整个操作系统。
       private string _initializeHashCode;//文件未作出更改时的MD5哈希代码。
-      private bool disposedValue = false;//检测冗余调用。
+      private bool _disposedValue = false;//检测冗余调用。
       private const int CODE_SECURITY_FLAG_STOP = 0x0000;//代码安全标识符常量，操作非法。
       private const int CODE_SECURITY_FLAG_NORMAL = 0xffff;//代码安全标识符常量，操作合法。
       private const string FILE_SECURITY_KEY = @"cabinink";//文件加密和解密用的安全密钥。
@@ -43,7 +43,8 @@ namespace Cabinink.IOSystem.Security
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
          _isApplyAccessRule = true;
-         _initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
+         //_initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
+         SetPrimeMD5Code();
       }
       /// <summary>
       /// 构造函数，创建一个指定文件路径的IO操作安全文件操作实例，并根据参数createdThenNotExists决定当文件不存在时是否创建新文件。
@@ -71,18 +72,20 @@ namespace Cabinink.IOSystem.Security
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
          _isApplyAccessRule = true;
-         _initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
+         //_initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
+         SetPrimeMD5Code();
       }
       /// <summary>
       /// 获取或设置当前实例的IO操作安全文件地址。
       /// </summary>
-      /// <exception cref="FileNotFoundException">当参数fileUrl指定的文件找不到时，则会抛出这个异常。</exception>
+      /// <exception cref="FileNotFoundException">当参数value指定的文件找不到时，则会抛出这个异常。</exception>
       public string FileUrl
       {
          get => _securityFileUrl;
          set
          {
-            if (!FileOperator.FileExists(value)) throw new FileNotFoundException("指定的文件找不到！", value);
+            bool condition = !FileOperator.FileExists(value) && value != null;
+            if (condition) throw new FileNotFoundException("指定的文件找不到！", value);
             _securityFileUrl = value;
          }
       }
@@ -189,10 +192,22 @@ namespace Cabinink.IOSystem.Security
       /// 通过指定的编码方式来读取IO操作安全文件的文件内容。
       /// </summary>
       /// <param name="encoding">指定的编码方式，这个编码决定了文件读取的编码方式。</param>
+      /// <exception cref="IOException">当尝试解密的文件其内容为明文时，则会抛出这个异常。</exception>
       public void Read(Encoding encoding)
       {
          ReadUnencrypted(encoding);
-         ExString.Decrypt(FileContext, FILE_SECURITY_KEY);
+         try
+         {
+            ExString.Decrypt(FileContext, FILE_SECURITY_KEY);
+         }
+         catch (FormatException exception)
+         {
+            if (exception != null)
+            {
+               RevokeJurisdiction();
+               throw new IOException("不允许针对明文进行解密操作！");
+            }
+         }
       }
       /// <summary>
       /// 通过指定的编码方式来读取一个未加密文件内容上下文的IO操作安全文件。
@@ -254,7 +269,7 @@ namespace Cabinink.IOSystem.Security
       /// <param name="password">在进行权限恢复之前需要进行身份验证的有效密码。</param>
       /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
       [MethodImpl(MethodImplOptions.Synchronized)]
-      public bool RrecoveryJurisdiction(ExString password)
+      public bool RecoveryJurisdiction(ExString password)
       {
          bool result = true;
          string domain = EnvironmentInformation.GetComputerName();
@@ -345,6 +360,18 @@ namespace Cabinink.IOSystem.Security
       /// </summary>
       private void ResetCodeSecurityFlag() => ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_STOP);
       /// <summary>
+      /// 设置当前实例所包含文件的初始MD5字符串。
+      /// </summary>
+      private void SetPrimeMD5Code()
+      {
+         LoadPassword(() => FILE_SECURITY_KEY);
+         RecoveryJurisdiction(FILE_SECURITY_KEY);
+         _initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
+         UpdatePassword(FILE_SECURITY_KEY, string.Empty);
+         RevokeJurisdiction();
+      }
+
+      /// <summary>
       /// 通过文件MD5和文件路径判断两个文件是否相同。
       /// </summary>
       /// <param name="other">用于比较的另一个文件。</param>
@@ -367,10 +394,11 @@ namespace Cabinink.IOSystem.Security
          int urlMaxGene = GC.GetGeneration(FileUrl);
          int initHashMaxGene = GC.GetGeneration(_initializeHashCode);
          int maxGene = urlMaxGene >= initHashMaxGene ? urlMaxGene : initHashMaxGene;
-         if (!disposedValue)
+         if (!_disposedValue)
          {
             if (disposing)
             {
+               RevokeJurisdiction();
                ((ExString)FileContext).Dispose();
                JurisdictionPassword.Dispose();
                FileUrl = null;
@@ -378,13 +406,13 @@ namespace Cabinink.IOSystem.Security
                bool condition = GC.CollectionCount(urlMaxGene) == 0 && GC.CollectionCount(initHashMaxGene) == 0;
                if (condition) GC.Collect(maxGene, GCCollectionMode.Forced, true);
             }
-            disposedValue = true;
+            _disposedValue = true;
          }
       }
       /// <summary>
       /// 手动释放该对象引用的所有内存资源。
       /// </summary>
-      public void Dispose() => Dispose(true);
+      public virtual void Dispose() => Dispose(true);
       #endregion
    }
    /// <summary>

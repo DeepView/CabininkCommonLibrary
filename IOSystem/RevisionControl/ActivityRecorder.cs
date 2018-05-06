@@ -5,6 +5,7 @@ using Cabinink.Windows;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Cabinink.DataTreatment.Database;
 namespace Cabinink.IOSystem.RevisionControl
 {
    /// <summary>
@@ -19,6 +20,7 @@ namespace Cabinink.IOSystem.RevisionControl
       private string _branch;//分支名称。
       private string _accountId;//活动发起的账户ID。
       private EActivityType _activityType;//活动类型。
+      private RepositoryManager _repositoryManager;//活动记录器需要记录的仓库。
       private string _description;//活动注释。
       private const string VCS_LOGDB_FILE = @"\vcsdb.sqlite3";//本地文件版本控制系统工作日志数据库名称。
       private const string VCS_ACTIVITY_RECORD_LOG_DBTABLE = @"activityRecordLog";//本地文件版本控制系统活动记录数据表名称。
@@ -30,11 +32,13 @@ namespace Cabinink.IOSystem.RevisionControl
       /// <param name="branch">指定的分支名称。</param>
       /// <param name="accountId">指定的发起账户ID。</param>
       /// <param name="activityType">指定的活动类型。</param>
-      public ActivityRecorder(DateTime recordTime, long activityId, string branch, string accountId, EActivityType activityType)
+      /// <param name="repositoryManager">指定记录的版本仓库。</param>
+      public ActivityRecorder(DateTime recordTime, long activityId, string branch, string accountId, EActivityType activityType, RepositoryManager repositoryManager)
       {
          _recordTime = recordTime;
          _activityId = activityId;
          _activityType = activityType;
+         _repositoryManager = repositoryManager;
          if (string.IsNullOrWhiteSpace(branch)) _branch = @"master";
          else _branch = branch;
          if (string.IsNullOrWhiteSpace(accountId)) _accountId = EnvironmentInformation.GetCurrentUserName();
@@ -48,13 +52,15 @@ namespace Cabinink.IOSystem.RevisionControl
       /// <param name="branch">指定的分支名称。</param>
       /// <param name="accountId">指定的发起账户ID。</param>
       /// <param name="activityType">指定的活动类型。</param>
+      /// <param name="repositoryManager">指定记录的版本仓库。</param>
       /// <param name="description">指定的活动注释信息。</param>
-      public ActivityRecorder(DateTime recordTime, long activityId, string branch, string accountId, EActivityType activityType, string description)
+      public ActivityRecorder(DateTime recordTime, long activityId, string branch, string accountId, EActivityType activityType, RepositoryManager repositoryManager, string description)
       {
          string activityTypeString = EnumerationDescriptionAttribute.GetEnumDescription(activityType);
          _recordTime = recordTime;
          _activityId = activityId;
          _activityType = activityType;
+         _repositoryManager = repositoryManager;
          if (string.IsNullOrWhiteSpace(branch)) _branch = @"master";
          else _branch = branch;
          if (string.IsNullOrWhiteSpace(accountId)) _accountId = EnvironmentInformation.GetCurrentUserName();
@@ -87,18 +93,39 @@ namespace Cabinink.IOSystem.RevisionControl
       /// </summary>
       public string Description { get => _description; set => _description = value; }
       /// <summary>
+      /// 获取当前实例的活动记录日志所在的数据库的文件地址。
+      /// </summary>
+      public string RecordDbUrl => _repositoryManager.LocalRepositoryDirectory + VCS_LOGDB_FILE;
+      /// <summary>
       /// 获取本地文件版本控制系统活动记录数据表名称。
       /// </summary>
-      internal static string ActivityRecordLogDbTableName => VCS_ACTIVITY_RECORD_LOG_DBTABLE;
+      internal static string LogDbTableName => VCS_ACTIVITY_RECORD_LOG_DBTABLE;
 
       public void ClearLog()
       {
-         throw new NotImplementedException();
-      }
 
+      }
       public void UpdateLog()
       {
-         throw new NotImplementedException();
+         SQLiteDBOIEncapsulation sqlite = new SQLiteDBOIEncapsulation(new Uri(RecordDbUrl));
+         sqlite.InitializeConnection();
+         sqlite.Connect();
+         CreateLogDataTable();
+         //TODO:这里的代码需要继续编辑。
+         //TODO:由于这个命名空间的代码没有去编辑，因此在继续编辑的时候需要花费时间去解析以前的代码。
+         sqlite.Disconnect();
+      }
+      private void CreateLogDataTable()
+      {
+         SQLiteDBOIEncapsulation sqlite = new SQLiteDBOIEncapsulation(new Uri(RecordDbUrl));
+         sqlite.InitializeConnection();
+         sqlite.Connect();
+         if (!sqlite.DataTableExists(VCS_ACTIVITY_RECORD_LOG_DBTABLE))
+         {
+            string sqlPart = @"recordTime BIGINT, activityId BIGINT, branch TEXT, accountId TEXT, activityType INT, description TEXT";
+            sqlite.ExecuteSql("create table " + VCS_ACTIVITY_RECORD_LOG_DBTABLE + "(" + sqlPart + ");");
+         }
+         sqlite.Disconnect();
       }
    }
    /// <summary>

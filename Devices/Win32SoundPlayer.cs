@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 namespace Cabinink.Devices
 {
    /// <summary>
-   /// 音频播放类，用于在Windows指定有效的音频设备中播放音频。
+   /// 通过Win32Api实现的基础性音频播放类，用于在Windows指定有效的音频设备中播放音频。
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public class Sound : IDisposable
+   public class Win32SoundPlayer : IDisposable
    {
       private ExString _soundFileUrl;//音频资源文件的文件地址。
       private bool disposedValue = false;//检测冗余调用
@@ -28,7 +28,7 @@ namespace Cabinink.Devices
       /// </summary>
       /// <param name="soundFileUrl">指定的音频资源文件。</param>
       /// <exception cref="FileNotFoundException">当参数soundFileUrl指定的文件未找到时，则会抛出这个异常。</exception>
-      public Sound(ExString soundFileUrl)
+      public Win32SoundPlayer(ExString soundFileUrl)
       {
          if (!FileOperator.FileExists(soundFileUrl)) throw new FileNotFoundException("指定的文件找不到！", soundFileUrl);
          else _soundFileUrl = soundFileUrl;
@@ -55,6 +55,10 @@ namespace Cabinink.Devices
       /// <param name="flags">指定的标识或者标志组合。</param>
       [CLSCompliant(false)]
       public void Play(ESoundFlags flags) => PlaySound(SourceFile, UIntPtr.Zero, (uint)flags);
+      /// <summary>
+      /// 结束音频文件的播放。
+      /// </summary>
+      public void Stop() => PlaySound(null, UIntPtr.Zero, (uint)ESoundFlags.FileName);
       #region IDisposable Support
       /// <summary>
       /// 释放该对象引用的所有内存资源。
@@ -76,7 +80,7 @@ namespace Cabinink.Devices
       /// <summary>
       /// 析构函数，释放该对象引用的所有内存资源和非托管资源。
       /// </summary>
-      ~Sound() => Dispose(false);
+      ~Win32SoundPlayer() => Dispose(false);
       /// <summary>
       /// 手动释放该对象引用的所有内存资源。
       /// </summary>

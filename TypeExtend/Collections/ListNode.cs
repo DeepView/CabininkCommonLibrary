@@ -21,6 +21,15 @@ namespace Cabinink.TypeExtend.Collections
          _next = null;
       }
       /// <summary>
+      /// 构造函数，创建一个指定存储元素和一个NULL后继的节点。
+      /// </summary>
+      /// <param name="element">节点需要存储的数据。</param>
+      public ListNode(T element)
+      {
+         _element = element;
+         _next = null;
+      }
+      /// <summary>
       /// 构造函数，创建一个存储指定元素和后继的节点。
       /// </summary>
       /// <param name="element">节点需要存储的数据。</param>

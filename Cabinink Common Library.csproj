@@ -24,9 +24,9 @@
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\Cabinink Common Library.xml</DocumentationFile>
     <RegisterForComInterop>false</RegisterForComInterop>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +40,18 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.AudioVideoPlayback, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.AudioVideoPlayback.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3D, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.Direct3D.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -67,9 +79,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\IntelligentLearning\TspSolution.cs" />
     <Compile Include="Algorithm\MathConstant.cs" />
+    <Compile Include="Algorithm\IntelligentLearning\BPDeepLearningNetwork.cs" />
     <Compile Include="Algorithm\NumericalSorting.cs" />
     <Compile Include="Algorithm\NumericalStatistics.cs" />
+    <Compile Include="Algorithm\PhysicsConstant.cs" />
     <Compile Include="AssemblyInformation.cs" />
     <Compile Include="CodeHelper.cs" />
     <Compile Include="DataTreatment\Database\DBOIEncapsulation.cs" />
@@ -81,30 +96,27 @@
     <Compile Include="DataTreatment\Database\SQLServerDBOIEncapsulation.cs" />
     <Compile Include="DataTreatment\DocumentData\SpreadsheetDataOperator.cs" />
     <Compile Include="DataTreatment\IDatabasesOperationBase.cs" />
+    <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
+    <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\ORMapping\ObjectMemberGetter.cs" />
     <Compile Include="DataTreatment\ORMapping\SQLGenerator.cs" />
     <Compile Include="DataTreatment\ORMapping\TypeMapping.cs" />
-    <Compile Include="DataTreatment\DocumentData\CsvFileOperator.cs" />
-    <Compile Include="DataTreatment\DocumentData\InitializationFileOperator.cs" />
     <Compile Include="DataTreatment\WebData\JsonOperator.cs" />
+    <Compile Include="Devices\IPlaybackControl.cs" />
+    <Compile Include="Devices\IPlaybackProgressControl.cs" />
+    <Compile Include="Devices\IVolumeControl.cs" />
     <Compile Include="Devices\Monitor.cs" />
     <Compile Include="Devices\PositionIndicator.cs" />
-    <Compile Include="Devices\Sound.cs" />
+    <Compile Include="Devices\SerialPortCommunication.cs" />
+    <Compile Include="Devices\SoundPlayer.cs" />
+    <Compile Include="Devices\Win32SoundPlayer.cs" />
+    <Compile Include="Devices\VideoPlayer.cs" />
     <Compile Include="EnumerationDescriptionAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IOSystem\FileOperator.cs" />
     <Compile Include="IOSystem\IObjectAccessSwitch.cs" />
-    <Compile Include="IOSystem\RevisionControl\BranchFactory.cs" />
-    <Compile Include="IOSystem\RevisionControl\Committer.cs" />
     <Compile Include="IOSystem\FileStateMonitor.cs" />
-    <Compile Include="IOSystem\RevisionControl\IExecuter.cs" />
-    <Compile Include="IOSystem\RevisionControl\ILogOperator.cs" />
-    <Compile Include="IOSystem\RevisionControl\Puller.cs" />
-    <Compile Include="IOSystem\RevisionControl\Pusher.cs" />
-    <Compile Include="IOSystem\RevisionControl\ActivityRecorder.cs" />
-    <Compile Include="IOSystem\RevisionControl\RepositoryManager.cs" />
-    <Compile Include="IOSystem\RevisionControl\StagingArea.cs" />
-    <Compile Include="IOSystem\RevisionControl\VersionComparer.cs" />
+    <Compile Include="IOSystem\MemoryIOFile.cs" />
     <Compile Include="IOSystem\Security\FileSignature.cs" />
     <Compile Include="IOSystem\Security\IOSecurityFile.cs" />
     <Compile Include="IOSystem\Security\IOAccessRuleManagement.cs" />
@@ -143,11 +155,14 @@
     <Compile Include="TypeExtend\Geometry2D\StraightLine2D.cs" />
     <Compile Include="TypeExtend\Geometry2D\Triangle.cs" />
     <Compile Include="TypeExtend\Geometry2D\UnregoinallyShape.cs" />
+    <Compile Include="Win32ApiExecutedResult.cs" />
     <Compile Include="Win32ApiHelper.cs" />
     <Compile Include="Windows\Applications\AppSettings.cs" />
     <Compile Include="Windows\Applications\IApplicationBasicIO.cs" />
     <Compile Include="Windows\Applications\SettingsOption.cs" />
+    <Compile Include="Windows\Applications\ShortcutCreator.cs" />
     <Compile Include="Windows\Energy\BatteryUsageInformation .cs" />
+    <Compile Include="Windows\Energy\PowerSchemesManager.cs" />
     <Compile Include="Windows\EnvironmentInformation.cs" />
     <Compile Include="Windows\Energy\PowerOperator.cs" />
     <Compile Include="Windows\MemoryOperator.cs" />
@@ -168,6 +183,15 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="Microsoft.Office.Core">
       <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
       <VersionMajor>2</VersionMajor>

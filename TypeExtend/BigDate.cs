@@ -10,6 +10,7 @@ namespace Cabinink.TypeExtend
    /// <summary>
    /// 大型日期类，可以表示跨度很长的日期。
    /// </summary>
+   /// <remarks>当前类用于表示一个跨度很长的日期，但是这个类并不能表示一个具体的时间，换句话说，该类的分度值为Day。另外，这个大型日期类是建立在一个自然科学的理想假设限制之上的（即地球公转和自转不不变化的情况下），就是这个类已经忽略掉了地球公转和自转的速率变化，这个变化在自然科学中而言是长久性和可持续性的，就目前而言，地球自转暂时保持在23h56m04s这个周期上，当然这些知识会涉及到天体物理学，静态宇宙模型以及相对论相关的知识，如果需要禁止忽略这些因素，可以参考地球公转和自转速率或者天体物理学和相对论等相关的百科知识。</remarks>
    [Serializable]
    [ComVisible(true)]
    [DebuggerDisplay("Date = {ToString(EDateDisplayCategory.DashedSegmentation)}")]
@@ -29,6 +30,17 @@ namespace Cabinink.TypeExtend
          _year = DateTime.Now.Year;
          _month = (byte)DateTime.Now.Month;
          _day = (byte)DateTime.Now.Day;
+      }
+      /// <summary>
+      /// 构造函数，通过一个适用于CLR的DateTime类型的Ticks来初始化当前BigDate实例。
+      /// </summary>
+      /// <param name="clrDateTimeTicks">可用于初始化System.DateTime的Ticks（即适用于CLR的DateTime类型的Ticks）。</param>
+      public BigDate(long clrDateTimeTicks)
+      {
+         DateTime time = new DateTime(clrDateTimeTicks);
+         _year = time.Year;
+         _month = (byte)time.Month;
+         _day = (byte)time.Day;
       }
       /// <summary>
       /// 构造函数，通过一个指定的DateTime结构体实例来初始化当前BigDate实例。

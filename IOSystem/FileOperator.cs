@@ -12,6 +12,80 @@ using System.Runtime.InteropServices;
 namespace Cabinink.IOSystem
 {
    /// <summary>
+   /// 包含ShellExecuteEx使用的信息的一个非托管结构。
+   /// </summary>
+   [StructLayout(LayoutKind.Sequential)]
+   public struct SShellExecuteInfo
+   {
+      /// <summary>
+      /// 结构体所占用的大小，SHELLEXECUTEINFO结构的CLR实现版本，详情请参考https://msdn.microsoft.com/en-us/library/bb759784%28VS.85%29.aspx?f=255&amp;MSPPError=-2147217396。
+      /// </summary>
+      public int SizeOfStructure;
+      /// <summary>
+      /// 表明其他结构成员的内容和有效性的标志。
+      /// </summary>
+      [CLSCompliant(false)]
+      public uint Flags;
+      /// <summary>
+      /// 可选值，父窗口句柄，用于显示执行此功能时系统可能产生的任何消息框，该值可以是NULL。
+      /// </summary>
+      public IntPtr Handle;
+      /// <summary>
+      /// 用于指定要执行的操作，可用Verb的集合取决于特定的文件或文件夹。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Verb;
+      /// <summary>
+      /// 空终止字符串的地址，它指定ShellExecuteEx将执行由Verb参数指定的操作的文件或对象的名称。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string FileUrl;
+      /// <summary>
+      /// 包含应用程序参数的以空字符结尾的字符串的地址。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Parameters;
+      /// <summary>
+      /// 指定工作目录名称的以空字符结尾的字符串的地址。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Directory;
+      /// <summary>
+      /// 指定应用程序在打开时如何显示的标志。
+      /// </summary>
+      public int ShowFlags;
+      /// <summary>
+      /// 如果设置了SEE_MASK_NOCLOSEPROCESS并且ShellExecuteEx调用成功，则它将此成员设置为大于32的值，如果该函数失败，则将其设置为指示失败原因的SE_ERR_XXX错误值。虽然这个参数为了兼容16位Windows应用程序而声明为HINSTANCE，但它并不是真正的HINSTANCE，它只能转换为int，并与32或以下SE_ERR_XXX错误代码进行比较。
+      /// </summary>
+      public IntPtr InstanceApp;
+      /// <summary>
+      /// 一个ITEMIDLIST结构（PCIDLIST_ABSOLUTE）的地址，用于包含唯一标识要执行的文件的项目标识符列表。
+      /// </summary>
+      public IntPtr ItemIdList;
+      /// <summary>
+      /// 以空值终止的字符串的地址。
+      /// </summary>
+      [MarshalAs(UnmanagedType.LPStr)]
+      public string Class;
+      /// <summary>
+      /// 文件类型的注册表项句柄，此注册表项的访问权限应设置为KEY_READ。
+      /// </summary>
+      public IntPtr RegistryHandle;
+      /// <summary>
+      /// 与应用程序关联的键盘快捷键，低位字是虚拟键码，高位字是修饰符标志（HOTKEYF_），有关修饰符标志的列表，请参阅WM_SETHOTKEY消息的描述。
+      /// </summary>
+      [CLSCompliant(false)]
+      public uint ShortcutKey;
+      /// <summary>
+      /// 文件类型图标的句柄。
+      /// </summary>
+      public IntPtr Icon;
+      /// <summary>
+      /// 新启动的应用程序的句柄。
+      /// </summary>
+      public IntPtr Process;
+   }
+   /// <summary>
    /// 文件操作类，用于实现文件的常用操作，例如创建文、打开、读写文件等等。
    /// </summary>
    [Serializable]
@@ -19,15 +93,21 @@ namespace Cabinink.IOSystem
    public sealed class FileOperator
    {
       private const int DEFAULT_BUFFER_SIZE = 4096;//默认文件缓冲大小
+      private const int SW_SHOW = 5;//API常量，激活窗口并以当前的大小和位置显示它。
+      private const uint SEE_MASK_INVOKEIDLIST = 12;//API常量，使用所选项目快捷菜单处理程序的IContextMenu界面。
+      /// <summary>
+      /// 对指定的文件执行操作。
+      /// </summary>
+      /// <param name="executeInfo">一个指向SShellExecuteInfo（Windows编程下为SHELLEXECUTEINFO结构）结构的指针，该结构包含并接收有关正在执行的应用程序的信息。</param>
+      /// <returns>如果函数成功，返回值为非零，如果函数失败，返回值为零。若想获得更多错误信息，请调用GetLastError函数。</returns>
+      [DllImport("shell32.dll")]
+      private static extern bool ShellExecuteEx(ref SShellExecuteInfo executeInfo);
       /// <summary>
       /// 仅通过一个文件路径来创建一个文件
       /// </summary>
       /// <param name="fileUrl">指定的本地文件路径，即需要被创建的文件应该保存于本地磁盘的哪一个位置。</param>
       /// <remarks>该重载版本，以及CreateFile(stringl, FileMode)、CreateFile(string fileUrl, FileMode)和CreateFile(string fileUrl, FileMode, FileAccess, FileShare)都可能会触发完整参数版本中所设置的异常触发条件。</remarks>
-      public static void CreateFile(string fileUrl)
-      {
-         CreateFile(fileUrl, FileMode.CreateNew);
-      }
+      public static void CreateFile(string fileUrl) => CreateFile(fileUrl, FileMode.CreateNew);
       /// <summary>
       /// 通过文件路径、创建模式来创建一个文件。
       /// </summary>
@@ -69,10 +149,7 @@ namespace Cabinink.IOSystem
       /// </summary>
       /// <param name="fileUrl">需用用于判定文件存在性的文件路径。</param>
       /// <returns>如果这个文件存在，则会返回true，否则会返回false。</returns>
-      public static bool FileExists(string fileUrl)
-      {
-         return File.Exists(fileUrl);
-      }
+      public static bool FileExists(string fileUrl) => File.Exists(fileUrl);
       /// <summary>
       /// 通过一个文件路径来读取文件内容。
       /// </summary>
@@ -107,7 +184,7 @@ namespace Cabinink.IOSystem
       /// <param name="isAppend">一个Boolean类型参数，用于决定该操作应该以追加还是覆盖的方式存储文本，如果该参数为true，则该操作会以追加方式存储文本，否则会以覆盖方式存储文本。</param>
       public static void WriteFile(string fileUrl, string writedContext, bool isAppend)
       {
-         WriteFile(fileUrl, writedContext, false, Encoding.GetEncoding("GB2312"));
+         WriteFile(fileUrl, writedContext, isAppend, Encoding.GetEncoding("GB2312"));
       }
       /// <summary>
       /// 通过一个追加指示和编码格式向指定的文件存储文本内容。
@@ -158,11 +235,32 @@ namespace Cabinink.IOSystem
       /// 复制文件到指定的地址。
       /// </summary>
       /// <param name="sourceFileUrl">需要复制的文件的文件地址。</param>
-      /// <param name="targetFileUrl">复制的目标地址，而非目标目录。</param>
-      /// <param name="isOverwrite">如果目标地址所表示的文件在复制之前就存在，则这个值指示是否覆盖这个文件。</param>
+      /// <param name="targetFileUrl">复制的目标地址，而非目标目录，允许文件名称不同（即允许重命名）。</param>
+      /// <param name="isOverwrite">如果目标地址所表示的文件在复制之前就存在，则这个值指示是否允许覆盖这个文件。</param>
       public static void CopyFile(string sourceFileUrl, string targetFileUrl, bool isOverwrite)
       {
          FileSystem.CopyFile(sourceFileUrl, targetFileUrl, isOverwrite);
+      }
+      /// <summary>
+      /// 移动文件到指定的地址。
+      /// </summary>
+      /// <param name="sourceFileUrl">需要移动的文件的文件地址。</param>
+      /// <param name="targetFileUrl">移动的目标地址，而非目标目录，允许文件名称不同（即允许重命名）。</param>
+      public static void MoveFile(string sourceFileUrl, string targetFileUrl) => MoveFile(sourceFileUrl, targetFileUrl, false);
+      /// <summary>
+      /// 移动文件到指定的地址，并决定是否覆盖目标同名文件。
+      /// </summary>
+      /// <param name="sourceFileUrl">需要移动的文件的文件地址。</param>
+      /// <param name="targetFileUrl">移动的目标地址，而非目标目录，允许文件名称不同（即允许重命名）。</param>
+      /// <param name="isOverwrite">如果目标地址所表示的文件在移动之前就存在，则这个值指示是否允许覆盖这个文件。</param>
+      public static void MoveFile(string sourceFileUrl, string targetFileUrl, bool isOverwrite)
+      {
+         if (FileExists(targetFileUrl))
+         {
+            if (isOverwrite) DeleteFile(targetFileUrl);
+            else throw new DirectoryIsExistedException();
+         }
+         File.Move(sourceFileUrl, targetFileUrl);
       }
       /// <summary>
       /// 删除指定目录下的所有文件。
@@ -256,10 +354,7 @@ namespace Cabinink.IOSystem
       /// </summary>
       /// <param name="directory">需要被用于判定的目录。</param>
       /// <returns>如果参数directory所指定的目录已经存在则会返回true，否则将会返回false。</returns>
-      public static bool DirectoryExists(string directory)
-      {
-         return Directory.Exists(directory);
-      }
+      public static bool DirectoryExists(string directory) => Directory.Exists(directory);
       /// <summary>
       /// 删除一个指定的空目录。
       /// </summary>
@@ -321,31 +416,28 @@ namespace Cabinink.IOSystem
       /// <summary>
       /// 返回不具有扩展名的指定路径字符串的文件名。
       /// </summary>
-      /// <param name="fileUrll">需要被获取文件名的文件地址。</param>
+      /// <param name="fileUrl">需要被获取文件名的文件地址。</param>
       /// <returns>由System.IO.Path.GetFileName返回的字符串，但不包括最后的句点以及之后的所有字符。</returns>
       /// <remarks>注意，这个方法不会验证文件的存在性和其他相关有效性</remarks>
-      public static string GetFileNameWithoutExtension(string fileUrl)
-      {
-         return Path.GetFileNameWithoutExtension(fileUrl);
-      }
+      public static string GetFileNameWithoutExtension(string fileUrl) => Path.GetFileNameWithoutExtension(fileUrl);
       /// <summary>
       /// 获取一个包含后缀名的文件名。
       /// </summary>
       /// <param name="fileUrl">需要被获取文件名的文件的本地地址。</param>
       /// <returns>如果不抛出任何异常，则该操作会返回一个不包含目录的文件名。</returns>
-      public static string GetFileName(string fileUrl)
-      {
-         return GetFileNameWithoutExtension(fileUrl) + GetFileExtension(fileUrl);
-      }
+      public static string GetFileName(string fileUrl) => GetFileNameWithoutExtension(fileUrl) + GetFileExtension(fileUrl);
       /// <summary>
       /// 获取一个文件的后缀名。
       /// </summary>
       /// <param name="fileUrl">用于被获取后缀名的文件地址。</param>
       /// <returns>如果没有异常发生，则将返回这个文件的后缀名，假设一个文件地址为C:\Windows\System32\cmd.exe，则这个操作返回的文件后缀名为.exe，而非exe。</returns>
-      public static string GetFileExtension(string fileUrl)
-      {
-         return new FileInfo(fileUrl).Extension;
-      }
+      public static string GetFileExtension(string fileUrl) => new FileInfo(fileUrl).Extension;
+      /// <summary>
+      /// 获取一个文件的大小，以字节（Byte）为单位。
+      /// </summary>
+      /// <param name="fileUrl">需要被获取文件大小的文件。</param>
+      /// <returns>该操作会返回一个长整形数据long（Int64），用于存放参数fileUrl所对应文件的文件大小。</returns>
+      public static long GetFileSize(string fileUrl) => new FileInfo(fileUrl).Length;
       /// <summary>
       /// 获取指定目录下面的所有文件名（包含路径和扩展名）。
       /// </summary>
@@ -412,12 +504,59 @@ namespace Cabinink.IOSystem
          return result;
       }
       /// <summary>
+      /// 在指定的目录中搜寻完全一样的文件。
+      /// </summary>
+      /// <param name="fileUrl">需要进行匹配的样本文件的文件地址。</param>
+      /// <param name="directory">需要进行搜寻的目录，即匹配的范围。</param>
+      /// <param name="isSorted">是否将匹配结果进行排序之后并作为返回值提交给用户。</param>
+      /// <returns>如果搜寻到完全一样的文件，则会返回这些文件地址所构成的List实例。</returns>
+      /// <remarks>该方法的原理是基于哈希验证的，但为了提高函数的效率，因此采用了文件名称对比、文件大小对比和文件SHA1代码对比来实现更加高效的运行，因为在哈希代码上完全相同的文件，其文件名称（不包含目录）和文件大小是完全相同的，但是当需要进行匹配的文件大小过大（比如说一个Windows离线安装镜像），则该操作将会非常的消耗时间，因此为了避免这种情况导致的应用程序性能下降，建议使用异步操作模式保证其他诸如UI线程的正常工作。</remarks>
+      public static List<string> SearchIdenticalFiles(string fileUrl, string directory, bool isSorted)
+      {
+         List<string> searchResult = new List<string>();
+         List<string> traversedFiles = TraverseWith(directory, false);
+         const int CRITICAL_FILE_SIZE = 50000000;
+         Parallel.For(0, traversedFiles.Count, (index, interrupt) =>
+         {
+            try
+            {
+               if (GetFileName(traversedFiles[index]) == GetFileName(fileUrl))
+               {
+                  long sourceSize = GetFileSize(fileUrl);
+                  long targetSize = GetFileSize(traversedFiles[index]);
+                  if (sourceSize == targetSize)
+                  {
+                     string srcHashCode = string.Empty;
+                     string tgtHashCode = srcHashCode;
+                     bool fileSizeCondition = sourceSize >= CRITICAL_FILE_SIZE || targetSize >= CRITICAL_FILE_SIZE;
+                     Action getSrcHash = () => srcHashCode = new FileSignature(fileUrl).GetSHA1String();
+                     Action getTgtHash = () => tgtHashCode = new FileSignature(traversedFiles[index]).GetSHA1String();
+                     if (fileSizeCondition) Parallel.Invoke(new Action[] { getSrcHash, getTgtHash });
+                     else
+                     {
+                        getSrcHash.Invoke();
+                        getTgtHash.Invoke();
+                     }
+                     if (srcHashCode.Equals(tgtHashCode)) searchResult.Add(traversedFiles[index]);
+                  }
+               }
+            }
+            catch (Exception throwedException)
+            {
+               if (throwedException != null) throw throwedException.InnerException;
+               interrupt.Stop();
+            }
+         });
+         if (isSorted) searchResult.Sort();
+         return searchResult;
+      }
+      /// <summary>
       /// 获取指定目录下的所有子目录的名称。
       /// </summary>
       /// <param name="directory">指定的目录。</param>
       /// <returns>如果不产生异常，则该操作会返回一个包含子目录集合的列表，如果该目录下没有任何子目录，则将会返回一个空列表。</returns>
       /// <exception cref="DirectoryNotFoundException">当参数directory所指定的目录找不到时，则会引发这个异常。</exception>
-      public static List<string> GetFolders(string directory)
+      public static List<string> GetSubDirectories(string directory)
       {
          if (DirectoryExists(directory) == false) throw new DirectoryNotFoundException("指定的目录找不到");
          return Directory.GetDirectories(directory).ToList();
@@ -427,18 +566,52 @@ namespace Cabinink.IOSystem
       /// </summary>
       /// <param name="directory">指定的目录。</param>
       /// <returns>操作成功之后将会返回一个文件夹名称字符串。</returns>
-      public static string GetFolderName(string directory)
-      {
-         return new DirectoryInfo(directory).Name;
-      }
+      public static string GetFolderName(string directory) => new DirectoryInfo(directory).Name;
       /// <summary>
       /// 获取指定文件所在的目录
       /// </summary>
       /// <param name="fileUrl">需要被获取目录的文件地址。</param>
       /// <returns>这个操作会返回一个字符串，该字符串存储了这个操作所获取的目录，如果操作失败可能会引发相关的异常。</returns>
-      public static string GetFatherDirectory(string fileUrl)
+      public static string GetFatherDirectory(string fileUrl) => Directory.GetParent(fileUrl).FullName;
+      /// <summary>
+      /// 获取指定目录的大小。
+      /// </summary>
+      /// <param name="directory">需要获取大小的目录。</param>
+      /// <returns>如果这个操作没有任何异常，则会返回一个存储了目录尺寸的Int64实例。</returns>
+      /// <exception cref="DirectoryNotFoundException">当指定的目录不存在时，则将会抛出这个异常。</exception>
+      public static long GetDirectorySize(string directory)
       {
-         return Directory.GetParent(fileUrl).FullName;
+         if (!DirectoryExists(directory)) throw new DirectoryNotFoundException("指定的目录不存在！");
+         long directorySize = 0;
+         DirectoryInfo dInfo = new DirectoryInfo(directory);
+         foreach (FileInfo fInfo in dInfo.GetFiles()) directorySize += fInfo.Length;
+         DirectoryInfo[] dInfos = dInfo.GetDirectories();
+         if (dInfos.Length > 0)
+         {
+            for (int i = 0; i < dInfos.Length; i++)
+            {
+               directorySize += GetDirectorySize(dInfos[i].FullName);
+            }
+         }
+         return directorySize;
+      }
+      /// <summary>
+      /// 显示指定文件的文件属性对话框。
+      /// </summary>
+      /// <param name="fileUrl">指定的文件，如果这个文件不存在，则将会抛出异常。</param>
+      public static void ShowFileAttributesDialog(string fileUrl)
+      {
+         if (!FileExists(fileUrl)) throw new FileNotFoundException("指定的文件找不到", fileUrl);
+         else
+         {
+            SShellExecuteInfo info = new SShellExecuteInfo();
+            info.SizeOfStructure = Marshal.SizeOf(info);
+            info.Verb = "properties";
+            info.FileUrl = fileUrl;
+            info.ShowFlags = SW_SHOW;
+            info.Flags = SEE_MASK_INVOKEIDLIST;
+            ShellExecuteEx(ref info);
+         }
       }
    }
    /// <summary>

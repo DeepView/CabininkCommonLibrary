@@ -266,5 +266,14 @@ namespace Cabinink.DataTreatment.Database
       /// 更新当前数据库连接对象的连接状态属性。
       /// </summary>
       public void RefreshStatue() => DbConnector.ResetState();
+      /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public override void Dispose()
+      {
+         base.Dispose();
+         DbConnector.Dispose();
+         _sqlCommand.Dispose();
+      }
    }
 }

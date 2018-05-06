@@ -230,5 +230,14 @@ namespace Cabinink.DataTreatment.Database
       {
          return "Cabinink.DataTreatment.Database.SQLServerDBOIEncapsulation";
       }
+      /// <summary>
+      /// 手动释放该对象引用的所有内存资源。
+      /// </summary>
+      public override void Dispose()
+      {
+         base.Dispose();
+         DbConnector.Dispose();
+         _sqlCommand.Dispose();
+      }
    }
 }

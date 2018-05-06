@@ -61,10 +61,7 @@ namespace Cabinink.TypeExtend
       /// <summary>
       /// 获取或设置当前实例的字符串文本。
       /// </summary>
-      public string StringContext
-      {
-         get => _clrString; set => _clrString = value;
-      }
+      public string StringContext { get => _clrString; set => _clrString = value; }
       /// <summary>
       /// 获取当前实例的字符串文本长度。
       /// </summary>
@@ -229,10 +226,24 @@ namespace Cabinink.TypeExtend
       /// <returns>执行这个操作之后会获取当前实例所表示字符串中每一个字符的字节码的有序集合，在这里值得一提的是，这个有序集合的顺序和当前字符串实例中字符排序是相吻合的。</returns>
       public byte[] ToBytecodeArray(Encoding encoding) => encoding.GetBytes(StringContext);
       /// <summary>
+      /// 将当前的字符串实例转换为十六进制字节码数组。
+      /// </summary>
+      /// <returns>执行这个操作之后会获取当前实例所表示字符串中每一个字符的十六进制字节码的有序集合。</returns>
+      public byte[] ToHexadecimalArray()
+      {
+         ExString hexString = ReplaceAll(" ", "");
+         if ((Length % 2) != 0) hexString += " ";
+         byte[] code = new byte[hexString.Length / 2];
+         for (int i = 0; i < code.Length; i++)
+         {
+            code[i] = Convert.ToByte(hexString.SubString(i * 2, 2).ReplaceAll(" ", ""), 16);
+         }
+         return code;
+      }
+      /// <summary>
       /// 返回当前扩展字符串实例的十六进制ASCII序列。
       /// </summary>
       /// <returns>如果该操作没有产生任何异常，则会得到一个当前实例的十六进制ASCII序列字符串。</returns>
-
       public ExString ToAsciiHexSerial()
       {
          char[] strArray = ConvertToCharArray();
@@ -648,17 +659,46 @@ namespace Cabinink.TypeExtend
       /// 隐式转换操作符重载（To ExString）。
       /// </summary>
       /// <param name="v">隐式转换操作符的源类型。</param>
-      public static implicit operator ExString(string v)
-      {
-         return new ExString(v);
-      }
+      public static implicit operator ExString(string v) => new ExString(v);
       /// <summary>
       /// 隐式转换操作符重载（To String）。
       /// </summary>
       /// <param name="v">隐式转换操作符的源类型。</param>
-      public static implicit operator string(ExString v)
+      public static implicit operator string(ExString v) => v.StringContext;
+      /// <summary>
+      /// 随机生成指定长度的字符串。
+      /// </summary>
+      /// <param name="length">需要生成的字符串的长度。</param>
+      /// <param name="isIncludeSymbol">决定这个随机字符串是否包含在ASCII码中的标点符号。</param>
+      /// <returns>该方法在执行之后会返回一个随机生成的字符串。</returns>
+      public static ExString GenerateRandomString(int length, bool isIncludeSymbol)
       {
-         return v.StringContext;
+         DateTime utcNow = DateTime.UtcNow;
+         int seed = utcNow.Day * utcNow.Hour * utcNow.Minute * utcNow.Second * utcNow.Millisecond;
+         return GenerateRandomString(length, seed, isIncludeSymbol);
+      }
+      /// <summary>
+      /// 通过一个种子值来随机生成指定长度的字符串。
+      /// </summary>
+      /// <param name="length">需要生成的字符串的长度。</param>
+      /// <param name="seed">用于随机生成的种子值，这个种子值可随意设置，但是范围需要在Int32的有效范围中。</param>
+      /// <param name="isIncludeSymbol">决定这个随机字符串是否包含在ASCII码中的标点符号。</param>
+      /// <returns>该方法在执行之后会返回一个随机生成的字符串。</returns>
+      public static ExString GenerateRandomString(int length, int seed, bool isIncludeSymbol)
+      {
+         ExString randomString = string.Empty;
+         Random random = new Random(seed);
+         string numAndLetter = "0123456789ABCDEFGHIJKMLNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+         string onlySymbol = "~`!@#$%^&*()_+-=[]\\{}|;':\x22,./<>?";
+         if (isIncludeSymbol) randomString = numAndLetter + onlySymbol;
+         else randomString = numAndLetter;
+         string returnValue = string.Empty;
+         for (int i = 0; i < length; i++)
+         {
+            int randomInt = random.Next(0, randomString.Length - 1);
+            returnValue += randomString[randomInt];
+         }
+         return returnValue;
       }
       /// <summary>
       /// 加密指定的ExString实例。

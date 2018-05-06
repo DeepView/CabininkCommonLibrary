@@ -12,6 +12,7 @@ namespace Cabinink.DataTreatment.WebData
    /// </summary>
    [Serializable]
    [ComVisible(true)]
+   [Obsolete("Will delete or restructure.")]
    public class JsonOperator
    {
       private string _jsonString;//Json字符串。

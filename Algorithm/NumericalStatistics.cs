@@ -30,10 +30,7 @@ namespace Cabinink.Algorithm
       /// </summary>
       /// <param name="elements">需要被用于均值计算的浮点数集合。</param>
       /// <returns>如果操作无异常，将会得到elements参数指定集合的算术平均值。</returns>
-      public static double Average(List<double> elements)
-      {
-         return Summation(elements) / elements.Count;
-      }
+      public static double Average(List<double> elements) => Summation(elements) / elements.Count;
       /// <summary>
       /// 根据指定的浮点数集合来实现均值计算（算术平均值），并通过reserved参数指定的无符号16位整形数来决定返回结果应该保留多少位小数。
       /// </summary>

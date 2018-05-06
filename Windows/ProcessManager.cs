@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Security;
 using System.Threading;
 using Cabinink.IOSystem;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using Cabinink.Windows.Privileges;
 using System.Runtime.InteropServices;
 namespace Cabinink.Windows
@@ -14,7 +16,7 @@ namespace Cabinink.Windows
    /// <summary>
    /// 用来存放快照进程信息的一个结构体，存放进程信息和调用成员输出进程信息。
    /// </summary>
-   [StructLayout(LayoutKind.Sequential)]
+   [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
    public struct SProcessEntry32
    {
       /// <summary>
@@ -73,7 +75,7 @@ namespace Cabinink.Windows
    [ComVisible(true)]
    public class ProcessManager
    {
-      private static Hashtable _processHwnd = null;//进程句柄哈希表。
+      private static Hashtable _processHwnd = new Hashtable();//进程句柄哈希表。
       private const int ERROR_SUCCESS = 0;//当成功时需要返回的错误码。
       /// <summary>
       /// 窗口枚举委托。
@@ -129,7 +131,7 @@ namespace Cabinink.Windows
       /// <param name="handle">被查找窗口的句柄。</param>
       /// <param name="id">进程号的存放地址（变量地址）。</param>
       /// <returns>返回线程号，注意，id 是存放进程号的变量。返回值是线程号，id是进程号存放处。</returns>
-      [DllImport("kernel32.dll")]
+      [DllImport("user32.dll")]
       private static extern int GetWindowThreadProcessId(IntPtr handle, out int id);
       /// <summary>
       /// 该函数将指定的消息发送到一个或多个窗口。
@@ -300,6 +302,17 @@ namespace Cabinink.Windows
          return retval;
       }
       /// <summary>
+      /// 获取当前所有进程的进程名称。
+      /// </summary>
+      /// <returns>该操作将会返回一个包含目前所有Windows进程名称的List实例。</returns>
+      public static List<string> GetAllProcessName()
+      {
+         List<string> list = new List<string>();
+         List<Process> procs = Process.GetProcesses().ToList();
+         Parallel.For(0, procs.Count, (index) => list.Add(procs[index].ProcessName));
+         return list;
+      }
+      /// <summary>
       /// 更改进程的优先级，但是这个操作可能存在风险，更改成功与否，都会返回一个Boolean值。
       /// </summary>
       /// <param name="processName">需要被修改优先级的进程的映像名称。</param>
@@ -430,30 +443,22 @@ namespace Cabinink.Windows
       /// </summary>
       /// <param name="processName">指定的进程名称，注意这里的进程名称不需要在后面添加后缀名。</param>
       /// <returns>该操作会返回一个进程句柄，如果操作出现异常，则可能会返回一个Zero句柄。</returns>
+      /// <remarks>需要在调用方访问Cabinink.Windows.Privileges.PrivilegeGetter.NeedAdministratorsPrivilege()方法，然后才能调用此方法，否则将会抛出System.Security.SecurityException异常。</remarks>
+      [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
       public static IntPtr GetHandleByImageName(string processName)
       {
-         List<SProcessEntry32> list = new List<SProcessEntry32>();
-         IntPtr handle = CreateToolhelp32Snapshot(0x2, 0);
          IntPtr processHandle = IntPtr.Zero;
-         if ((int)handle > 0)
+         Process[] procs = Process.GetProcesses();
+         for (int i = 0; i < procs.Length; i++)
          {
-            SProcessEntry32 pe32 = new SProcessEntry32();
-            pe32.Size = (uint)Marshal.SizeOf(pe32);
-            int bMore = Process32First(handle, ref pe32);
-            while (bMore == 1)
+            if (processName == procs[i].ProcessName)
             {
-               IntPtr temp = Marshal.AllocHGlobal((int)pe32.Size);
-               Marshal.StructureToPtr(pe32, temp, true);
-               SProcessEntry32 pe32_s = (SProcessEntry32)Marshal.PtrToStructure(temp, typeof(SProcessEntry32));
-               Marshal.FreeHGlobal(temp);
-               list.Add(pe32_s);
-               if (pe32_s.ExecuteFileName == processName)
+               try
                {
-                  bMore = 2;
-                  processHandle = GetCurrentWindowHandle(pe32_s.ProcessId);
-                  break;
+                  processHandle = procs[i].Handle;
                }
-               bMore = Process32Next(handle, ref pe32);
+               catch (Exception throwedException) { if (throwedException != null) throw throwedException; }
+               break;
             }
          }
          return processHandle;

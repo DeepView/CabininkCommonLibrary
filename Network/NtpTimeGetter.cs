@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Net.Sockets;
+using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 namespace Cabinink.Network
@@ -168,6 +169,7 @@ namespace Cabinink.Network
       /// <param name="win32ErrorCode">需要传递并且用于开发者参考的错误代码。</param>
       /// <param name="win32ErrorInformation">需要传递并且用于开发者参考的错误消息。</param>
       /// <returns>如果操作成功则会返回true，否则会返回false。</returns>
+      [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
       public bool UpdateLocalTime(ref long win32ErrorCode, ref string win32ErrorInformation)
       {
          bool result = true;
@@ -199,7 +201,7 @@ namespace Cabinink.Network
       /// <returns>返回一个交换字节顺序之后的结果。</returns>
       private static uint SwapEndianness(ulong swapedNum)
       {
-         return (uint)(((swapedNum & 0x000000ff) << 24) + ((swapedNum & 0x0000ff00) << 8) + ((swapedNum & 0x00ff0000) >> 8) + ((swapedNum & 0xff000000) >> 24));
+         return (uint)(((swapedNum & 0xff) << 24) + ((swapedNum & 0xff00) << 8) + ((swapedNum & 0xff0000) >> 8) + ((swapedNum & 0xff000000) >> 24));
       }
       /// <summary>
       /// 线程池回调。

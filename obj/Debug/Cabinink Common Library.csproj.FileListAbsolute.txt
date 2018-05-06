@@ -23,3 +23,11 @@ E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Libr
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csproj.CoreCompileInputs.cache
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.dll
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.pdb
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Interop.IWshRuntimeLibrary.dll
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Cabinink Common Library.xml
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.AudioVideoPlayback.dll
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.Direct3D.dll
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.dll
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.xml
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.AudioVideoPlayback.xml
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.Direct3D.xml

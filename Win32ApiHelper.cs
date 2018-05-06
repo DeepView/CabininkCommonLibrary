@@ -6,6 +6,9 @@ using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 namespace Cabinink
 {
+   /// <summary>
+   /// Win32Api基础性帮助类，实现一些有助于访问操作系统API的一些功能。
+   /// </summary>
    [Serializable]
    [ComVisible(true)]
    public sealed class Win32ApiHelper
@@ -35,7 +38,7 @@ namespace Cabinink
       /// 将指定的可执行模块映射到调用进程的地址空间。
       /// </summary>
       /// <param name="libraryName">可执行模块(dll or exe)的名字：以null结束的字符串指针. 该名称是可执行模块的文件名，与模块本身存储的,用关键字LIBRARY在模块定义文件(.def)中指定的名称无关。</param>
-      /// <returns>如果执行成功, 返回模块的句柄。如果执行失败, 返回 NULL. 如果要获取更多的错误信息, 请调用Marshal.GetLastWin32Error.</br></returns>
+      /// <returns>如果执行成功, 返回模块的句柄。如果执行失败, 返回 NULL. 如果要获取更多的错误信息, 请调用Marshal.GetLastWin32Error.</returns>
       [DllImport("kernel32.dll", EntryPoint = "LoadLibraryA", CharSet = CharSet.Ansi)]
       private extern static IntPtr LoadLibrary(string libraryName);
       /// <summary>
