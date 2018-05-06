@@ -6,6 +6,9 @@ using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 namespace Cabinink
 {
+   /// <summary>
+   /// Win32Api基础性帮助类，实现一些有助于访问操作系统API的一些功能。
+   /// </summary>
    [Serializable]
    [ComVisible(true)]
    public sealed class Win32ApiHelper
