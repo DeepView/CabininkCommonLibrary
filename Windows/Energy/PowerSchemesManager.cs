@@ -7,13 +7,26 @@ using System.Threading.Tasks;
 
 namespace Cabinink.Windows.Energy
 {
+   /// <summary>
+   /// A structure of system power scheme.
+   /// </summary>
    public struct SSystemPowerScheme
    {
+      /// <summary>
+      /// A friendly name.
+      /// </summary>
       public string FriendlyName;
+      /// <summary>
+      /// A GUID.
+      /// </summary>
       public Guid GUID;
    }
+   /// <summary>
+   /// This is a manager class of power schemes, but it's code is building.
+   /// </summary>
    [Serializable]
    [ComVisible(true)]
+   [Obsolete("CODE_IS_BUILDING")]
    public class PowerSchemesManager
    {
       private List<SSystemPowerScheme> _schemes;

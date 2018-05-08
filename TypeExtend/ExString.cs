@@ -670,7 +670,7 @@ namespace Cabinink.TypeExtend
       /// </summary>
       /// <param name="length">需要生成的字符串的长度。</param>
       /// <param name="isIncludeSymbol">决定这个随机字符串是否包含在ASCII码中的标点符号。</param>
-      /// <returns>该方法在执行之后会返回一个随机生成的字符串。</returns>
+      /// <returns>该方法在执行之后会返回一个随机生成的字符串，另外在这个重载版本中，其seed参数是根据System.DateTime.UtcNow返回的DateTime中的Day，Hour，Minute，Second和Millisecond的乘积来决定。</returns>
       public static ExString GenerateRandomString(int length, bool isIncludeSymbol)
       {
          DateTime utcNow = DateTime.UtcNow;

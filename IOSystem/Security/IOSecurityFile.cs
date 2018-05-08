@@ -21,7 +21,6 @@ namespace Cabinink.IOSystem.Security
       private string _securityFileUrl;//IO操作安全文件的文件路径。
       private ExString _fileContext;//IO操作安全文件的文件内容。
       private ExString _jurisdictionPassword;//适用于操作安全的权限密码。
-      private EFileSecurityFlag _securityFlag;//文件操作安全标识符。
       private int _codeSecurityFlag;//代码安全标识符。
       private bool _isApplyAccessRule;//指示是否应用文件安全访问规则。
       private bool _isReadOnly;//指示当前文件是否只读，这个是基于当前实例，而非基于整个操作系统。
@@ -43,7 +42,6 @@ namespace Cabinink.IOSystem.Security
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
          _isApplyAccessRule = true;
-         //_initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
          SetPrimeMD5Code();
       }
       /// <summary>
@@ -72,7 +70,6 @@ namespace Cabinink.IOSystem.Security
          _securityFileUrl = fileUrl;
          _fileContext = string.Empty;
          _isApplyAccessRule = true;
-         //_initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
          SetPrimeMD5Code();
       }
       /// <summary>
@@ -86,7 +83,7 @@ namespace Cabinink.IOSystem.Security
          {
             bool condition = !FileOperator.FileExists(value) && value != null;
             if (condition) throw new FileNotFoundException("指定的文件找不到！", value);
-            _securityFileUrl = value;
+            else _securityFileUrl = value;
          }
       }
       /// <summary>
@@ -99,13 +96,26 @@ namespace Cabinink.IOSystem.Security
          set
          {
             if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
-            _fileContext = value;
+            else _fileContext = value;
          }
       }
       /// <summary>
       /// 获取当前实例所加载的文件的MD5代码。
       /// </summary>
-      public string MD5Code => new FileSignature(FileUrl).GetMD5String();
+      public string MD5Code
+      {
+         get
+         {
+            string md5Code = string.Empty;
+            LoadPassword(() => FILE_SECURITY_KEY);
+            if (SecurityFlag == EFileSecurityFlag.FileIsLocked) RecoveryJurisdiction(JurisdictionPassword);
+            md5Code = new FileSignature(FileUrl).GetMD5String();
+            UpdatePassword(FILE_SECURITY_KEY, string.Empty);
+            RevokeJurisdiction();
+            return md5Code;
+         }
+      }
+
       /// <summary>
       /// 获取当前实例所加载的文件是否产生了更改。
       /// </summary>
@@ -126,7 +136,15 @@ namespace Cabinink.IOSystem.Security
       /// <summary>
       /// 获取当前实例的安全标识符。
       /// </summary>
-      public EFileSecurityFlag SecurityFlag => _securityFlag;
+      public EFileSecurityFlag SecurityFlag
+      {
+         get
+         {
+            EFileSecurityFlag securityFlag = EFileSecurityFlag.OperationIsAuthorized;
+            if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) securityFlag = EFileSecurityFlag.FileIsLocked;
+            return securityFlag;
+         }
+      }
       /// <summary>
       /// 获取或设置当前实例是否应用Windows文件安全访问规则。
       /// </summary>
@@ -198,14 +216,14 @@ namespace Cabinink.IOSystem.Security
          ReadUnencrypted(encoding);
          try
          {
-            ExString.Decrypt(FileContext, FILE_SECURITY_KEY);
+            FileContext = ExString.Decrypt(FileContext, FILE_SECURITY_KEY);
          }
-         catch (FormatException exception)
+         catch (FormatException thworedException)
          {
-            if (exception != null)
+            if (thworedException != null)
             {
                RevokeJurisdiction();
-               throw new IOException("不允许针对明文进行解密操作！");
+               throw new IOException(thworedException.Message + "\n附加信息：不允许针对明文进行解密操作！");
             }
          }
       }
@@ -326,10 +344,12 @@ namespace Cabinink.IOSystem.Security
       /// </summary>
       /// <param name="isAppend">用于决定文件内容的存取方式，如果这个参数值为true，则意味着该操作将会以追加的方式把文本内容追加到文件末尾，反之将会以覆盖原本内容的方式存取文件。</param>
       /// <param name="encoding">指定的编码方式，这个编码决定了文件存取的编码方式。</param>
+      /// <exception cref="CodeSecurityNotMatchException">当代码操作在允许的构造逻辑或者操作安全范围外时，则会抛出这个异常。</exception>
       public void Write(bool isAppend, Encoding encoding)
       {
+         if (SecurityFlag == EFileSecurityFlag.FileIsLocked || _isReadOnly) throw new CodeSecurityNotMatchException();
          string ciphertext = ExString.Encrypt(FileContext, FILE_SECURITY_KEY);
-         WriteUnencrypted(isAppend, encoding);
+         FileOperator.WriteFile(FileUrl, ciphertext, isAppend, encoding);
       }
       /// <summary>
       /// 通过指定的IO操作安全文件内容存取方式和编码方式将文件内容以未加密的形式存储到FileUrl属性指定的文件中。
@@ -340,7 +360,7 @@ namespace Cabinink.IOSystem.Security
       [MethodImpl(MethodImplOptions.Synchronized)]
       public void WriteUnencrypted(bool isAppend, Encoding encoding)
       {
-         if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP || _isReadOnly) throw new CodeSecurityNotMatchException();
+         if (SecurityFlag == EFileSecurityFlag.FileIsLocked || _isReadOnly) throw new CodeSecurityNotMatchException();
          FileOperator.WriteFile(FileUrl, FileContext, isAppend, encoding);
       }
       /// <summary>
@@ -349,28 +369,23 @@ namespace Cabinink.IOSystem.Security
       /// <param name="flag">用于被变更的代码安全标识符。</param>
       /// <exception cref="ArgumentOutOfRangeException">当参数超出范围时，则会抛出这个异常。</exception>
       [MethodImpl(MethodImplOptions.Synchronized)]
-      private void ChangeCodeSecurityFlag(int flag)
-      {
-         _codeSecurityFlag = flag;
-         if (_codeSecurityFlag == CODE_SECURITY_FLAG_NORMAL) _securityFlag = EFileSecurityFlag.OperationIsAuthorized;
-         else _securityFlag = EFileSecurityFlag.FileIsLocked;
-      }
+      private void ChangeCodeSecurityFlag(int flag) => _codeSecurityFlag = flag;
       /// <summary>
       /// 复位代码安全标识符。
       /// </summary>
       private void ResetCodeSecurityFlag() => ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_STOP);
+
       /// <summary>
-      /// 设置当前实例所包含文件的初始MD5字符串。
+      /// 获取文件的Hashcode并赋值给_initializeHashCode私有字段。
       /// </summary>
       private void SetPrimeMD5Code()
       {
          LoadPassword(() => FILE_SECURITY_KEY);
-         RecoveryJurisdiction(FILE_SECURITY_KEY);
+         if (SecurityFlag == EFileSecurityFlag.FileIsLocked) RecoveryJurisdiction(JurisdictionPassword);
          _initializeHashCode = new FileSignature(_securityFileUrl).GetMD5String();
          UpdatePassword(FILE_SECURITY_KEY, string.Empty);
          RevokeJurisdiction();
       }
-
       /// <summary>
       /// 通过文件MD5和文件路径判断两个文件是否相同。
       /// </summary>

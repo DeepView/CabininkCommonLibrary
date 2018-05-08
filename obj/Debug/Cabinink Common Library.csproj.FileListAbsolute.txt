@@ -18,7 +18,6 @@ E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Libr
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.ValueTuple.dll
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.Data.SQLite.pdb
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\System.Data.SQLite.dll.config
-E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csprojResolveAssemblyReference.cache
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csproj.ResolveComReference.cache
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csproj.CoreCompileInputs.cache
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.dll
@@ -31,3 +30,4 @@ E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Libr
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.xml
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.AudioVideoPlayback.xml
 E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\bin\Debug\Microsoft.DirectX.Direct3D.xml
+E:\Visual Studio Solution\Visual C#\Cabinink Common Library\Cabinink Common Library\obj\Debug\Cabinink Common Library.csprojResolveAssemblyReference.cache

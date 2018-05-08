@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using Cabinink.IOSystem;
 using System.Collections;
 using System.Diagnostics;
@@ -14,7 +16,6 @@ namespace Cabinink.DataTreatment.DocumentData
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   [Obsolete("Will restructure.")]
    [DebuggerDisplay("CsvFileOperator = FileUrl:{FileUrl};SecurityFlag:{SecurityFlag}")]
    public class CsvFileOperator : IOSecurityFile, ICollection<string>
    {
@@ -34,6 +35,23 @@ namespace Cabinink.DataTreatment.DocumentData
          }
       }
       /// <summary>
+      /// 构造函数，创建一个指定文件的CSV文件操作实例，如果指定的CSV文件不存在则将会抛出异常，该操作会自动启用写操作通道（即自动执行OpenWritePassageway方法），与之对应的，Dispose方法也会自动执行CloseWritePassageway方法关闭写操作通道。
+      /// </summary>
+      /// <param name="csvFileUrl">指定的CSV文件的文件地址。</param>
+      /// <param name="createdThenNotExists">用于决定是否在检测到文件不存在时来创建新文件。</param>
+      /// <exception cref="FileNotFoundException">当参数fileUrl指定的文件找不到，并且不允许根据参数createdThenNotExists决定当文件不存在时是否创建新文件的情况下，则会抛出这个异常。</exception>
+      /// <exception cref="FileTypeNotLegitimateException">如果文件类型不符合匹配条件，则将会抛出这个异常。</exception>
+      public CsvFileOperator(string csvFileUrl, bool createdThenNotExists) : base(csvFileUrl, createdThenNotExists)
+      {
+         if (!createdThenNotExists && !FileOperator.FileExists(csvFileUrl)) throw new FileNotFoundException("指定的文件无法找到！", csvFileUrl);
+         if (FileOperator.GetFileExtension(csvFileUrl) != ".csv") throw new FileTypeNotLegitimateException();
+         else
+         {
+            _csvDataElements = new List<string>();
+            OpenWritePassageway();
+         }
+      }
+      /// <summary>
       /// 获取当前实例所操作的CSV文件转换为List实例之后的CSV元素数量。
       /// </summary>
       public int Count => Elements.Count;
@@ -45,7 +63,7 @@ namespace Cabinink.DataTreatment.DocumentData
          get
          {
             char[] separator = new char[] { ',' };
-            //return FileContext.Split(separator).ToList();
+            _csvDataElements = FileContext.Split(separator).ToList();
             return _csvDataElements;
          }
          set => _csvDataElements = value;
