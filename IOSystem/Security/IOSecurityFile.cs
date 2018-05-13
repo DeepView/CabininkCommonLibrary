@@ -26,6 +26,7 @@ namespace Cabinink.IOSystem.Security
       private bool _isReadOnly;//指示当前文件是否只读，这个是基于当前实例，而非基于整个操作系统。
       private string _initializeHashCode;//文件未作出更改时的MD5哈希代码。
       private bool _disposedValue = false;//检测冗余调用。
+      private bool _canChangedPassword = false;//是否允许修改文件权限密码。
       private const int CODE_SECURITY_FLAG_STOP = 0x0000;//代码安全标识符常量，操作非法。
       private const int CODE_SECURITY_FLAG_NORMAL = 0xffff;//代码安全标识符常量，操作合法。
       private const string FILE_SECURITY_KEY = @"cabinink";//文件加密和解密用的安全密钥。
@@ -95,7 +96,7 @@ namespace Cabinink.IOSystem.Security
          get => _fileContext;
          set
          {
-            if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
+            if (SecurityFlag == EFileSecurityFlag.FileIsLocked) throw new CodeSecurityNotMatchException();
             else _fileContext = value;
          }
       }
@@ -129,7 +130,8 @@ namespace Cabinink.IOSystem.Security
          get => _jurisdictionPassword;
          set
          {
-            if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
+            bool condition = SecurityFlag == EFileSecurityFlag.FileIsLocked && _canChangedPassword;
+            if (condition) throw new CodeSecurityNotMatchException();
             else _jurisdictionPassword = value;
          }
       }
@@ -187,8 +189,10 @@ namespace Cabinink.IOSystem.Security
          if (!JurisdictionPassword.Equals(password)) throw new PasswordNotMatchException();
          else
          {
+            _canChangedPassword = true;
             ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
             JurisdictionPassword = string.Empty;
+            _canChangedPassword = false;
             ResetCodeSecurityFlag();
          }
       }
@@ -235,7 +239,7 @@ namespace Cabinink.IOSystem.Security
       [MethodImpl(MethodImplOptions.Synchronized)]
       public void ReadUnencrypted(Encoding encoding)
       {
-         if (_codeSecurityFlag == CODE_SECURITY_FLAG_STOP) throw new CodeSecurityNotMatchException();
+         if (SecurityFlag == EFileSecurityFlag.FileIsLocked) throw new CodeSecurityNotMatchException();
          FileContext = FileOperator.ReadFileContext(FileUrl, true, encoding);
       }
       /// <summary>
@@ -309,7 +313,7 @@ namespace Cabinink.IOSystem.Security
       /// <summary>
       /// 更新用于操作当前实例的IO权限密码。
       /// </summary>
-      /// <param name="oldPassword">需要用户提供的旧密码。</param>
+      /// <param name="oldPassword">需要用户提供的旧密码，如果没有这个密码或者密码被清除，则这个参数设置为String.Empty即可。</param>
       /// <param name="newPassword">需要用户设置的新密码。</param>
       /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
       [MethodImpl(MethodImplOptions.Synchronized)]
@@ -319,8 +323,10 @@ namespace Cabinink.IOSystem.Security
          if (!JurisdictionPassword.Equals(oldPassword)) result = false;
          else
          {
+            _canChangedPassword = true;
             ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_NORMAL);
             JurisdictionPassword = newPassword;
+            _canChangedPassword = false;
             ResetCodeSecurityFlag();
          }
          return result;
