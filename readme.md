@@ -49,3 +49,10 @@ devM.Size = (short)Marshal.SizeOf(typeof(SDevicesMode));
 ```
 以上的新语法格式均来自与C# 7.0，如果你需要了解更多C# 7.0或者Visual Studio 2017的新特性，请[点击这里](https://www.cnblogs.com/cncc/p/7698543.html)进行详细了解，如果您的网络浏览器无法访问刚才的链接，请手动复制以下链接前往进行访问：（All of the above new syntax formats come from C# 7. If you need to know more about the new features of C# 7 or Visual Studio 2017, please [click here](https://www.cnblogs.com/cncc/p/7698543.html) for a detailed understanding. If your web browser cannot access the link, please copy the following link manually for access:）
 > https://www.cnblogs.com/cncc/p/7698543.html
+
+7. 如果您在您的项目中访问了Cabinink.Devices命名空间下的SoundPlayer和VideoPlayer等引用了DirectX SDK的类，那么你的应用程序可能无法正确运行或者无法通过调试，因为访问这些功能将会触发一些代码安全机制，因此您需要将您的项目的app.config文件中的&lt;startup&gt;标记添加**useLegacyV2RuntimeActivationPolicy**属性：（If you visited Cabinink in your project. The Devices under the namespace SoundPlayer VideoPlayer and quoting the DirectX SDK classes, then your application may not be able to run correctly or not through debugging, because access to these functions will trigger some code security mechanism, so you need to put your project in the app. In the config file &lt;startup&gt; tag to add **useLegacyV2RuntimeActivationPolicy** properties）
+```xml
+<startup useLegacyV2RuntimeActivationPolicy="true">
+    <!--This is your app's configure code.-->
+</startup>
+```

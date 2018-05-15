@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Cabinink.DataTreatment.ORMapping;
 namespace Cabinink
 {
    /// <summary>
@@ -166,6 +168,63 @@ namespace Cabinink
             finally { if (process != null) process.Close(); }
          }
          return outputString;
+      }
+      /// <summary>
+      /// 获取指定值类型可能的极值（即最大值和最小值）。
+      /// </summary>
+      /// <param name="valueType">指定的值类型或者值类型相关数据。</param>
+      /// <returns>该操作将会返回一个包含极值的元组，这个元组中，第一个元素表示为最大值，最后一个元素表示为最小值。</returns>
+      /// <exception cref="NotSupportedTypeException">当出现不支持或者无法提供计算的类型时，则会抛出这个异常。</exception>
+      public static (ValueType, ValueType) GetExtremum(ValueType valueType)
+      {
+         (ValueType, ValueType) result = (0, 0);
+         bool condition = valueType.GetType().BaseType.FullName != "System.ValueType" || valueType.GetType().FullName == "System.Boolean";
+         if (condition) throw new NotSupportedTypeException();
+         else
+         {
+            if (valueType.GetType().FullName == "System.SByte") result = (sbyte.MaxValue, sbyte.MinValue);
+            if (valueType.GetType().FullName == "System.Byte") result = (byte.MaxValue, byte.MinValue);
+            if (valueType.GetType().FullName == "System.Int16") result = (short.MaxValue, short.MinValue);
+            if (valueType.GetType().FullName == "System.UInt16") result = (ushort.MaxValue, ushort.MinValue);
+            if (valueType.GetType().FullName == "System.Int32") result = (int.MaxValue, int.MinValue);
+            if (valueType.GetType().FullName == "System.UInt32") result = (uint.MaxValue, uint.MinValue);
+            if (valueType.GetType().FullName == "System.Int64") result = (long.MaxValue, long.MinValue);
+            if (valueType.GetType().FullName == "System.UInt64") result = (ulong.MaxValue, ulong.MinValue);
+            if (valueType.GetType().FullName == "System.Char") result = (char.MaxValue, char.MinValue);
+            if (valueType.GetType().FullName == "System.Single") result = (float.MaxValue, float.MinValue);
+            if (valueType.GetType().FullName == "System.Double") result = (double.MaxValue, double.MinValue);
+         }
+         return result;
+      }
+      /// <summary>
+      /// 获取一个包含值类型数据集合或者列表的极值。
+      /// </summary>
+      /// <param name="elements">用于装载值类型数据的集合或者列表。</param>
+      /// <returns>该操作将会返回一个包含极值的元组，这个元组中，第一个元素表示为最大值，最后一个元素表示为最小值。</returns>
+      /// <exception cref="ArgumentException">当传递的列表或者其他集合的元素量小于或者等于1时，则将会抛出这个异常。</exception>
+      /// <exception cref="NotSupportedTypeException">当出现不支持或者无法提供计算的类型时，则会抛出这个异常。</exception>
+      public static (ValueType, ValueType) GetExtremum(IList<ValueType> elements)
+      {
+         (ValueType, ValueType) result = (0, 0);
+         if (elements.Count <= 1) throw new ArgumentException("传递的列表或者其他集合的元素量不能小于或等于1", "elements");
+         else
+         {
+            Type itemType = elements[0].GetType();
+            bool condition = itemType.GetType().BaseType.FullName != "System.ValueType" || itemType.GetType().FullName == "System.Boolean";
+            if (condition) throw new NotSupportedTypeException();
+            else
+            {
+               double tempMax = (double)elements[0];
+               double tempMin = (double)elements[0];
+               for (int i = 0; i < elements.Count; i++)
+               {
+                  if (tempMax < (double)elements[i]) tempMax = (double)elements[i];
+                  if ((double)elements[i] < tempMin) tempMin = (double)elements[i];
+               }
+               result = (tempMax, tempMin);
+            }
+         }
+         return result;
       }
    }
 }
