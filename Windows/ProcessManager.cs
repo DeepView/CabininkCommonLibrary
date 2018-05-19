@@ -249,22 +249,24 @@ namespace Cabinink.Windows
       /// <returns>如果这个进程不存在或者因为其他原因，则会导致进程终结失败，终结失败会返回false。</returns>
       public static bool KillProcess(string processName)
       {
-         bool retval = true;
+         bool retval = false;
          try
          {
-            if (ProcessExists(processName) == false) retval = false;
+            if (!ProcessExists(processName)) retval = false;
             else
             {
-               Parallel.ForEach(Process.GetProcesses(), (item) =>
+               foreach (Process item in Process.GetProcesses())
                {
-                  if (item.ProcessName == processName) item.Kill();
-               });
+                  if (item.ProcessName.ToLower() == processName.ToLower())
+                  {
+                     item.Kill();
+                     retval = true;
+                     break;
+                  }
+               }
             }
          }
-         catch
-         {
-            retval = false;
-         }
+         catch { retval = false; }
          return retval;
       }
       /// <summary>
@@ -274,15 +276,20 @@ namespace Cabinink.Windows
       /// <returns>如果这个进程不存在或者因为其他原因，则会导致进程终结失败，终结失败会返回false。</returns>
       public static bool KillProcess(int processId)
       {
-         bool retval = true;
+         bool retval = false;
          try
          {
-            Parallel.ForEach(Process.GetProcesses(), (item) => { if (item.Id == processId) item.Kill(); });
+            Parallel.ForEach(Process.GetProcesses(), (item, interrupt) =>
+            {
+               if (item.Id == processId)
+               {
+                  item.Kill();
+                  retval = true;
+                  interrupt.Stop();
+               }
+            });
          }
-         catch
-         {
-            retval = false;
-         }
+         catch { retval = false; }
          return retval;
       }
       /// <summary>
@@ -296,8 +303,11 @@ namespace Cabinink.Windows
          bool retval = false;
          Parallel.ForEach(prc, (pr, stat) =>
          {
-            if (processName == pr.ProcessName) retval = true;
-            stat.Stop();
+            if (processName == pr.ProcessName)
+            {
+               retval = true;
+               stat.Stop();
+            }
          });
          return retval;
       }
