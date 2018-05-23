@@ -130,7 +130,7 @@ namespace Cabinink.IOSystem.Security
          get => _jurisdictionPassword;
          set
          {
-            bool condition = SecurityFlag == EFileSecurityFlag.FileIsLocked && _canChangedPassword;
+            bool condition = SecurityFlag == EFileSecurityFlag.FileIsLocked && !_canChangedPassword;
             if (condition) throw new CodeSecurityNotMatchException();
             else _jurisdictionPassword = value;
          }
