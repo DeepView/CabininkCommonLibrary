@@ -37,6 +37,45 @@ namespace Cabinink.DataTreatment.Database
          _dbConnectionString = dbConnectionString;
       }
       /// <summary>
+      /// 构造函数，通过一个指定的数据库文件地址和数据库访问密码来初始化当前实例。
+      /// </summary>
+      /// <param name="dbFileUrl">指定的数据库文件地址，如果这个文件地址无效则会抛出FileNotFoundException异常。</param>
+      /// <param name="dbPassword">指定的数据库访问密码。</param>
+      /// <exception cref="FileNotFoundException">如果找不到dbFileUrl参数指定的数据库文件，则会抛出这个异常。</exception>
+      public SQLiteDBOIEncapsulation(string dbFileUrl, string dbPassword)
+      {
+         if (FileOperator.FileExists(dbFileUrl) == false) throw new FileNotFoundException("找不到数据库文件！");
+         _dbConnectionString = "Data Source=" + dbFileUrl + "; Password" + dbPassword + ";";
+      }
+      /// <summary>
+      /// 构造函数，通过一个指定的数据库文件地址和数据库访问密码来初始化当前实例，但与此同时还要指定数据库系统的版本，以及是否使用UTF16编码。
+      /// </summary>
+      /// <param name="dbFileUrl">指定的数据库文件地址，如果这个文件地址无效则会抛出FileNotFoundException异常。</param>
+      /// <param name="dbPassword">指定的数据库访问密码。</param>
+      /// <param name="dbsVersion">指定的数据库系统版本，如果数据库系统版本为2.x，则这个参数可指定为2，如果数据库系统版本为3.x，则这个参数指定为3。</param>
+      /// <param name="isUsingUTF16Encoding">决定是否使用UTF16编码。</param>
+      /// <exception cref="FileNotFoundException">如果找不到dbFileUrl参数指定的数据库文件，则会抛出这个异常。</exception>
+      public SQLiteDBOIEncapsulation(string dbFileUrl, string dbPassword, int dbsVersion, bool isUsingUTF16Encoding) : base()
+      {
+         if (FileOperator.FileExists(dbFileUrl) == false) throw new FileNotFoundException("找不到数据库文件！");
+         _dbConnectionString = "Data Source=" + dbFileUrl + "; Password" + dbPassword + "; Version=" + dbsVersion + "; UseUTF16Encoding=" + isUsingUTF16Encoding + ";";
+      }
+      /// <summary>
+      /// 构造函数，通过一个指定的数据库文件地址和数据库访问密码来初始化当前实例，但与此同时还要指定数据库系统的版本，是否使用只读的访问模式，连接池大小，以及是否使用UTF16编码。
+      /// </summary>
+      /// <param name="dbFileUrl">指定的数据库文件地址，如果这个文件地址无效则会抛出FileNotFoundException异常。</param>
+      /// <param name="dbPassword">指定的数据库访问密码。</param>
+      /// <param name="dbsVersion">指定的数据库系统版本，如果数据库系统版本为2.x，则这个参数可指定为2，如果数据库系统版本为3.x，则这个参数指定为3。</param>
+      /// <param name="isUsingUTF16Encoding">决定是否使用UTF16编码。</param>
+      /// <param name="isReadOnly">指定是否以只读的访问模式来连接这个数据库。</param>
+      /// <param name="connectionPoolMaximumSize">指定数据库的连接池大小限制。</param>
+      /// <exception cref="FileNotFoundException">如果找不到dbFileUrl参数指定的数据库文件，则会抛出这个异常。</exception>
+      public SQLiteDBOIEncapsulation(string dbFileUrl, string dbPassword, int dbsVersion, bool isUsingUTF16Encoding, bool isReadOnly, int connectionPoolMaximumSize) : base()
+      {
+         if (FileOperator.FileExists(dbFileUrl) == false) throw new FileNotFoundException("找不到数据库文件！");
+         _dbConnectionString = "Data Source=" + dbFileUrl + "; Password" + dbPassword + "; Version=" + dbsVersion + "; UseUTF16Encoding=" + isUsingUTF16Encoding + "; Read Only=" + isReadOnly + "; Max Pool Size=" + connectionPoolMaximumSize + ";";
+      }
+      /// <summary>
       /// 获取或设置当前数据库的连接字符串。
       /// </summary>
       /// <exception cref="FileNotFoundException">如果找不到value参数指定的数据库文件，则会抛出这个异常。</exception>

@@ -75,7 +75,7 @@ namespace Cabinink.Windows
    [ComVisible(true)]
    public class ProcessManager
    {
-      private static Hashtable _processHwnd = new Hashtable();//进程句柄哈希表。
+      private static Hashtable _processHandleHashTable = new Hashtable();//进程句柄哈希表。
       private const int ERROR_SUCCESS = 0;//当成功时需要返回的错误码。
       /// <summary>
       /// 窗口枚举委托。
@@ -482,18 +482,17 @@ namespace Cabinink.Windows
       public static IntPtr GetCurrentWindowHandle(uint processId)
       {
          IntPtr ptrWnd = IntPtr.Zero;
-         uint uiPid = processId;
-         object objWnd = _processHwnd[uiPid];
+         object objWnd = _processHandleHashTable[processId];
          if (objWnd != null)
          {
             ptrWnd = (IntPtr)objWnd;
             if (ptrWnd != IntPtr.Zero && IsWindow(ptrWnd)) return ptrWnd;
             else ptrWnd = IntPtr.Zero;
          }
-         bool bResult = EnumWindows(new WindowEnumProc(EnumWindowsProc), uiPid);
+         bool bResult = EnumWindows(new WindowEnumProc(EnumWindowsProc), processId);
          if (!bResult && Marshal.GetLastWin32Error() == 0)
          {
-            objWnd = _processHwnd[uiPid];
+            objWnd = _processHandleHashTable[processId];
             if (objWnd != null) ptrWnd = (IntPtr)objWnd;
          }
          return ptrWnd;
@@ -513,7 +512,7 @@ namespace Cabinink.Windows
             GetWindowThreadProcessId(handle, out uiPid);
             if (uiPid == lParam)
             {
-               _processHwnd.Add(uiPid, handle);
+               _processHandleHashTable.Add(uiPid, handle);
                SetLastError(0);
                return false;
             }

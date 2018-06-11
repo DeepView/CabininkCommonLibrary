@@ -59,7 +59,7 @@ namespace Cabinink.Network
    /// </summary>
    [Serializable]
    [ComVisible(true)]
-   public unsafe class NtpTimeGetter
+   public class NtpTimeGetter
    {
       private string _ntpServer;//指定的NTP服务器。
       private ManualResetEvent _doneEvent;//通知线程等待用的事件。
@@ -169,6 +169,7 @@ namespace Cabinink.Network
       /// <param name="win32ErrorCode">需要传递并且用于开发者参考的错误代码。</param>
       /// <param name="win32ErrorInformation">需要传递并且用于开发者参考的错误消息。</param>
       /// <returns>如果操作成功则会返回true，否则会返回false。</returns>
+      /// <remarks>需要在调用方访问Cabinink.Windows.Privileges.PrivilegeGetter.NeedAdministratorsPrivilege() 方法，然后才能调用此方法，否则将会抛出System.Security.SecurityException异常。</remarks>
       [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
       public bool UpdateLocalTime(ref long win32ErrorCode, ref string win32ErrorInformation)
       {

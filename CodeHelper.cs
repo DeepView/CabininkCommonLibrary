@@ -226,5 +226,66 @@ namespace Cabinink
          }
          return result;
       }
+      /// <summary>
+      /// 判断指定的双精度浮点数变量是否在指定区间范围内。
+      /// </summary>
+      /// <param name="variable">需要用于被判定的双精度浮点数变量。</param>
+      /// <param name="upperLimit">区间的上限值，如果isIntersecting和isIncludedUpperLimit参数都为true，这个参数即表示为区间的最大值。</param>
+      /// <param name="lowerLimit">区间的下限值，如果isIntersecting和isIncludedLowerLimit参数都为true，这个参数即表示为区间的最小值。</param>
+      /// <param name="isIntersecting">决定这个区间是否存在数轴上的交集。</param>
+      /// <param name="isIncludedUpperLimit">决定区间在数轴上的右边是否包含了上限值。</param>
+      /// <param name="isIncludedLowerLimit">决定区间在数轴上的左边是否包含了下限值。</param>
+      /// <returns>该操作会返回一个布尔型数据，如果这个返回值为true，则表示variable在区间内，否则在区间外。</returns>
+      /// <exception cref="ArgumentOutOfRangeException">当区间下限大于或等于区间上限时，则将会抛出这个异常。</exception>
+      public static bool Inside(double variable, double upperLimit, double lowerLimit, bool isIntersecting, bool isIncludedUpperLimit, bool isIncludedLowerLimit)
+      {
+         if (upperLimit <= lowerLimit) throw new ArgumentOutOfRangeException("区间下限不能大于或等于区间上限！");
+         bool isInsided = false;
+         bool conditionLHOI = !isIncludedUpperLimit && isIncludedLowerLimit;
+         bool conditionRHOI = !isIncludedLowerLimit && isIncludedUpperLimit;
+         bool conditionCI = isIncludedUpperLimit && isIncludedLowerLimit;
+         bool conditionOI = !isIncludedUpperLimit && !isIncludedLowerLimit;
+         if (isIntersecting)
+         {
+            if (conditionLHOI) isInsided = variable <= upperLimit && variable > lowerLimit;
+            if (conditionRHOI) isInsided = variable < upperLimit && variable >= lowerLimit;
+            if (conditionCI) isInsided = variable < upperLimit && variable > lowerLimit;
+            if (conditionOI) isInsided = variable <= upperLimit && variable >= lowerLimit;
+         }
+         else
+         {
+            if (conditionLHOI) isInsided = variable >= upperLimit || variable < lowerLimit;
+            if (conditionRHOI) isInsided = variable > upperLimit || variable <= lowerLimit;
+            if (conditionCI) isInsided = variable > upperLimit || variable < lowerLimit;
+            if (conditionOI) isInsided = variable >= upperLimit || variable <= lowerLimit;
+         }
+         return isInsided;
+      }
+      /// <summary>
+      /// 判定指定的双精度浮点数变量集合中每一个分量是否在指定区间范围内。
+      /// </summary>
+      /// <param name="variableList">需要用于被判定的双精度浮点数变量的集合。</param>
+      /// <param name="upperLimit">区间的上限值，如果isIntersecting和isIncludedUpperLimit参数都为true，这个参数即表示为区间的最大值。</param>
+      /// <param name="lowerLimit">区间的下限值，如果isIntersecting和isIncludedLowerLimit参数都为true，这个参数即表示为区间的最小值。</param>
+      /// <param name="isIntersecting">决定这个区间是否存在数轴上的交集。</param>
+      /// <param name="isIncludedUpperLimit">决定区间在数轴上的右边是否包含了上限值。</param>
+      /// <param name="isIncludedLowerLimit">决定区间在数轴上的左边是否包含了下限值。</param>
+      /// <param name="falseCount">当返回值列表中存在false的结果时，该参数用于存储false结果的数量统计。</param>
+      /// <returns>该操作会返回一个布尔型数据集合，如果某一个布尔型数据集合分量的返回值为true，则表示variableList的某一个分量在区间内，否则在区间外。</returns>
+      /// <remarks>返回值的集合分量的索引是与variableList集合的分量索引是相对应的，如果该操作采用了并行For循环，则无法保证返回值集合内元素的顺序性和有效性。</remarks>
+      /// <exception cref="ArgumentException">当变量列表元素数量小于1时，则将会抛出这个异常。</exception>
+      public static List<bool> Inside(IList<double> variableList, double upperLimit, double lowerLimit, bool isIntersecting, bool isIncludedUpperLimit, bool isIncludedLowerLimit, out int falseCount)
+      {
+         List<bool> itemResultColection = new List<bool>(variableList.Count);
+         falseCount = 0;
+         if (variableList.Count < 1) throw new ArgumentException("变量列表元素数量不能小于1！", "variableList");
+         for (int i = 0; i < variableList.Count; i++)
+         {
+            bool isIncluded = Inside(variableList[i], upperLimit, lowerLimit, isIntersecting, isIncludedUpperLimit, isIncludedLowerLimit);
+            if (!isIncluded) falseCount++;
+            itemResultColection.Add(isIncluded);
+         }
+         return itemResultColection;
+      }
    }
 }

@@ -259,13 +259,20 @@ namespace Cabinink.IOSystem.Security
          }
       }
       /// <summary>
-      /// 撤销当前实例的IO操作权限。
+      /// 撤销当前实例的IO操作权限，但不会关闭写操作通道。
       /// </summary>
       /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
+      public bool RevokeJurisdiction() => RevokeJurisdiction(false);
+      /// <summary>
+      /// 撤销当前实例的IO操作权限，并决定是否关闭写操作通道。
+      /// </summary>
+      /// <param name="isCloseWritePassageway">决定是否关闭写操作通道。</param>
+      /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
       [MethodImpl(MethodImplOptions.Synchronized)]
-      public bool RevokeJurisdiction()
+      public bool RevokeJurisdiction(bool isCloseWritePassageway)
       {
          bool result = true;
+         if (isCloseWritePassageway) CloseWritePassageway();
          string domain = EnvironmentInformation.GetComputerName();
          string usrname = domain + @"\" + EnvironmentInformation.GetCurrentUserName();
          try
@@ -286,14 +293,22 @@ namespace Cabinink.IOSystem.Security
          return result;
       }
       /// <summary>
-      /// 恢复当前实例的IO操作权限，但必须需要提供权限密码进行身份验证，如果验证通过，才会恢复操作权限。
+      /// 恢复当前实例的IO操作权限，不会打开写操作通道，但必须需要提供权限密码进行身份验证，如果验证通过，才会恢复操作权限。
       /// </summary>
       /// <param name="password">在进行权限恢复之前需要进行身份验证的有效密码。</param>
       /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
+      public bool RecoveryJurisdiction(ExString password) => RecoveryJurisdiction(password, false);
+      /// <summary>
+      /// 恢复当前实例的IO操作权限，并决定是否打开写操作通道，但必须需要提供权限密码进行身份验证，如果验证通过，才会恢复操作权限。
+      /// </summary>
+      /// <param name="password">在进行权限恢复之前需要进行身份验证的有效密码。</param>
+      /// <param name="isOpenWritePassageway">决定是否打开写操作通道。</param>
+      /// <returns>用于说明当前操作是否成功，如果为true则表示操作正常且成功，反之操作失败。</returns>
       [MethodImpl(MethodImplOptions.Synchronized)]
-      public bool RecoveryJurisdiction(ExString password)
+      public bool RecoveryJurisdiction(ExString password, bool isOpenWritePassageway)
       {
          bool result = true;
+         if (isOpenWritePassageway) OpenWritePassageway();
          string domain = EnvironmentInformation.GetComputerName();
          string usrname = domain + @"\" + EnvironmentInformation.GetCurrentUserName();
          if (JurisdictionPassword.Equals(password))
@@ -380,7 +395,6 @@ namespace Cabinink.IOSystem.Security
       /// 复位代码安全标识符。
       /// </summary>
       private void ResetCodeSecurityFlag() => ChangeCodeSecurityFlag(CODE_SECURITY_FLAG_STOP);
-
       /// <summary>
       /// 获取文件的Hashcode并赋值给_initializeHashCode私有字段。
       /// </summary>

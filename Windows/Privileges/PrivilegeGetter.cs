@@ -58,6 +58,7 @@ namespace Cabinink.Windows.Privileges
    public sealed class PrivilegeGetter
    {
       private const int ERROR_NOT_ALL_ASSIGNED = 1300;//如果进程的访问令牌中没有关联某权限，则AdjustTokenPrivileges函数调用将会返回错误码ERROR_NOT_ALL_ASSIGNED（值为1300）。
+      private const string SECURITY_GROUP_ADMINISTRATORS = @"Administrators";//计算机管理员用户组名称。
       /// <summary>
       /// 获取当前进程的一个伪句柄。
       /// </summary>
@@ -197,7 +198,7 @@ namespace Cabinink.Windows.Privileges
       /// <summary>
       /// 要求需要执行的操作必须具备Windows管理员组权限，执行这个操作才允许用管理员身份运行您需要运行的应用程序。
       /// </summary>
-      public static void NeedAdministratorsPrivilege() => ChangePrivilegeRole("Administrators");
+      public static void NeedAdministratorsPrivilege() => ChangePrivilegeRole(SECURITY_GROUP_ADMINISTRATORS);
       /// <summary>
       /// 修改代码的执行用户或者安全组，修改之后只允许该用户或者安全组才能执行指定的代码区域。
       /// </summary>

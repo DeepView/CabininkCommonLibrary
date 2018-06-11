@@ -18,7 +18,7 @@ namespace Cabinink.DataTreatment.Database.Extend
       private string _description;//计划任务的详细注释。
       private string _code;//计划任务需要执行的SQL语句。
       private int _maximalDelayed = 1000;//允许当前计划任务执行时间与实际时间的最大时延，默认值为1000，单位毫秒（Millisecond）。
-      private bool disposedValue = false; //要检测冗余调用。
+      private bool _disposedValue = false; //要检测冗余调用。
       /// <summary>
       /// 构造函数，创建一个具有有效数据库操作类，计划任务名称，执行时间和注释的计划任务实例。
       /// </summary>
@@ -179,7 +179,7 @@ namespace Cabinink.DataTreatment.Database.Extend
       protected virtual void Dispose(bool disposing)
       {
          int maxGeneration = GC.MaxGeneration;
-         if (!disposedValue)
+         if (!_disposedValue)
          {
             if (disposing)
             {
@@ -189,7 +189,7 @@ namespace Cabinink.DataTreatment.Database.Extend
                _code = null;
                GC.Collect(maxGeneration, GCCollectionMode.Forced, true);
             }
-            disposedValue = true;
+            _disposedValue = true;
          }
       }
       /// <summary>

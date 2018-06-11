@@ -8,6 +8,16 @@ namespace Cabinink.Devices
    /// <summary>
    /// 音频播放类，可用于播放一些基本格式的音频。
    /// </summary>
+   /// <remarks>
+   /// 由于这个类使用了DirectX SDK的相关技术，因此您需要在您的项目中进行一些设置，这是由于在DirectX SDK中，适用于.NET Framework的代码采用了早期版本的技术，因此您需要在项目的app.config文件的startup标记添加useLegacyV2RuntimeActivationPolicy属性，其详细的配置代码如下所示：
+   /// <example>
+   /// <code>
+   /// &lt;startup useLegacyV2RuntimeActivationPolicy="true"&gt;
+   /// &lt;!--This is your app's configure code.--&gt;
+   /// &lt;/startup&gt;
+   /// </code>
+   /// </example>
+   /// </remarks>
    [Serializable]
    [ComVisible(true)]
    public class SoundPlayer : IPlaybackControl, IVolumeControl, IPlaybackProgressControl, IDisposable

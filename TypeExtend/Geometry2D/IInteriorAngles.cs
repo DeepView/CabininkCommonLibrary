@@ -3,7 +3,7 @@
    /// <summary>
    /// 多边形内角和相关接口。
    /// </summary>
-   interface IInteriorAngles
+   public interface IInteriorAngles
    {
       /// <summary>
       /// 获取指定顶点所在内角的大小，以角度制作为计量依据。

@@ -25,6 +25,54 @@ namespace Cabinink.Network
       private bool _enableSsl;//是否对邮件内容进行socket层加密传输
       private bool _authentication; //是否对发件人邮箱进行密码验证
       /// <summary>
+      /// 构造函数，通过MailMessage实例初始化当前的电子邮件发送实例。
+      /// </summary>
+      /// <param name="messageInstance">一个MailMessage实例，用于存储收件人，邮件主题，邮件主题等属性的参数。</param>
+      /// <param name="server">发件箱的邮件服务器地址。</param>
+      /// <param name="userName">发件箱的用户名（即@符号前面的字符串，例如：hello@163.com，用户名为：hello）。</param>
+      /// <param name="password">发件人邮箱密码。</param>
+      /// <param name="port">发送邮件所用的端口号（stmp协议默认为25）。</param>
+      /// <param name="enableSsl">true表示对邮件内容进行socket层加密传输，false表示不加密。</param>
+      /// <param name="isCheckedPassword">true表示对发件人邮箱进行密码验证，false表示不对发件人邮箱进行密码验证。</param>
+      public MailSender(MailMessage messageInstance, string server, string userName, string password, string port, bool enableSsl, bool isCheckedPassword)
+      {
+         _mailMessage = messageInstance;
+         _server = server;
+         _senderUserName = userName;
+         _senderPassword = password;
+         _port = Convert.ToInt32(port);
+         _enableSsl = enableSsl;
+         _authentication = isCheckedPassword;
+      }
+      /// <summary>
+      /// 构造函数，初始化当前的电子邮件发送实例，默认启用SSL加密和密码检查。
+      /// </summary>
+      /// <param name="server">发件箱的邮件服务器地址。</param>
+      /// <param name="to">收件人地址（可以是多个收件人，程序中是以“;"进行区分的）。</param>
+      /// <param name="from">发件人地址。</param>
+      /// <param name="subject">邮件标题。</param>
+      /// <param name="body">邮件内容（可以以html格式进行设计）。</param>
+      /// <param name="userName">发件箱的用户名（即@符号前面的字符串，例如：hello@163.com，用户名为：hello）。</param>
+      /// <param name="password">发件人邮箱密码。</param>
+      /// <param name="port">发送邮件所用的端口号（stmp协议默认为25）。</param>
+      public MailSender(string server, string to, string from, string subject, string body, string userName, string password, string port)
+      {
+         _mailMessage = new MailMessage();
+         _mailMessage.To.Add(to);
+         _mailMessage.From = new MailAddress(from);
+         _mailMessage.Subject = subject;
+         _mailMessage.Body = body;
+         _mailMessage.IsBodyHtml = true;
+         _mailMessage.BodyEncoding = Encoding.UTF8;
+         _mailMessage.Priority = MailPriority.Normal;
+         _server = server;
+         _senderUserName = userName;
+         _senderPassword = password;
+         _port = Convert.ToInt32(port);
+         _enableSsl = true;
+         _authentication = true;
+      }
+      /// <summary>
       /// 构造函数，初始化当前的电子邮件发送实例。
       /// </summary>
       /// <param name="server">发件箱的邮件服务器地址。</param>

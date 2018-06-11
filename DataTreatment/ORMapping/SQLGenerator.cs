@@ -19,6 +19,40 @@ namespace Cabinink.DataTreatment.ORMapping
       private string _sqlSentence;//SQL语句。
       private ESupportedDbSystem _supportedDbSystem;//CCL支持的DBS的名称枚举。
       /// <summary>
+      /// 构造函数，创建一个适用于SQLite DBS的空System.Object实例的SQL语句生成实例。
+      /// </summary>
+      public SQLGenerator()
+      {
+         _operatedObject = new object();
+         _sqlSentence = string.Empty;
+         _supportedDbSystem = ESupportedDbSystem.SQLite;
+      }
+      /// <summary>
+      /// 构造函数，创建一个适用于SQLite DBS的SQL语句生成实例。
+      /// </summary>
+      /// <param name="operatedObject">需要生成对应成员SQL语句的对象。</param>
+      /// <exception cref="NotSupportedTypeException">当参数operatedObject指定的对象不受支持时，则会抛出这个异常。</exception>
+      public SQLGenerator(object operatedObject)
+      {
+         if (operatedObject.GetType().FullName == @"Cabinink.DataTreatment.ORMapping.SQLGenerator")
+         {
+            throw new NotSupportedTypeException();
+         }
+         _operatedObject = operatedObject;
+         _sqlSentence = string.Empty;
+         _supportedDbSystem = ESupportedDbSystem.SQLite;
+      }
+      /// <summary>
+      /// 构造函数，创建一个指定DBS的空System.Object实例的SQL语句生成实例。
+      /// </summary>
+      /// <param name="supportedDbSystem">受CCL支持的DBS。</param>
+      public SQLGenerator(ESupportedDbSystem supportedDbSystem)
+      {
+         _operatedObject = new object();
+         _sqlSentence = string.Empty;
+         _supportedDbSystem = supportedDbSystem;
+      }
+      /// <summary>
       /// 构造函数，创建一个指定操作对象SQL语句生成实例。
       /// </summary>
       /// <param name="operatedObject">需要生成对应成员SQL语句的对象。</param>
@@ -37,6 +71,7 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <summary>
       /// 获取或设置当前实例需要生成对应成员SQL语句的对象。
       /// </summary>
+      /// <exception cref="NotSupportedTypeException">当参数operatedObject指定的对象不受支持时，则会抛出这个异常。</exception>
       public object OperatedObject
       {
          get => _operatedObject;
@@ -58,7 +93,7 @@ namespace Cabinink.DataTreatment.ORMapping
       /// </summary>
       public ESupportedDbSystem SupportedDbSystem { get => _supportedDbSystem; set => _supportedDbSystem = value; }
       /// <summary>
-      /// 获取当前被操作实例的属性信息集合。
+      /// 获取当前被操作实例的属性信息集合，这个集合的每一个元素都以(propertyName, typeName)形式的元组呈现。
       /// </summary>
       public List<(string, string)> PropertiesInfo
       {
@@ -70,16 +105,17 @@ namespace Cabinink.DataTreatment.ORMapping
             List<string> memberNames = getter.GetPropertyNames();
             for (int i = 0; i < memberNames.Count; i++)
             {
-               result.Add((new TypeMapping(0)
+               if (memberTypes[i] == @"System.DateTime") result.Add((memberNames[i], new TypeMapping(0).DateTimeTypeMapping(true)));
+               else result.Add((memberNames[i], new TypeMapping(0)
                {
                   SupportedDbSystem = SupportedDbSystem
-               }.CTSMapping(memberTypes[i]), memberNames[i]));
+               }.CTSMapping(memberTypes[i])));
             }
             return result;
          }
       }
       /// <summary>
-      /// 创建一个指定名称，路径和日志记录文件路径的数据库，目前这个方法暂时支持SQLServer数据库的创建。
+      /// 生成创建一个指定名称，路径和日志记录文件路径的数据库的SQL语句，目前这个方法暂时支持SQLServer数据库的创建。
       /// </summary>
       /// <param name="databaseName">数据库的名称。</param>
       /// <param name="databaseFileUrl">数据库文件的物理地址。</param>
@@ -101,38 +137,49 @@ namespace Cabinink.DataTreatment.ORMapping
          }
       }
       /// <summary>
-      /// 创建一个数据表，数据类型系统由SupportedDbSystem属性指定。
+      /// 生成创建数据表的SQL语句，数据库系统类型由SupportedDbSystem属性指定。
       /// </summary>
       /// <param name="tableName">数据表的名称。</param>
       /// <param name="primaryKey">指定的主键字段，如果指定的字段在PropertiesInfo属性中无法被检索到，则会默认指定第一个字段为主键。</param>
       /// <param name="isNullField">一个列表集合，用于存储所对应字段是否允许为空字段，如果某个索引上的值为true，则表示这个这个索引所对应的字段允许为空，否则不允许为空。</param>
       public void GenerateSqlForCreateTable(string tableName, string primaryKey, List<bool> isNullField)
       {
-         ExString baseSql = @"create table " + tableName + "(";
+         ExString baseSql = @"create table " + tableName + "( ";
          List<(string, string)> propInfos = PropertiesInfo;
+         List<bool> isnulfd = isNullField;
+         if (isnulfd == null)
+         {
+            isnulfd = new List<bool>(propInfos.Count);
+            for (int i = 0; i < isnulfd.Count; i++) isnulfd.Add(true);
+         }
          if (isNullField.Count < propInfos.Count)
          {
             throw new OverflowException("isNullField参数的Coun属性不能小于当前实例的PropertiesInfo.Count属性！");
          }
          for (int i = 0; i < propInfos.Count; i++)
          {
-            if (propInfos[i].Item1 == primaryKey) primaryKey = propInfos[i].Item1;
-            else primaryKey = propInfos[0].Item1;
-         }
-         for (int i = 0; i < propInfos.Count; i++)
-         {
             if (propInfos[i].Item1 == primaryKey)
             {
-               baseSql = baseSql + propInfos[i].Item1 + " " + propInfos[i].Item2 + " primary key not null,";
+               baseSql = baseSql + propInfos[i].Item1 + " " + propInfos[i].Item2 + " primary key not null, ";
             }
             else
             {
-               string notNullString = isNullField[i] ? string.Empty : " not null,";
+               string notNullString = isNullField[i] ? string.Empty : " not null, ";
                baseSql = baseSql + propInfos[i].Item1 + " " + propInfos[i].Item2 + notNullString;
             }
          }
-         SqlSentence = baseSql.SubString(0, baseSql.Length - 1) + ");";
+         SqlSentence = baseSql.SubString(0, baseSql.Length - 2) + " );";
       }
-      public void GenerateSqlForDeleteTable(string tableName) => SqlSentence = @"drop table " + tableName;
+      /// <summary>
+      /// 生成删除数据表的SQL语句。
+      /// </summary>
+      /// <param name="tableName">指定需要删除的数据表。</param>
+      public void GenerateSqlForDeleteTable(string tableName) => SqlSentence = @"drop table " + tableName + ";";
+      /// <summary>
+      /// 生成用于列举不同值的SQL语句
+      /// </summary>
+      /// <param name="tableName">指定需要操作的数据表。</param>
+      /// <param name="fieldName">指定需要被列举的字段。</param>
+      public void GenerateSqlForDistinct(string tableName, string fieldName) => SqlSentence = @"select distinct " + fieldName + " from " + tableName + ";";
    }
 }
