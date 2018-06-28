@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
+using Cabinink.TypeExtend.Collections;
 namespace Cabinink.DataTreatment.ORMapping
 {
    /// <summary>
@@ -139,6 +140,20 @@ namespace Cabinink.DataTreatment.ORMapping
       {
          MemberExpression expressionBody = (MemberExpression)expression.Body;
          return expressionBody.Member.Name;
+      }
+      /// <summary>
+      /// 获取当前实例包含的对象的公共属性的属性值。
+      /// </summary>
+      /// <returns>这个操作将会返回一个双向链表，考虑到属性值的顺序安全性，因此并不会采用列表或者数组，如有这个需求，请调用BiDirectionalLinkedList.ToList()或者BiDirectionalLinkedList.ToArray()方法。</returns>
+      public BiDirectionalLinkedList<object> GetProperitiesValues()
+      {
+         BiDirectionalLinkedList<object> values = new BiDirectionalLinkedList<object>();
+         PropertyInfo[] pInfos = GetPropertyInfoCollection();
+         foreach (PropertyInfo pInfo in pInfos)
+         {
+            values.Add(pInfo.GetValue(OperatedObject.GetType()));
+         }
+         return values;
       }
       /// <summary>
       /// 获取当前被操作对象的所有属性的信息。

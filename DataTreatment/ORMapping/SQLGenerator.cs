@@ -4,8 +4,10 @@ using System.Text;
 using Cabinink.TypeExtend;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 using Cabinink.DataTreatment.Database;
+using Cabinink.TypeExtend.Collections;
 namespace Cabinink.DataTreatment.ORMapping
 {
    /// <summary>
@@ -142,6 +144,7 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <param name="tableName">数据表的名称。</param>
       /// <param name="primaryKey">指定的主键字段，如果指定的字段在PropertiesInfo属性中无法被检索到，则会默认指定第一个字段为主键。</param>
       /// <param name="isNullField">一个列表集合，用于存储所对应字段是否允许为空字段，如果某个索引上的值为true，则表示这个这个索引所对应的字段允许为空，否则不允许为空。</param>
+      /// <exception cref="OverflowException">当isNullField参数的Coun属性小于当前实例的PropertiesInfo.Count属性时，则将会抛出这个异常。</exception>
       public void GenerateSqlForCreateTable(string tableName, string primaryKey, List<bool> isNullField)
       {
          ExString baseSql = @"create table " + tableName + "( ";
@@ -176,10 +179,41 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <param name="tableName">指定需要删除的数据表。</param>
       public void GenerateSqlForDeleteTable(string tableName) => SqlSentence = @"drop table " + tableName + ";";
       /// <summary>
-      /// 生成用于列举不同值的SQL语句
+      /// 生成用于列举不同值的SQL语句。
       /// </summary>
       /// <param name="tableName">指定需要操作的数据表。</param>
       /// <param name="fieldName">指定需要被列举的字段。</param>
       public void GenerateSqlForDistinct(string tableName, string fieldName) => SqlSentence = @"select distinct " + fieldName + " from " + tableName + ";";
+      /// <summary>
+      /// 生成插入新值的SQL语句。
+      /// </summary>
+      /// <param name="tableName">指定需要操作的数据表。</param>
+      /// <param name="instanceWithIncludedValues">需要插入的值所在的对象或者实例。</param>
+      /// <remarks>这个操作生成的Insert SQL语句，其中需要插入的值由instanceWithIncludedValues参数中的公共属性的值来决定。</remarks>
+      /// <exception cref="TypeIsNotMatchException">当源数据类型与指定数据类型不匹配时，则将会抛出这个异常。</exception>
+      public void GenerateSqlForInsert(string tableName, object instanceWithIncludedValues)
+      {
+         if (instanceWithIncludedValues.GetType().FullName != OperatedObject.GetType().FullName)
+         {
+            throw new TypeIsNotMatchException();
+         }
+         string baseSql = @"insert into " + tableName + " values(";
+         string valuesCsvStr = string.Empty;
+         BiDirectionalLinkedList<object> values = new ObjectMemberGetter(OperatedObject).GetProperitiesValues();
+         for (int i = 0; i < values.Count; i++) valuesCsvStr += "'" + values[i].ToString() + "',";
+         valuesCsvStr = valuesCsvStr.Substring(0, valuesCsvStr.Length - 1) + ");";
+         SqlSentence = baseSql + valuesCsvStr;
+      }
+   }
+   /// <summary>
+   /// 数据类型不匹配时需要抛出的异常。
+   /// </summary>
+   [Serializable]
+   public class TypeIsNotMatchException : Exception
+   {
+      public TypeIsNotMatchException() : base("源数据类型与指定数据类型不匹配！") { }
+      public TypeIsNotMatchException(string message) : base(message) { }
+      public TypeIsNotMatchException(string message, Exception inner) : base(message, inner) { }
+      protected TypeIsNotMatchException(SerializationInfo info, StreamingContext context) : base(info, context) { }
    }
 }
