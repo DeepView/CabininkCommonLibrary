@@ -185,7 +185,13 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <param name="fieldName">指定需要被列举的字段。</param>
       public void GenerateSqlForDistinct(string tableName, string fieldName) => SqlSentence = @"select distinct " + fieldName + " from " + tableName + ";";
       /// <summary>
-      /// 生成插入新值的SQL语句。
+      /// 通过当前实例包含的对象来生成插入新值的SQL语句。
+      /// </summary>
+      /// <param name="tableName">指定需要操作的数据表。</param>
+      /// <remarks>这个操作生成的Insert SQL语句，其中需要插入的值由当前实例的OperatedObject属性中的公共属性的值来决定。</remarks>
+      public void GenerateSqlForInsert(string tableName) => GenerateSqlForInsert(tableName, OperatedObject);
+      /// <summary>
+      /// 通过指定的对象来生成插入新值的SQL语句。
       /// </summary>
       /// <param name="tableName">指定需要操作的数据表。</param>
       /// <param name="instanceWithIncludedValues">需要插入的值所在的对象或者实例。</param>
@@ -199,11 +205,17 @@ namespace Cabinink.DataTreatment.ORMapping
          }
          string baseSql = @"insert into " + tableName + " values(";
          string valuesCsvStr = string.Empty;
-         BiDirectionalLinkedList<object> values = new ObjectMemberGetter(OperatedObject).GetProperitiesValues();
-         for (int i = 0; i < values.Count; i++) valuesCsvStr += "'" + values[i].ToString() + "',";
+         BiDirectionalLinkedList<object> values = new ObjectMemberGetter(OperatedObject).GetProperityValues();
+         for (int i = 0; i < values.Count; i++) valuesCsvStr += "'" + values[i].Element.ToString() + "',";
          valuesCsvStr = valuesCsvStr.Substring(0, valuesCsvStr.Length - 1) + ");";
          SqlSentence = baseSql + valuesCsvStr;
       }
+      /// <summary>
+      /// 生成显示指定数据表所有记录的SQL语句。
+      /// </summary>
+      /// <param name="tableName">指定需要操作的数据表。</param>
+      /// <remarks>该方法所生成的SQL语句为select * from table.</remarks>
+      public void GenerateSqlForShowTable(string tableName) => SqlSentence = @"select * from " + tableName + ";";
    }
    /// <summary>
    /// 数据类型不匹配时需要抛出的异常。

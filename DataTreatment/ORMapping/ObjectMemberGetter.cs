@@ -115,11 +115,6 @@ namespace Cabinink.DataTreatment.ORMapping
          else for (int i = 0; i < fInfos.Count; i++) if (!fInfos[i].IsPublic) fTypes.Add(fInfos[i].FieldType.ToString());
          return fTypes;
       }
-      //public List<(string,string)> GetFieldInfoWithRecursive()
-      //{
-      //   (string, string) infos = ("","");
-      //   foreach((string,string) item in T)
-      //}
       /// <summary>
       /// 获取指定变量的名称。
       /// </summary>
@@ -145,13 +140,13 @@ namespace Cabinink.DataTreatment.ORMapping
       /// 获取当前实例包含的对象的公共属性的属性值。
       /// </summary>
       /// <returns>这个操作将会返回一个双向链表，考虑到属性值的顺序安全性，因此并不会采用列表或者数组，如有这个需求，请调用BiDirectionalLinkedList.ToList()或者BiDirectionalLinkedList.ToArray()方法。</returns>
-      public BiDirectionalLinkedList<object> GetProperitiesValues()
+      public BiDirectionalLinkedList<object> GetProperityValues()
       {
          BiDirectionalLinkedList<object> values = new BiDirectionalLinkedList<object>();
          PropertyInfo[] pInfos = GetPropertyInfoCollection();
          foreach (PropertyInfo pInfo in pInfos)
          {
-            values.Add(pInfo.GetValue(OperatedObject.GetType()));
+            values.Add(pInfo.GetValue(OperatedObject));
          }
          return values;
       }
