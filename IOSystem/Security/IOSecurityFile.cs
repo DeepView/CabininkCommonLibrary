@@ -116,7 +116,6 @@ namespace Cabinink.IOSystem.Security
             return md5Code;
          }
       }
-
       /// <summary>
       /// 获取当前实例所加载的文件是否产生了更改。
       /// </summary>

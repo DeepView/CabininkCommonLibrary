@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using Cabinink.TypeExtend;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
@@ -18,8 +15,9 @@ namespace Cabinink.DataTreatment.ORMapping
    public class SQLGenerator
    {
       private object _operatedObject;//需要生成对应成员SQL语句的对象。
-      private string _sqlSentence;//SQL语句。
+      private string _sqlSentence;//存储生成的SQL语句。
       private ESupportedDbSystem _supportedDbSystem;//CCL支持的DBS的名称枚举。
+      private EDateTimeConvertMode _dateTimeConvertMode;//日期类型转换存储的模式。
       /// <summary>
       /// 构造函数，创建一个适用于SQLite DBS的空System.Object实例的SQL语句生成实例。
       /// </summary>
@@ -28,6 +26,7 @@ namespace Cabinink.DataTreatment.ORMapping
          _operatedObject = new object();
          _sqlSentence = string.Empty;
          _supportedDbSystem = ESupportedDbSystem.SQLite;
+         _dateTimeConvertMode = EDateTimeConvertMode.ToString;
       }
       /// <summary>
       /// 构造函数，创建一个适用于SQLite DBS的SQL语句生成实例。
@@ -43,6 +42,7 @@ namespace Cabinink.DataTreatment.ORMapping
          _operatedObject = operatedObject;
          _sqlSentence = string.Empty;
          _supportedDbSystem = ESupportedDbSystem.SQLite;
+         _dateTimeConvertMode = EDateTimeConvertMode.ToString;
       }
       /// <summary>
       /// 构造函数，创建一个指定DBS的空System.Object实例的SQL语句生成实例。
@@ -53,6 +53,7 @@ namespace Cabinink.DataTreatment.ORMapping
          _operatedObject = new object();
          _sqlSentence = string.Empty;
          _supportedDbSystem = supportedDbSystem;
+         _dateTimeConvertMode = EDateTimeConvertMode.ToString;
       }
       /// <summary>
       /// 构造函数，创建一个指定操作对象SQL语句生成实例。
@@ -69,6 +70,25 @@ namespace Cabinink.DataTreatment.ORMapping
          _operatedObject = operatedObject;
          _sqlSentence = string.Empty;
          _supportedDbSystem = supportedDbSystem;
+         _dateTimeConvertMode = EDateTimeConvertMode.ToString;
+      }
+      /// <summary>
+      /// 构造函数，创建一个指定操作对象SQL语句生成实例。
+      /// </summary>
+      /// <param name="operatedObject">需要生成对应成员SQL语句的对象。</param>
+      /// <param name="supportedDbSystem">受CCL支持的DBS。</param>
+      /// <param name="dateTimeConvertMode">指定日期类型转换存储的模式。</param>
+      /// <exception cref="NotSupportedTypeException">当参数operatedObject指定的对象不受支持时，则会抛出这个异常。</exception>
+      public SQLGenerator(object operatedObject, ESupportedDbSystem supportedDbSystem, EDateTimeConvertMode dateTimeConvertMode)
+      {
+         if (operatedObject.GetType().FullName == @"Cabinink.DataTreatment.ORMapping.SQLGenerator")
+         {
+            throw new NotSupportedTypeException();
+         }
+         _operatedObject = operatedObject;
+         _sqlSentence = string.Empty;
+         _supportedDbSystem = supportedDbSystem;
+         _dateTimeConvertMode = dateTimeConvertMode;
       }
       /// <summary>
       /// 获取或设置当前实例需要生成对应成员SQL语句的对象。
@@ -94,6 +114,10 @@ namespace Cabinink.DataTreatment.ORMapping
       /// 获取或设置当前实例受支持的DBS。
       /// </summary>
       public ESupportedDbSystem SupportedDbSystem { get => _supportedDbSystem; set => _supportedDbSystem = value; }
+      /// <summary>
+      /// 获取或设置当前实例的日期类型转换存储的模式。
+      /// </summary>
+      public EDateTimeConvertMode DateTimeConvertMode { get => _dateTimeConvertMode; set => _dateTimeConvertMode = value; }
       /// <summary>
       /// 获取当前被操作实例的属性信息集合，这个集合的每一个元素都以(propertyName, typeName)形式的元组呈现。
       /// </summary>
@@ -205,8 +229,31 @@ namespace Cabinink.DataTreatment.ORMapping
          }
          string baseSql = @"insert into " + tableName + " values(";
          string valuesCsvStr = string.Empty;
+         string sqlInsertedValue = string.Empty;
          BiDirectionalLinkedList<object> values = new ObjectMemberGetter(OperatedObject).GetProperityValues();
-         for (int i = 0; i < values.Count; i++) valuesCsvStr += "'" + values[i].Element.ToString() + "',";
+         for (int i = 0; i < values.Count; i++)
+         {
+            if (values[i].Element.GetType().FullName == @"System.DateTime")
+            {
+               switch (DateTimeConvertMode)
+               {
+                  case EDateTimeConvertMode.ToTicks:
+                     sqlInsertedValue = ((DateTime)(values[i].Element)).Ticks.ToString() + ",";
+                     break;
+                  case EDateTimeConvertMode.ToDbsDateTime:
+                     string shortDateStr = ((DateTime)(values[i].Element)).ToShortDateString();
+                     string longTimeStr = ((DateTime)(values[i].Element)).ToLongTimeString();
+                     sqlInsertedValue = "'" + shortDateStr + " " + longTimeStr + "',";
+                     break;
+                  case EDateTimeConvertMode.ToString:
+                  default:
+                     sqlInsertedValue = "'" + values[i].Element.ToString() + "',";
+                     break;
+               }
+            }
+            else sqlInsertedValue = "'" + values[i].Element.ToString() + "',";
+            valuesCsvStr += sqlInsertedValue;
+         }
          valuesCsvStr = valuesCsvStr.Substring(0, valuesCsvStr.Length - 1) + ");";
          SqlSentence = baseSql + valuesCsvStr;
       }
@@ -216,6 +263,27 @@ namespace Cabinink.DataTreatment.ORMapping
       /// <param name="tableName">指定需要操作的数据表。</param>
       /// <remarks>该方法所生成的SQL语句为select * from table.</remarks>
       public void GenerateSqlForShowTable(string tableName) => SqlSentence = @"select * from " + tableName + ";";
+   }
+   /// <summary>
+   /// 日期时间类型的转换模式的枚举。
+   /// </summary>
+   public enum EDateTimeConvertMode : int
+   {
+      /// <summary>
+      /// 通过DateTime实例的ToString方法直接转换为字符串。
+      /// </summary>
+      [EnumerationDescription("以ToString方法转换")]
+      ToString = 0x0000,
+      /// <summary>
+      /// 转换为Ticks，即转换为long数据类型。
+      /// </summary>
+      [EnumerationDescription("转换为Ticks")]
+      ToTicks = 0x0001,
+      /// <summary>
+      /// 转换为DBS兼容的日期时间类型。
+      /// </summary>
+      [EnumerationDescription("转换为DBS兼容的日期时间类型")]
+      ToDbsDateTime = 0x0002
    }
    /// <summary>
    /// 数据类型不匹配时需要抛出的异常。
