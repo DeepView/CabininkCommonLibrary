@@ -1,5 +1,23 @@
+项目说明(Project Description)
+===========================
 > - ***注意：以下说明文本的英语翻译均来自机器翻译。***
 > - ***Note: the following translations of the text are from Machine Translation.***
+
+关于这个项目（About This Project）
+------------------------------
+这是一个基于Microsoft.Net的应用程序扩展集，它可以用于快速开发一些Windows桌面应用程序，是一个非常不错的工具！
+（This is a Microsoft .Net Application extend library, it can fast used developed some Windows Desktop Application(Win32 Application), and this is a very good toolbox! ）
+
+标签（Tags）
+----------
+> - 微软.NET应用程序框架（.NET Framework）
+> - 自封装应用程序扩展库（Self Encapsulation Library）
+> - Win32应用程序集（Win32 Assembly）
+> - 已封装的编程开发接口（Encapsulated Programming Interface）
+
+编译时注意事项（Things to Note When Compiling）
+-------------------------------------------
+
 1. 如果在编译源代码并想这些代码生效时，你可能需要将Unmanaged Code Dependency目录下的所有第三方依赖项添加到代码引用中！（If you compile the source code and want these code to take effect, you may need to add all third party dependencies in the Unmanaged Code Dependency directory to the code reference!）
 2. 以下代码依赖项需要手动复制到项目的生成目标文件夹中，否则在使用某些相关功能，可能将会导致一些未知的异常：（This list contains code dependencies that need to be manually copied to the project's generated target folders, otherwise some of the related functions may lead to some unknown exceptions:）
 > - Unmanaged Code Dependency\SQLite.Interop.dll

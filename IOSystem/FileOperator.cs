@@ -95,6 +95,10 @@ namespace Cabinink.IOSystem
       private const int DEFAULT_BUFFER_SIZE = 4096;//默认文件缓冲大小
       private const int SW_SHOW = 5;//API常量，激活窗口并以当前的大小和位置显示它。
       private const uint SEE_MASK_INVOKEIDLIST = 12;//API常量，使用所选项目快捷菜单处理程序的IContextMenu界面。
+      private const string DRIVE_FORMAT_NTFS = "NTFS";//表示NTFS文件系统。
+      private const string DRIVE_FORMAT_FAT12 = "FAT12";//表示FAT12文件系统。
+      private const string DRIVE_FORMAT_FAT16 = "FAT16";//表示FAT16文件系统。
+      private const string DRIVE_FORMAT_FAT32 = "FAT32";//表示FAT32文件系统。
       /// <summary>
       /// 对指定的文件执行操作。
       /// </summary>
@@ -237,8 +241,13 @@ namespace Cabinink.IOSystem
       /// <param name="sourceFileUrl">需要复制的文件的文件地址。</param>
       /// <param name="targetFileUrl">复制的目标地址，而非目标目录，允许文件名称不同（即允许重命名）。</param>
       /// <param name="isOverwrite">如果目标地址所表示的文件在复制之前就存在，则这个值指示是否允许覆盖这个文件。</param>
+      /// <exception cref="UnsupportedFileSizeException">当源文件的文件大小超出复制目标所在驱动器所支持的最大文件大小，则将会抛出这个异常。</exception>
       public static void CopyFile(string sourceFileUrl, string targetFileUrl, bool isOverwrite)
       {
+         if (GetFileSize(sourceFileUrl) > GetSupportedMaximalFileSize(GetDriveLetterAccessUrl(targetFileUrl)))
+         {
+            throw new UnsupportedFileSizeException();
+         }
          FileSystem.CopyFile(sourceFileUrl, targetFileUrl, isOverwrite);
       }
       /// <summary>
@@ -253,12 +262,18 @@ namespace Cabinink.IOSystem
       /// <param name="sourceFileUrl">需要移动的文件的文件地址。</param>
       /// <param name="targetFileUrl">移动的目标地址，而非目标目录，允许文件名称不同（即允许重命名）。</param>
       /// <param name="isOverwrite">如果目标地址所表示的文件在移动之前就存在，则这个值指示是否允许覆盖这个文件。</param>
+      /// <exception cref="DirectoryIsExistedException">当目录已经存在时，则将会抛出这个异常。</exception>
+      /// <exception cref="UnsupportedFileSizeException">当源文件的文件大小超出复制目标所在驱动器所支持的最大文件大小，则将会抛出这个异常。</exception>
       public static void MoveFile(string sourceFileUrl, string targetFileUrl, bool isOverwrite)
       {
          if (FileExists(targetFileUrl))
          {
             if (isOverwrite) DeleteFile(targetFileUrl);
             else throw new DirectoryIsExistedException();
+         }
+         if (GetFileSize(sourceFileUrl) > GetSupportedMaximalFileSize(GetDriveLetterAccessUrl(targetFileUrl)))
+         {
+            throw new UnsupportedFileSizeException();
          }
          File.Move(sourceFileUrl, targetFileUrl);
       }
@@ -278,8 +293,13 @@ namespace Cabinink.IOSystem
       /// <param name="sourceFileUrl">需要被复制的文件的文件地址。</param>
       /// <param name="targetFileUrl">复制操作的目标地址。</param>
       /// <param name="transmissionSize">每一次传输的大小，通常这个值设定为1024即可。</param>
+      /// <exception cref="UnsupportedFileSizeException">当源文件的文件大小超出复制目标所在驱动器所支持的最大文件大小，则将会抛出这个异常。</exception>
       public static void CopyBigFile(string sourceFileUrl, string targetFileUrl, int transmissionSize)
       {
+         if (GetFileSize(sourceFileUrl) > GetSupportedMaximalFileSize(GetDriveLetterAccessUrl(targetFileUrl)))
+         {
+            throw new UnsupportedFileSizeException();
+         }
          FileStream fileToCreate = new FileStream(targetFileUrl, FileMode.Create);
          FileStream fOpen = new FileStream(sourceFileUrl, FileMode.Open, FileAccess.Read);
          FileStream tOpen = new FileStream(targetFileUrl, FileMode.Append, FileAccess.Write);
@@ -408,7 +428,7 @@ namespace Cabinink.IOSystem
             {
                string sourceFileName = Path.GetFileName(sourceFilePath);
                if (!DirectoryExists(dest)) CreateDirectory(dest);
-               File.Copy(sourceFilePath, Path.Combine(dest, sourceFileName), isOverwrite);
+               CopyFile(sourceFilePath, Path.Combine(dest, sourceFileName), isOverwrite);
             }
             else CopyDirectory(sourceFilePath, dest, isOverwrite);
          }
@@ -613,6 +633,157 @@ namespace Cabinink.IOSystem
             ShellExecuteEx(ref info);
          }
       }
+      /// <summary>
+      /// 获取指定驱动器能支持的最大文件大小。
+      /// </summary>
+      /// <param name="driveLetter">指定驱动器所对应的盘符。</param>
+      /// <returns>该操作会返回一个64位无符号整型数据，这个数据表示了参数driveLetter所对应的驱动器能够支持的最大文件大小。</returns>
+      [CLSCompliant(false)]
+      public static long GetSupportedMaximalFileSize(string driveLetter) => GetSupportedMaximalFileSize(GetDriveFormat(driveLetter));
+      /// <summary>
+      /// 获取不同文件系统下支持的最大文件大小。
+      /// </summary>
+      /// <param name="driveFormat">指定的文件系统。</param>
+      /// <returns>该操作会返回一个64位无符号整型数据，这个数据表示了参数driveFormat表示的文件系统所支持的最大文件大小。</returns>
+      [CLSCompliant(false)]
+      public static long GetSupportedMaximalFileSize(EDriveFormat driveFormat)
+      {
+         long maximalFileSize = 0;
+         switch (driveFormat)
+         {
+#if UNIX_LINUX_MAC
+            case EDriveFormat.LinuxExt:
+               maximalFileSize = 2147483648;
+               break;
+            case EDriveFormat.LinuxExt2:
+               maximalFileSize = 2199023255552;
+               break;
+            case EDriveFormat.LinuxExt3:
+            case EDriveFormat.LinuxExt4:
+            case EDriveFormat.LinuxJFS:
+               maximalFileSize = 17592186044416;
+               break;
+#endif
+#if WINDOWS
+            case EDriveFormat.Win32NTFS:
+               maximalFileSize = 68719476736;
+               break;
+            case EDriveFormat.Win32FAT12:
+               maximalFileSize = 8388608;
+               break;
+            case EDriveFormat.Win32FAT16:
+               maximalFileSize = 2147483648;
+               break;
+            case EDriveFormat.Win32FAT32:
+               maximalFileSize = 4294967296;
+               break;
+            case EDriveFormat.Win32NTFSv5:
+            default:
+               maximalFileSize = 2199023255552;
+               break;
+#endif
+         }
+         return maximalFileSize;
+      }
+      /// <summary>
+      /// 通过指定的本地文件路径或者目录获取盘符。
+      /// </summary>
+      /// <param name="fileUrlOrDirectory">指定的本地文件路径或者目录。</param>
+      /// <returns>该操作将会返回一个有效的盘符，比如说“C:”。</returns>
+      public static string GetDriveLetterAccessUrl(string fileUrlOrDirectory)
+      {
+         bool isAbsoluteUri = new Uri(fileUrlOrDirectory).IsAbsoluteUri;
+         if (!isAbsoluteUri) throw new ArgumentException("参数无效或者文件地址格式错误！", "fileUrlOrDirectory");
+         return fileUrlOrDirectory.Substring(0, 2);
+      }
+#if WINDOWS
+      /// <summary>
+      /// 获取指定分区（或者驱动器）的驱动器格式或文件系统。
+      /// </summary>
+      /// <param name="driveLetter">指定驱动器所对应的盘符。</param>
+      /// <returns>该操作将会返回指定驱动器的文件系统，在Windows环境下，这个操作将不会获取UNIX以及衍生操作系统所支持的文件系统。</returns>
+      public static EDriveFormat GetDriveFormat(string driveLetter)
+      {
+         EDriveFormat format = EDriveFormat.Win32NTFS;
+         DriveInfo dInfo = new DriveInfo(driveLetter);
+         string formatStr = dInfo.DriveFormat;
+         switch (formatStr)
+         {
+            case DRIVE_FORMAT_FAT12:
+               format = EDriveFormat.Win32FAT12;
+               break;
+            case DRIVE_FORMAT_FAT16:
+               format = EDriveFormat.Win32FAT16;
+               break;
+            case DRIVE_FORMAT_FAT32:
+               format = EDriveFormat.Win32FAT32;
+               break;
+            case DRIVE_FORMAT_NTFS:
+               format = EDriveFormat.Win32NTFS;
+               break;
+            default:
+               throw new UnsupportedDriveFormatException();
+         }
+         return format;
+      }
+#endif
+   }
+   public enum EDriveFormat : int
+   {
+#if WINDOWS
+      /// <summary>
+      /// Windows NT文件系统，现在Windows上运用最多的文件系统。
+      /// </summary>
+      [EnumerationDescription("NTFS")]
+      Win32NTFS = 0x0000,
+      /// <summary>
+      /// 早期版本的FAT文件系统。
+      /// </summary>
+      [EnumerationDescription("FAT12")]
+      Win32FAT12 = 0x0001,
+      /// <summary>
+      /// 基于FAT12改进的FAT16文件系统。
+      /// </summary>
+      [EnumerationDescription("FAT16")]
+      Win32FAT16 = 0x0002,
+      /// <summary>
+      /// FAT32文件系统，现常用基于USB的Windows Preinstallation Environment启动介质的文件系统。
+      /// </summary>
+      [EnumerationDescription("FAT32")]
+      Win32FAT32 = 0x0003,
+      /// <summary>
+      /// 可恢复的Windows NT文件系统。
+      /// </summary>
+      [EnumerationDescription("NTFS 5.0")]
+      Win32NTFSv5 = 0x0004,
+#endif
+#if UNIX_LINUX_MAC
+      /// <summary>
+      /// 延伸文件系统，是Linux上常用的文件系统。
+      /// </summary>
+      [EnumerationDescription("ext")]
+      LinuxExt = 0x1000,
+      /// <summary>
+      /// 改进后的第二代延伸文件系统。
+      /// </summary>
+      [EnumerationDescription("ext2")]
+      LinuxExt2 = 0x1001,
+      /// <summary>
+      /// 第三代延伸文件系统。
+      /// </summary>
+      [EnumerationDescription("ext3")]
+      LinuxExt3 = 0x1002,
+      /// <summary>
+      /// 第四代延伸文件系统。
+      /// </summary>
+      [EnumerationDescription("ext4")]
+      LinuxExt4 = 0x1003,
+      /// <summary>
+      /// 字节级日志文件系统。
+      /// </summary>
+      [EnumerationDescription("JFS")]
+      LinuxJFS = 0x1004
+#endif
    }
    /// <summary>
    /// 在文件已经存在时需要抛出的异常。
@@ -659,5 +830,27 @@ namespace Cabinink.IOSystem
       public AbortedCheckOperationException(string message) : base(message) { }
       public AbortedCheckOperationException(string message, Exception inner) : base(message, inner) { }
       protected AbortedCheckOperationException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+   }
+   /// <summary>
+   /// 当遇到不支持的文件系统或者驱动器格式时需要抛出的异常。
+   /// </summary>
+   [Serializable]
+   public class UnsupportedDriveFormatException : Exception
+   {
+      public UnsupportedDriveFormatException() : base("不支持的文件系统或者驱动器格式！") { }
+      public UnsupportedDriveFormatException(string message) : base(message) { }
+      public UnsupportedDriveFormatException(string message, Exception inner) : base(message, inner) { }
+      protected UnsupportedDriveFormatException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+   }
+   /// <summary>
+   /// 当遇到驱动器不支持的文件大小时需要抛出的异常。
+   /// </summary>
+   [Serializable]
+   public class UnsupportedFileSizeException : Exception
+   {
+      public UnsupportedFileSizeException() : base("不支持的文件大小！") { }
+      public UnsupportedFileSizeException(string message) : base(message) { }
+      public UnsupportedFileSizeException(string message, Exception inner) : base(message, inner) { }
+      protected UnsupportedFileSizeException(SerializationInfo info, StreamingContext context) : base(info, context) { }
    }
 }

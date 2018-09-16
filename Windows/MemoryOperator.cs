@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
-using Cabinink.DataTreatment.ORMapping;
 using System.Runtime.ConstrainedExecution;
+#if CPPCLI
+using System.Reflection;
+using Cabinink.DataTreatment.ORMapping;
+#endif
 namespace Cabinink.Windows
 {
    /// <summary>
@@ -78,6 +80,7 @@ namespace Cabinink.Windows
       [return: MarshalAs(UnmanagedType.Bool)]
       [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
       private static extern bool GlobalMemoryStatusEx(ref SMemoryStatus buffer);
+#if CPPCLI
       /// <summary>
       /// 将指定的内存块清零。
       /// </summary>
@@ -86,6 +89,7 @@ namespace Cabinink.Windows
       /// <remarks>使用结构前清零，而不让结构的成员数值具有不确定性，是一个好的编程习惯。</remarks>
       [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = true, ExactSpelling = true)]
       private static extern void ZeroMemory(IntPtr initalizeLocation, int size);
+#endif
       /// <summary>
       /// 获取当前进程的一个伪句柄。
       /// </summary>
@@ -160,10 +164,7 @@ namespace Cabinink.Windows
             CloseHandle(new SafeFileHandle(hProcess, true));
             return Marshal.ReadInt64(byteAddress);
          }
-         catch
-         {
-            throw new MemoryIOException();
-         }
+         catch { throw new MemoryIOException(); }
       }
       /// <summary>
       /// 通过指定的PID从这个进程中获取指定内存地址所存储的值。
@@ -183,10 +184,7 @@ namespace Cabinink.Windows
             CloseHandle(new SafeFileHandle(hProcess, true));
             return Marshal.ReadInt64(byteAddress);
          }
-         catch
-         {
-            throw new MemoryIOException();
-         }
+         catch { throw new MemoryIOException(); }
       }
       /// <summary>
       /// 将数据写入某个进程的指定的内存地址。
@@ -220,11 +218,9 @@ namespace Cabinink.Windows
             WriteProcessMemory(hProcess, (IntPtr)baseAddress, new int[] { value }, 4, IntPtr.Zero);
             CloseHandle(new SafeFileHandle(hProcess, true));
          }
-         catch
-         {
-            throw new MemoryIOException();
-         }
+         catch { throw new MemoryIOException(); }
       }
+#if CPPCLI
       /// <summary>
       /// 将指定的内存块清零，只适用于值类型和结构体。
       /// </summary>
@@ -264,6 +260,7 @@ namespace Cabinink.Windows
          if (canResetMemory) ResetMemoryContext(valueTypeObject, size);
          return canResetMemory;
       }
+#endif
       /// <summary>
       /// 获取当前计算机的内存状态。
       /// </summary>

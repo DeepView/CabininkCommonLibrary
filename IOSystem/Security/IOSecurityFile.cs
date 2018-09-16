@@ -119,7 +119,7 @@ namespace Cabinink.IOSystem.Security
       /// <summary>
       /// 获取当前实例所加载的文件是否产生了更改。
       /// </summary>
-      public bool IsChanged => !MD5Code.Equals(_initializeHashCode);
+      public bool IsChanged => !(MD5Code == _initializeHashCode);
       /// <summary>
       /// 获取或设置当前实例的IO权限密码。
       /// </summary>
