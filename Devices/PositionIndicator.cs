@@ -1,10 +1,66 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.Devices;
 using Cabinink.TypeExtend.Geometry2D;
 using System.Runtime.InteropServices;
 namespace Cabinink.Devices
 {
+   /// <summary>
+   /// 用于方便作为Win32Api的RECT类型传递的矩形结构。
+   /// </summary>
+   [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+   public struct SWin32ApiRectangle
+   {
+      /// <summary>
+      /// 表示当前矩形的左边位置。
+      /// </summary>
+      public int Left;
+      /// <summary>
+      /// 表示当前矩形的顶部位置。
+      /// </summary>
+      public int Top;
+      /// <summary>
+      /// 表示当前矩形的右边位置。
+      /// </summary>
+      public int Right;
+      /// <summary>
+      /// 表示当前矩形的底部位置。
+      /// </summary>
+      public int Bottom;
+      /// <summary>
+      /// 构造函数，创建一个指定尺寸的矩形。
+      /// </summary>
+      /// <param name="left">矩形的水平位置，或者是矩形的左边位置。</param>
+      /// <param name="top">矩形的垂直位置，或者是矩形的顶部位置。</param>
+      /// <param name="right">矩形的右边位置。</param>
+      /// <param name="bottom">矩形的底部位置。</param>
+      public SWin32ApiRectangle(int left, int top, int right, int bottom)
+      {
+         Left = left;
+         Top = top;
+         Right = right;
+         Bottom = bottom;
+      }
+      /// <summary>
+      /// 运算符重载，将指定的SWin32ApiRectangle结构实例转换为System.Drawing.Rectangle实例。
+      /// </summary>
+      /// <param name="rect">用于转换的SWin32ApiRectangle结构实例。</param>
+      /// <returns>该操作将会转换一个数学意义上与SWin32ApiRectangle结构实例相同的System.Drawing.Rectangle实例。</returns>
+      public static implicit operator Rectangle(SWin32ApiRectangle rect)
+      {
+         return Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom);
+      }
+      /// <summary>
+      /// 运算符重载，将指定的System.Drawing.Rectangle实例转换为SWin32ApiRectangle结构实例。
+      /// </summary>
+      /// <param name="rect">用于转换的System.Drawing.Rectangle实例。</param>
+      /// <returns>该操作将会转换一个数学意义上与System.Drawing.Rectangle实例相同的SWin32ApiRectangle结构实例。</returns>
+      public static implicit operator SWin32ApiRectangle(Rectangle rect)
+      {
+         return new SWin32ApiRectangle(rect.Left, rect.Top, rect.Right, rect.Bottom);
+      }
+   }
    /// <summary>
    /// 鼠标相关操作表示类，在这里之所以用位置指示器来作为当前类的名称，是为了防止与CLR的鼠标实例名称相冲突。
    /// </summary>
@@ -39,6 +95,13 @@ namespace Cabinink.Devices
 #pragma warning disable IDE1006
       private static extern int mouse_event(int flags, int dx, int dy, int buttons, int extraInfo);
 #pragma warning restore IDE1006
+      /// <summary>
+      /// 将鼠标光标的活动范围限制在屏幕上指定的一个有效矩形区域内。
+      /// </summary>
+      /// <param name="rectangle">指定的有效矩形区域。</param>
+      /// <returns>该操作会返回一个bool类型，用于表示这个操作是否成功。</returns>
+      [DllImport("user32.dll", SetLastError = true)]
+      private static extern bool ClipCursor(ref SWin32ApiRectangle rectangle);
       /// <summary>
       /// 构造函数，实例化当前的鼠标类对象。
       /// </summary>
@@ -96,6 +159,49 @@ namespace Cabinink.Devices
          CodeHelper.IsWritedWin32ErrorCode(executed, out win32ErrorCode);
          exceptionInfo = Win32ApiHelper.FormatErrorCode(win32ErrorCode);
          return win32ErrorCode == 0 ? true : false;
+      }
+      /// <summary>
+      /// 将鼠标光标的活动范围限制在指定的Rectangle实例所表示的矩形内。
+      /// </summary>
+      /// <param name="rectangle">指定的Rectangle实例，用于描述一个矩形。</param>
+      /// <returns>该操作会返回一个bool类型，用于表示这个操作是否成功。</returns>
+      public bool Restrict(Rectangle rectangle)
+      {
+         SWin32ApiRectangle rect = rectangle;
+         return ClipCursor(ref rect);
+      }
+      /// <summary>
+      /// 将鼠标光标的活动范围限制在指定的ExRectangle实例所表示的矩形内。
+      /// </summary>
+      /// <param name="rectangle">指定的ExRectangle实例，用于描述一个矩形。</param>
+      /// <returns>该操作会返回一个bool类型，用于表示这个操作是否成功。</returns>
+      public bool Restrict(ExRectangle rectangle)
+      {
+         int x = (int)rectangle.Position.XPosition;
+         int y = (int)rectangle.Position.YPosition;
+         int width = (int)rectangle.Width;
+         int height = (int)rectangle.Height;
+         Rectangle clrRect = new Rectangle(new Point(x, y), new Size(width, height));
+         SWin32ApiRectangle rect = clrRect;
+         return ClipCursor(ref rect);
+      }
+      /// <summary>
+      /// 将鼠标光标的活动范围限制在由指定位置和尺寸所描述的矩形范围之内。
+      /// </summary>
+      /// <param name="position">鼠标光标活动限制的基准位置。</param>
+      /// <param name="size">鼠标光标活动的范围。</param>
+      /// <returns>该操作会返回一个bool类型，用于表示这个操作是否成功。</returns>
+      public bool Restrict(Point position, Size size) => Restrict(new Rectangle(position, size));
+      /// <summary>
+      /// 解除鼠标光标的活动范围限制。
+      /// </summary>
+      /// <returns>该操作会返回一个bool类型，用于表示这个操作是否成功。</returns>
+      public bool Relieve()
+      {
+         Monitor monitor = new Monitor();
+         Rectangle clrRect = new Rectangle(0, 0, (int)monitor.Width, (int)monitor.Height);
+         SWin32ApiRectangle rect = clrRect;
+         return ClipCursor(ref rect);
       }
    }
 }

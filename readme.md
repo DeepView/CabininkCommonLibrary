@@ -15,6 +15,33 @@
 > - Win32应用程序集（Win32 Assembly）
 > - 已封装的编程开发接口（Encapsulated Programming Interface）
 
+命名空间概述（Summary of Namespace）
+--------------------------------
+以下命名空间概述信息均参考自我上传至VSTS中的项目master分支。（The following namespace overview information refers to the project Master branch that uploads itself to VSTS.）
+
+命名空间（Namespace）                     |概述（Summary）
+----------------------------------------|-----------------------------------------------------------------------------------------
+Cabinink                                |应用程序集的根命名空间。（The assembly's root namespace.）
+Cabinink.Algorithm                      |与算法相关的命名空间。（The namespace associated with the algorithm.）
+Cabinink.Algorithm.IntelligentLearning  |人工智能与深度学习相关的命名空间。（AI is associated with deep learning namespaces.）
+Cabinink.DataTreatment                  |一些基本的数据操作。（Some basic operation of the data.）
+Cabinink.DataTreatment.Database         |包含一些数据库系统操作的命名空间。（A namespace that contains some database system operations.）
+Cabinink.DataTreatment.Database.Extend  |数据库操作调用扩展。（The database operation calls the extension.）
+Cabinink.DataTreatment.DocumentData     |文档数据操作。（About the operation of the document data.）
+Cabinink.DataTreatment.ORMapping        |ORM框架的基础性实现。（The underlying implementation of the ORM framework.）
+Cabinink.DataTreatment.WebData          |实现基本的网络数据读取操作。（Implements basic network data read operations.）
+Cabinink.Devices                        |本地设备管理以及操作。（Local device management and operations.）
+Cabinink.IOSystem                       |本地文件输入输出操作。（Local file I/O operation.）
+Cabinink.IOSystem.Security              |文件安全相关类所在的命名空间。（The namespace in which the file security class resides.）
+Cabinink.Network                        |网络操作以及相关功能实现。（Network operations and related functions are implemented.）
+Cabinink.TypeExtend                     |CLR基础类型扩展。（CLR Foundation type Extension.）
+Cabinink.TypeExtend.Collections         |基本的集合类型扩展与增强。（Basic collection type extensions and enhancements.）
+Cabinink.TypeExtend.Geometry2D          |基础平面几何相关操作以及描述。（Basic plane geometry related operations and descriptions.）
+Cabinink.Windows                        |与Windows操作系统相关的操作。（Operations related to the Windows OS.）
+Cabinink.Windows.Applications           |Windows应用程序的相关操作以及特征实现。（The operations and feature implementations of Windows apps.）
+Cabinink.Windows.Energy                 |能源操作相关的命名空间。(The namespace associated with the energy operation.)
+Cabinink.Windows.Privileges             |Windows系统权限相关操作。(Actions related to Windows system permissions.)
+
 编译时注意事项（Things to Note When Compiling）
 -------------------------------------------
 

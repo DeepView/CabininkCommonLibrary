@@ -69,7 +69,11 @@ namespace Cabinink
       public void Dispose()
       {
          StopMeasure();
+#if CONSOLE
          Console.WriteLine("{0}'s running time is {1} milliseconds.", _codeName, ExecutedTimestamp);
+         Console.Write("Press any key to continue...");
+         Consle.ReadKey(false);
+#endif
       }
    }
 }

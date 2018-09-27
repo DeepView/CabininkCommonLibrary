@@ -72,6 +72,10 @@ namespace Cabinink.TypeExtend.Geometry2D
       /// </summary>
       public double Width => new StraightLine2D(LeftTopVertex, RightTopVertex).GetDistanceWith();
       /// <summary>
+      /// 获取当前实例所表示矩形的位置，这个位置一般都是矩形左上角的顶点。
+      /// </summary>
+      public ExPoint2D Position => LeftTopVertex;
+      /// <summary>
       /// 获取当前矩形的面积。
       /// </summary>
       public override double MeasureOfArea => Height * Width;
