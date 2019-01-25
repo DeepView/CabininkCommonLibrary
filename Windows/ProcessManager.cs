@@ -189,10 +189,20 @@ namespace Cabinink.Windows
       /// <exception cref="FileNotFoundException">当指定的Windows可执行文件找不到时，则会抛出这个异常。</exception>
       public static Process CreateProcess(string executeFileUrl, EProcessPriority priority)
       {
-         Process retval;
-         if (!FileOperator.FileExists(executeFileUrl)) throw new FileNotFoundException("指定的Windows可执行文件不存在！");
+         Process retval = new Process();
+         bool condition = !FileOperator.FileExists(executeFileUrl) && !FileOperator.DirectoryExists(executeFileUrl);
+         if (condition) throw new FileNotFoundException("指定的Windows可执行文件不存在！");
          retval = Process.Start(executeFileUrl);
-         retval.PriorityClass = (ProcessPriorityClass)priority;
+         try
+         {
+            retval.PriorityClass = (ProcessPriorityClass)priority;
+         }
+         catch (NullReferenceException exception)
+         {
+#if DEBUG
+            Console.WriteLine("Throwed Exception => \n{0}\nTime => {1}", exception.ToString(), DateTime.Now.ToString());
+#endif
+         }
          return retval;
       }
       /// <summary>

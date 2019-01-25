@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;/define WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;/define WINDOWS;DEBUG_CONSOLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -172,6 +172,8 @@
     <Compile Include="Win32ApiHelper.cs" />
     <Compile Include="Windows\Applications\AppSettings.cs" />
     <Compile Include="Windows\Applications\IApplicationBasicIO.cs" />
+    <Compile Include="Windows\Applications\IRemoteCallProtocol.cs" />
+    <Compile Include="Windows\Applications\RemoteCaller.cs" />
     <Compile Include="Windows\Applications\SettingsOption.cs" />
     <Compile Include="Windows\Applications\ShortcutCreator.cs" />
     <Compile Include="Windows\Applications\StartupHelper.cs" />

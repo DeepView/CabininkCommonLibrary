@@ -372,7 +372,7 @@ namespace Cabinink.IOSystem.Security
          FileOperator.WriteFile(FileUrl, ciphertext, isAppend, encoding);
       }
       /// <summary>
-      /// 通过指定的IO操作安全文件内容存取方式和编码方式将文件内容以未加密的形式存储到FileUrl属性指定的文件中。
+      /// 通过指定的IO操作安全文件内容存取方式和编码方式将文件内容以未加密的形式存储到FileUrl属性指定的文件中，如果您不是有特殊的开发需求，我们则不建议您这么做，因为这样可能会降低文件的安全性。
       /// </summary>
       /// <param name="isAppend">用于决定文件内容的存取方式，如果这个参数值为true，则意味着该操作将会以追加的方式把文本内容追加到文件末尾，反之将会以覆盖原本内容的方式存取文件。</param>
       /// <param name="encoding">指定的编码方式，这个编码决定了文件存取的编码方式。</param>
@@ -433,6 +433,7 @@ namespace Cabinink.IOSystem.Security
             if (disposing)
             {
                RevokeJurisdiction();
+               CloseWritePassageway();
                ((ExString)FileContext).Dispose();
                JurisdictionPassword.Dispose();
                FileUrl = null;

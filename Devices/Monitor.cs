@@ -152,7 +152,9 @@ namespace Cabinink.Devices
    {
       private int _deviceContext;//当前彩色显示设备上下文。
       private Computer _thisComputer;//表示当前的计算机。
-      private const short SYSTEM_DEFAULT_BRIGHTNESS_WITH_GAMMA = 127;//操作系统默认的基于Gamma的亮度值
+      private const short SYSTEM_DEFAULT_BRIGHTNESS_WITH_GAMMA = 127;//操作系统默认的基于Gamma的亮度值。
+      private const int SM_DIGITIZER = 94;//API常量，用于指定设备支持的数字化器输入类型的位掩码的常量。
+      private const int SM_MAXIMUMTOUCHES = 95;//API常量，用于获取当前设备支持的最大触摸点的数量的常量。
       /// <summary>
       /// 设置Direct彩色显示器上的伽玛斜坡, 其驱动程序支持硬件中可下载的伽玛坡道。
       /// </summary>
@@ -263,6 +265,14 @@ namespace Cabinink.Devices
       [DllImport("user32.dll")]
       public extern static IntPtr GetDesktopWindow();
       /// <summary>
+      /// 检索显示元素和系统配置设置的各种系统度量。
+      /// </summary>
+      /// <param name="index">要检索的系统度量或配置设置。</param>
+      /// <returns>如果函数操作成功，返回值是请求的系统度量或配置设置。如果函数操作失败，返回值为0。GetLastError不会为该函数提供扩展错误信息。</returns>
+      /// <remarks>如果需要获取该函数的更多信息，可以参考https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics。</remarks>
+      [DllImport("user32.dll")]
+      private static extern int GetSystemMetrics(int index);
+      /// <summary>
       /// 构造函数，初始化当前的计算机显示器实例。
       /// </summary>
       public Monitor()
@@ -323,11 +333,28 @@ namespace Cabinink.Devices
          set => ChangeResolving((int)Width, (int)Height, value, BitsPerPixel);
       }
       /// <summary>
+      /// 获取当前实例所对应的主显示器是否是触摸屏。
+      /// </summary>
+      /// <param name="numberOfTouchPoint">该参数会传出一个硬件能支持的触摸点的数量，如果硬件不支持触摸屏，则该参数值为0。</param>
+      /// <returns>该操作将会返回一个Boolean值，这个值用于表示当前设备是否支持触摸屏操作。</returns>
+      public bool IsTouchScreen(out int numberOfTouchPoint)
+      {
+         bool isTouch = true;
+         byte digitizerStatus = (byte)GetSystemMetrics(SM_DIGITIZER);
+         if ((digitizerStatus & (0x80 + 0x40)) == 0)
+         {
+            isTouch = false;
+            numberOfTouchPoint = 0;
+         }
+         else numberOfTouchPoint = GetSystemMetrics(SM_MAXIMUMTOUCHES);
+         return isTouch;
+      }
+      /// <summary>
       /// 获取当前计算机显示器的全屏幕快照。
       /// </summary>
       /// <param name="isCopyToClipboard">指示是否将获取的屏幕快照写入Windows剪贴板。</param>
       /// <returns>该操作会返回一个和显示器尺寸相同的Bitmap格式的屏幕快照。</returns>
-      public Bitmap GetScreenSnapshot(bool isCopyToClipboard) => GetScreenSnapshot(LTCoordinate, RBCoordinate, isCopyToClipboard);
+      public Bitmap Snap(bool isCopyToClipboard) => Snap(LTCoordinate, RBCoordinate, isCopyToClipboard);
       /// <summary>
       /// 获取当前计算机显示器的局部屏幕快照，该方法与显示设备没有太多关联，因此多个Monitor实例进行屏幕快照操作是一件没有意义的事情。
       /// </summary>
@@ -335,7 +362,7 @@ namespace Cabinink.Devices
       /// <param name="rbPoint">获取屏幕快照的右下角坐标。</param>
       /// <param name="isCopyToClipboard">指示是否将获取的屏幕快照写入Windows剪贴板。</param>
       /// <returns>该操作会返回一个指定区域的Bitmap格式的屏幕快照。</returns>
-      public Bitmap GetScreenSnapshot(ExPoint2D ltPoint, ExPoint2D rbPoint, bool isCopyToClipboard)
+      public Bitmap Snap(ExPoint2D ltPoint, ExPoint2D rbPoint, bool isCopyToClipboard)
       {
          if ((ltPoint == rbPoint) || (ltPoint.Equals(rbPoint))) throw new AggregateException("不允许面积为零的截图区域");
          Rectangle rect = System.Windows.Forms.SystemInformation.VirtualScreen;
@@ -410,7 +437,7 @@ namespace Cabinink.Devices
             for (int i = 0; i < 256; i++)
             {
                int arrayVal = i * (gamma + 128);
-               if (arrayVal > 65535) arrayVal = 65535;
+               if (arrayVal > ushort.MaxValue) arrayVal = ushort.MaxValue;
                *idx = (short)arrayVal;
                idx++;
             }
