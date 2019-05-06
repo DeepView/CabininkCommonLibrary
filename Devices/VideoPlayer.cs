@@ -192,6 +192,22 @@ namespace Cabinink.Devices
       /// </summary>
       public void StopWhenReady() => DirectXVideoInstance.StopWhenReady();
       /// <summary>
+      /// 增加1%的音量。
+      /// </summary>
+      public void IncreaseVolume()
+      {
+         if (Volume < 100) Volume++;
+         else Volume = 100;
+      }
+      /// <summary>
+      /// 降低1%的音量。
+      /// </summary>
+      public void ReduceVolume()
+      {
+         if (Volume > 0) Volume--;
+         else Volume = 0;
+      }
+      /// <summary>
       /// 在视频呈现容器中显示鼠标光标。
       /// </summary>
       public void ShowCursor() => DirectXVideoInstance.ShowCursor();

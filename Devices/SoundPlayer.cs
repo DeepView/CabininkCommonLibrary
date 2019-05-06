@@ -132,6 +132,22 @@ namespace Cabinink.Devices
       /// </summary>
       public void StopWhenReady() => DirectXAudioInstance.StopWhenReady();
       /// <summary>
+      /// 增加1%的音量。
+      /// </summary>
+      public void IncreaseVolume()
+      {
+         if (Volume < 100) Volume++;
+         else Volume = 100;
+      }
+      /// <summary>
+      /// 降低1%的音量。
+      /// </summary>
+      public void ReduceVolume()
+      {
+         if (Volume > 0) Volume--;
+         else Volume = 0;
+      }
+      /// <summary>
       /// 获取当前正在播放的媒体文件的声道偏移量。
       /// </summary>
       /// <returns>该操作会返回一个32位整数数值，这个数值如果为负数则表示为当前正在播放的媒体文件的音轨被设置为了左声道，正数为右声道，0为立体声。</returns>

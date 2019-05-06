@@ -144,7 +144,7 @@ namespace Cabinink.Devices
       public int DisplayFrequency;
    }
    /// <summary>
-   /// 计算机显示器表示类。
+   /// 计算机显示器表示类，该类不适合于多显示器设备。
    /// </summary>
    [Serializable]
    [ComVisible(true)]
@@ -278,8 +278,12 @@ namespace Cabinink.Devices
       public Monitor()
       {
          _thisComputer = new Computer();
-         _deviceContext = Graphics.FromHwnd(IntPtr.Zero).GetHdc().ToInt32();
+         _deviceContext = DeviceContext.ToInt32();
       }
+      /// <summary>
+      /// 获取当前显示设备的设备上下文。
+      /// </summary>
+      public IntPtr DeviceContext => Graphics.FromHwnd(IntPtr.Zero).GetHdc();
       /// <summary>
       /// 获取当前计算机显示器的高度。
       /// </summary>
@@ -336,7 +340,7 @@ namespace Cabinink.Devices
       /// 获取当前实例所对应的主显示器是否是触摸屏。
       /// </summary>
       /// <param name="numberOfTouchPoint">该参数会传出一个硬件能支持的触摸点的数量，如果硬件不支持触摸屏，则该参数值为0。</param>
-      /// <returns>该操作将会返回一个Boolean值，这个值用于表示当前设备是否支持触摸屏操作。</returns>
+      /// <returns>该操作将会返回一个Boolean值，这个值用于表示当前设备是否支持触摸屏操作，如果这个值为true，则表示该显示设备支持触摸操作，否则表示该设备不支持触摸操作，或者触摸设备被操作系统禁用或卸载，或者触摸设备已损坏或未检测到。</returns>
       public bool IsTouchScreen(out int numberOfTouchPoint)
       {
          bool isTouch = true;

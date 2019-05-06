@@ -36,5 +36,13 @@
       /// </summary>
       /// <param name="deviationAmount">设置音轨的偏移量，如果为负数则表示为左声道，正数为右声道，0为立体声。</param>
       void SetChannelDeviation(int deviationAmount);
+      /// <summary>
+      /// 向上增加1%的音量。
+      /// </summary>
+      void IncreaseVolume();
+      /// <summary>
+      /// 向下降低1%的音量。
+      /// </summary>
+      void ReduceVolume();
    }
 }

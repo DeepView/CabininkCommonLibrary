@@ -17,16 +17,16 @@ namespace Cabinink.Algorithm
       /// <param name="sortedList">需要被排序的32位整型数据。</param>
       public static void BubbleSort(ref List<int> sortedList)
       {
-         int temp, count = sortedList.Count;
-         for (int i = 0; i < count; ++i)
+         int tempValue;
+         for (int i = 0; i < sortedList.Count; ++i)
          {
-            for (int j = 0; j + 1 < count; ++j)
+            for (int j = 0; j + 1 < sortedList.Count; ++j)
             {
                if (sortedList[j] > sortedList[j + 1])
                {
-                  temp = sortedList[j];
+                  tempValue = sortedList[j];
                   sortedList[j] = sortedList[j + 1];
-                  sortedList[j + 1] = temp;
+                  sortedList[j + 1] = tempValue;
                }
             }
          }
@@ -35,12 +35,11 @@ namespace Cabinink.Algorithm
       /// 插入排序法。
       /// </summary>
       /// <param name="sortedList">需要被排序的32位整型数据。</param>
-      /// <param name="token">用于传播有关应取消操作的通知的令牌。</param>
-      public static void InsertionSort(ref List<int> sortedList, CancellationToken token)
+      public static void InsertionSort(ref List<int> sortedList)
       {
-         int currentLocation, currentValue, insertionLocation, count = sortedList.Count;
+         int currentLocation, currentValue, insertionLocation;
          sortedList.Insert(0, 0);
-         for (int location = 1; location < count + 1; ++location)
+         for (int location = 1; location < sortedList.Count; ++location)
          {
             currentLocation = location;
             insertionLocation = location - 1;
@@ -82,6 +81,57 @@ namespace Cabinink.Algorithm
             PivotSort(ref sortedList, begin, bound - 1, pivot);
             PivotSort(ref sortedList, bound + 1, last, pivot);
          }
+      }
+      /// <summary>
+      /// 选择排序法。
+      /// </summary>
+      /// <param name="sortedList">需要被排序的32位整型数据。</param>
+      public static void SelectionSort(ref List<int> sortedList)
+      {
+         for (int i = 0; i < sortedList.Count; i++)
+         {
+            int index = 1;
+            for (int j = i + 1; j < sortedList.Count; j++)
+            {
+               if (sortedList[j] < sortedList[index]) index = j;
+            }
+            if (index == i) continue;
+            else
+            {
+               int tempValue = sortedList[index];
+               sortedList[index] = sortedList[i];
+               sortedList[i] = tempValue;
+            }
+         }
+      }
+      /// <summary>
+      /// 希尔排序法。
+      /// </summary>
+      /// <param name="sortedList">需要被排序的32位整型数据。</param>
+      public static void ShellSort(ref List<int> sortedList)
+      {
+         int increasement = sortedList.Count;
+         do
+         {
+            increasement = increasement / 3 + 1;
+            for(int i= 0; i < increasement; i++)
+            {
+               for (int j = i + increasement; j < sortedList.Count; j += increasement)
+               {
+                  if (sortedList[j] < sortedList[j - increasement])
+                  {
+                     int temp = sortedList[j];
+                     int subLoopIncrement = 0;
+                     for (int k = j - increasement; k >= 0 && temp < sortedList[k]; k -= increasement)
+                     {
+                        subLoopIncrement = k;
+                        sortedList[k + increasement] = sortedList[k];
+                     }
+                     sortedList[subLoopIncrement + increasement] = temp;
+                  }
+               }
+            }
+         } while (increasement > 1);
       }
    }
 }
